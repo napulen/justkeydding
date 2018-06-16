@@ -1,4 +1,14 @@
-/* June 2018, Nestor Napoles */
+/* June 2018, Nestor Napoles 
+For now, the code is only reading a csv with the features already
+extracted (e.g., using nnls-chroma or essentia). This should be
+substituted in the future for the chromagram extraction done here.
+
+Some things to do:
+  * Embed chromagram computation from nnls
+  * Store the output in some data structure
+  * Implement a viterbi algorithm to find the best path
+  * Import the weights I computed in the symbolic version
+  * Generate a cool dataset to test this before submission */
 
 #include<iostream>
 #include<fstream>
