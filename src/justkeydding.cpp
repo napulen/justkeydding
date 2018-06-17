@@ -15,17 +15,21 @@ Some things to do:
 #include<sstream>
 #include<vector>
 #include<string>
+#include<array>
 
 #define RTRN_MISSING_ARG 1
 #define RTRN_FILE_ERROR 2
-
 
 #define PITCH_CLASSES 12
 
 struct entry{
     float time;
-    float magnitudes[12];
+    std::array<int, 12> magnitudes;
 };
+
+int getMagnitude(float magnitude){
+    return (int)magnitude;
+}
 
 /* For now, this function reads a csv with computed chromagram
    features and starts parsing that into a sequence of observa-
@@ -57,11 +61,15 @@ int main(int argc, char *argv[]) {
             if(!i){
                 x.time = std::stof(token);          
             } else{
-                x.magnitudes[i-1] = std::stof(token);
+                x.magnitudes[i-1] = getMagnitude(std::stof(token));
             }
             i++;
         }
-        rows.push_back(x);
+        if(rows.empty()){
+            rows.push_back(x);
+        } else if(x.magnitudes != rows.back().magnitudes){
+            rows.push_back(x);
+        }
     }
     for(std::vector<entry>::const_iterator it = rows.begin(); 
         it != rows.end(); it++) {
@@ -69,8 +77,8 @@ int main(int argc, char *argv[]) {
                   << std::endl << "\t";     
         for(int pc=0; pc < 12; pc++){
             int pcIndex = (3+pc) % PITCH_CLASSES;
-            float pcMagnitude = it->magnitudes[pcIndex];
-            std::cout << (pcMagnitude > 1.0) << " ";
+            int pcMagnitude = it->magnitudes[pcIndex];
+            std::cout << (int)pcMagnitude << " ";
         }
         std::cout << std::endl;
     }
