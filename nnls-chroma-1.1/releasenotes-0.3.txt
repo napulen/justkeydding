@@ -1,0 +1,23 @@
+NNLS Chroma 0.3 -- Release Notes
+
+General Description:
+
+A Vamp plugin library for harmony and chord extraction with some features aimed at amateur musicians, and some at music information retrieval researchers.
+It contains the Chordino, NNLS Chroma and Tuning plugins.
+For more information see README or http://isophonics.net/nnls-chroma
+
+Feature changes:
+
+in Chordino: 
+* added Log-Likelihood of Chord Estimate (based on the Viterbi path used for chord estimation),
+* added option for Chris Harte's chord syntax,
+* removed option for non-HMM chord estimation.
+
+in NNLS-Chroma: 
+* removed consonance output.
+
+Bug fixes:
+* renamed dim7 chord to half-diminished (m7b5 and :hdim7, respectively), and added the correct chord label to the diminished chord (was empty before, and hence treated as major chord).
+
+Other:
+* renamed: spectral roll-off parameter to Bass Noise Threshold (in response to Tim Crawfords comment, thanks!)

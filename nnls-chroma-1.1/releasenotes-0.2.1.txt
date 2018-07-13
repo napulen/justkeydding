@@ -1,0 +1,12 @@
+NNLS Chroma 0.2.1 -- Release Notes
+
+General Description:
+
+A Vamp plugin library for harmony and chord extraction with some features aimed at amateur musicians, and some at music information retrieval researchers.
+It contains the Chordino, NNLS Chroma and Tuning plugins.
+For more information see README or http://isophonics.net/nnls-chroma
+
+Bug fixes:
+
+* Spectral shape parameter now has an effect.
+* Removed bias towards consonance from consonance estimate.

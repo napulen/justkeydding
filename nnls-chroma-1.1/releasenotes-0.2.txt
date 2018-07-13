@@ -1,0 +1,25 @@
+NNLS Chroma 0.2 -- Release Notes
+
+General Description:
+
+A Vamp plugin library for harmony and chord extraction with some features aimed at amateur musicians, and some at music information retrieval researchers.
+It contains the Chordino, NNLS Chroma and Tuning plugins.
+For more information see README or http://isophonics.net/nnls-chroma
+
+New features: 
+
+Chordino:
+* The new MIDI note output of the estimated chords allows, for example, instant playback of chord notes in Sonic Visualiser.
+* new parameter "boost N": allows better recognition of the "no chord" label N (default setting is 0.1, previous Chordino version had no boost, i.e. 0.0).
+
+NNLS Chroma:
+* new output "Consonance Estimate". Experimental attempt to capture the tonal consonance in at a given time. Based on the convolution of a simple consonance profile with the semitone spectrum.
+
+Bug fixes:
+
+* Default chord dictionary loads when no chord.dict file found in Vamp path.
+* Corrected parameter range for spectral rollon parameter (Chordino).
+* Semitone Spectrum has values at zero energy frames (NNLS Chroma).
+* Crash with non-standard input resolved (now amplitude-limited).
+* minor internal fixes.
+
