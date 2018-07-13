@@ -68,5 +68,6 @@ Vagrant.configure("2") do |config|
     apt-get install -y build-essential
     apt-get install -y libboost-all-dev
     apt-get install -y vamp-plugin-sdk
+    apt-get install -y libsndfile1-dev
   SHELL
 end
