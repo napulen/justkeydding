@@ -44,3 +44,7 @@ nnls-chroma-1.1/chordextract
 
 # ignoring temporary csv outputs
 *.csv
+
+# ignoring build and bin folders
+build/
+bin/
