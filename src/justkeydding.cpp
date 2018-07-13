@@ -17,65 +17,91 @@ Some things to do:
 #include<string>
 #include<array>
 
+#define RTRN_OK 0
 #define RTRN_MISSING_ARG 1
 #define RTRN_FILE_ERROR 2
 
 #define PITCH_CLASSES 12
 
-struct entry{
+struct chromagram {
     float time;
     std::array<int, 12> magnitudes;
 };
 
-int getMagnitude(float magnitude) {
-    return static_cast<int>(magnitude);
-}
+char *programName;
 
-/* For now, this function reads a csv with computed chromagram
-   features and starts parsing that into a sequence of observa-
-   tion symbols for the HMM */
-int main(int argc, char *argv[]) {
-    // Parsing args
-    if (argc != 2) {
-        std::cout << "Missing an argument"
-                  << std::endl << argv[0]
-                  << "<input_file>" << std::endl;
-        // TODO(napulen): Add a proper argparse and help
-        return RTRN_MISSING_ARG;
-    }
-    // Reading the csv
+int getChromagram(char *audioFile, std::vector<chromagram> *chromagrams) {
     std::ifstream infile;
-    infile.open(argv[1]);
+    infile.open(audioFile);
     if (!infile.is_open()) {
-        std::cout << "Couldn't open your file." << std::endl;
         return RTRN_FILE_ERROR;
     }
     std::string line;
-    std::vector<entry> rows;
     while ( std::getline(infile, line) ) {
         std::istringstream sstr(line);
         std::string token;
         int i = 0;
-        struct entry x;
+        struct chromagram chr;
         while ( std::getline(sstr, token, ',') ) {
             if (!i) {
-                x.time = std::stof(token);
+                chr.time = std::stof(token);
             } else {
-                x.magnitudes[i-1] = getMagnitude(std::stof(token));
+                chr.magnitudes[i-1] = std::stof(token);
             }
             i++;
         }
-        if (rows.empty()) {
-            rows.push_back(x);
-        } else if (x.magnitudes != rows.back().magnitudes) {
-            rows.push_back(x);
-        }
+        chromagrams->push_back(chr);
     }
-    for (std::vector<entry>::const_iterator it = rows.begin();
-            it != rows.end(); it++) {
+    infile.close();
+    return RTRN_OK;
+}
+
+int getMagnitude(float magnitude) {
+    // This function determines how to "discretize"
+    // the magnitude of a pitch-class in the chromagram
+    return static_cast<int>(magnitude);
+}
+
+void logError(int status) {
+    std::string msg;
+    switch (status) {
+        case RTRN_MISSING_ARG:
+            msg = "Missing an argument.";
+            break;
+        case RTRN_FILE_ERROR:
+            msg = "Couldn't open your file.";
+            break;
+        default:
+        msg = "There was an error running the program.";
+    }
+    msg += "\n\nUsage:\n" + std::string(programName) + " <input_file>\n";
+    std::cerr << "Error " << status << ": " << msg << std::endl;
+}
+
+int main(int argc, char *argv[]) {
+    // Parsing args
+    int status;
+    // This should always exist, right?
+    programName = argv[0];
+    if (argc != 2) {
+        // TODO(napulen): Add a proper argparse and help
+        status = RTRN_MISSING_ARG;
+        logError(status);
+        return status;
+    }
+    std::vector<chromagram> chromagrams;
+    if ((status = getChromagram(argv[1], &chromagrams)) != RTRN_OK) {
+        logError(status);
+        return status;
+    }
+    for (std::vector<chromagram>::const_iterator it = chromagrams.begin();
+         it != chromagrams.end();
+         it++) {
         std::cout << it->time << ":"
                   << std::endl << "\t";
         for (int pc=0; pc < 12; pc++) {
+            // The original order of the chromagram
+            // pitch-classes is A-G#, we want it to be C-B
             int pcIndex = (3+pc) % PITCH_CLASSES;
             int pcMagnitude = it->magnitudes[pcIndex];
             std::cout << static_cast<int>(pcMagnitude) << " ";
