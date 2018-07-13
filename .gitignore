@@ -37,3 +37,10 @@
 # nnls binaries
 nnls-chroma-1.1/chromaextract
 nnls-chroma-1.1/chordextract
+
+# ignoring audio files
+*.mp3
+*.wav
+
+# ignoring temporary csv outputs
+*.csv
