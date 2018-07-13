@@ -66,5 +66,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     apt-get update
     apt-get install -y build-essential
+    apt-get install -y libboost-all-dev
+    apt-get install -y vamp-plugin-sdk
   SHELL
 end
