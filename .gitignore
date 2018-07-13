@@ -33,3 +33,7 @@
 
 # Vagrant
 .vagrant
+
+# nnls binaries
+nnls-chroma-1.1/chromaextract
+nnls-chroma-1.1/chordextract
