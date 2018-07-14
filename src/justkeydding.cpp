@@ -146,13 +146,11 @@ int main(int argc, char *argv[]) {
         logError(status);
         return status;
     }
-    printChromagram(chromagrams);
     // "Normalizing" the chromagrams
     if ((status = normalizeChromagrams(&chromagrams)) != STATUS_OK) {
         logError(status);
         return status;
     }
-    printChromagram(chromagrams);
     pitchClassSequence pcSequence;
     // Turning the chromagrams into a sequence of pitch-classes
     if ((status = getPitchClassSequence(chromagrams,
