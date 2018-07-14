@@ -93,7 +93,7 @@ int getPitchClassSequence(const chromagramVector &chromagrams,
             int pcMagnitude = static_cast<int>(it->magnitudes[pc]);
             if (pcMagnitude) {
                 for (int n=0; n < pcMagnitude; n++) {
-                    pcSeq->push_back(n);
+                    pcSeq->push_back(pc);
                 }
             }
         }
@@ -112,6 +112,15 @@ int printChromagram(const chromagramVector &chromagrams) {
         }
         std::cout << it->magnitudes[pc] << std::endl;
     }
+}
+
+int printPitchClassSequence(const pitchClassSequence &pcSeq) {
+    for (pitchClassSequence::const_iterator it = pcSeq.begin();
+         it != pcSeq.end();
+         it++) {
+        std::cout << *it << ",";
+    }
+    std::cout << std::endl;
 }
 
 void logError(int status) {
@@ -158,5 +167,6 @@ int main(int argc, char *argv[]) {
         logError(status);
         return status;
     }
+    printPitchClassSequence(pcSequence);
     return STATUS_OK;
 }
