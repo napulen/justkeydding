@@ -17,24 +17,26 @@ Some things to do:
 #include<string>
 #include<array>
 
-#define RTRN_OK 0
-#define RTRN_MISSING_ARG 1
-#define RTRN_FILE_ERROR 2
+enum status {
+    STATUS_OK,
+    STATUS_MISSING_ARG,
+    STATUS_FILE_ERROR
+};
 
 #define PITCH_CLASSES 12
+
+char *programName;
 
 struct chromagram {
     float time;
     std::array<int, 12> magnitudes;
 };
 
-char *programName;
-
-int getChromagram(char *audioFile, std::vector<chromagram> *chromagrams) {
+int getChromagrams(char *audioFile, std::vector<chromagram> *chromagrams) {
     std::ifstream infile;
     infile.open(audioFile);
     if (!infile.is_open()) {
-        return RTRN_FILE_ERROR;
+        return STATUS_FILE_ERROR;
     }
     std::string line;
     while ( std::getline(infile, line) ) {
@@ -53,7 +55,7 @@ int getChromagram(char *audioFile, std::vector<chromagram> *chromagrams) {
         chromagrams->push_back(chr);
     }
     infile.close();
-    return RTRN_OK;
+    return STATUS_OK;
 }
 
 int getMagnitude(float magnitude) {
@@ -65,10 +67,10 @@ int getMagnitude(float magnitude) {
 void logError(int status) {
     std::string msg;
     switch (status) {
-        case RTRN_MISSING_ARG:
+        case STATUS_MISSING_ARG:
             msg = "Missing an argument.";
             break;
-        case RTRN_FILE_ERROR:
+        case STATUS_FILE_ERROR:
             msg = "Couldn't open your file.";
             break;
         default:
@@ -85,12 +87,12 @@ int main(int argc, char *argv[]) {
     programName = argv[0];
     if (argc != 2) {
         // TODO(napulen): Add a proper argparse and help
-        status = RTRN_MISSING_ARG;
+        status = STATUS_MISSING_ARG;
         logError(status);
         return status;
     }
     std::vector<chromagram> chromagrams;
-    if ((status = getChromagram(argv[1], &chromagrams)) != RTRN_OK) {
+    if ((status = getChromagrams(argv[1], &chromagrams)) != STATUS_OK) {
         logError(status);
         return status;
     }
