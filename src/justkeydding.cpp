@@ -33,6 +33,7 @@ struct chromagram {
 };
 
 typedef std::vector<chromagram> chromagramVector;
+typedef std::vector<int> pitchClassSequence;
 
 char *programName;
 
@@ -52,7 +53,10 @@ int getChromagrams(char *audioFile, chromagramVector *chromagrams) {
             if (!i) {
                 chr.time = std::stof(token);
             } else {
-                chr.magnitudes[i-1] = std::stof(token);
+                // NNLS orders chromagrams from A-G#
+                // we want to store them as C-B instead
+                int pcIndex = (3 + (i-1)) % PITCH_CLASSES;
+                chr.magnitudes[pcIndex] = std::stof(token);
             }
             i++;
         }
@@ -62,30 +66,52 @@ int getChromagrams(char *audioFile, chromagramVector *chromagrams) {
     return STATUS_OK;
 }
 
-int preprocessChromagrams(chromagramVector *chromagrams) {
-    for (chromagramVector::const_iterator it = chromagrams->begin();
+int normalizeChromagrams(chromagramVector *chromagrams) {
+    // For now, as a normalization, we just get the integer
+    // value of the magnitude and discard the rest
+    for (chromagramVector::iterator it = chromagrams->begin();
          it != chromagrams->end();
+         it++) {
+        for (int pc=0; pc < 12; pc++) {
+            int pcMagnitude = static_cast<int>(it->magnitudes[pc]);
+            it->magnitudes[pc] = static_cast<float>(pcMagnitude);
+        }
+    }
+    return STATUS_OK;
+}
+
+int getPitchClassSequence(const chromagramVector &chromagrams,
+    pitchClassSequence *pcSeq) {
+    for (chromagramVector::const_iterator it = chromagrams.begin();
+         it != chromagrams.end();
          it++) {
         if (it->magnitudes == (it+1)->magnitudes) {
             // Remove duplicates
             continue;
         }
         for (int pc=0; pc < 12; pc++) {
-            // The original order of the chromagram
-            // pitch-classes is A-G#, we want it to be C-B
-            int pcIndex = (3+pc) % PITCH_CLASSES;
-            float pcMagnitude = it->magnitudes[pcIndex];
-            std::cout << pcMagnitude << " ";
+            int pcMagnitude = static_cast<int>(it->magnitudes[pc]);
+            if (pcMagnitude) {
+                for (int n=0; n < pcMagnitude; n++) {
+                    pcSeq->push_back(n);
+                }
+            }
         }
-        std::cout << std::endl;
     }
     return STATUS_OK;
 }
 
-int getMagnitude(float magnitude) {
-    // This function determines how to "discretize"
-    // the magnitude of a pitch-class in the chromagram
-    return static_cast<int>(magnitude);
+int printChromagram(const chromagramVector &chromagrams) {
+    for (chromagramVector::const_iterator it = chromagrams.begin();
+         it != chromagrams.end();
+         it++) {
+        int pc;
+        std::cout << it->time << ", ";
+        for (pc=0; pc < 11; pc++) {
+            std::cout << it->magnitudes[pc] << ", ";
+        }
+        std::cout << it->magnitudes[pc] << std::endl;
+    }
 }
 
 void logError(int status) {
@@ -120,8 +146,17 @@ int main(int argc, char *argv[]) {
         logError(status);
         return status;
     }
-    // Any pre-processing before "discretizing"
-    if ((status = preprocessChromagrams(&chromagrams)) != STATUS_OK) {
+    printChromagram(chromagrams);
+    // "Normalizing" the chromagrams
+    if ((status = normalizeChromagrams(&chromagrams)) != STATUS_OK) {
+        logError(status);
+        return status;
+    }
+    printChromagram(chromagrams);
+    pitchClassSequence pcSequence;
+    // Turning the chromagrams into a sequence of pitch-classes
+    if ((status = getPitchClassSequence(chromagrams,
+        &pcSequence)) != STATUS_OK) {
         logError(status);
         return status;
     }
