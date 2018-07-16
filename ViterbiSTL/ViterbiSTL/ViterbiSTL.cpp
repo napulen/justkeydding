@@ -4,8 +4,6 @@
 
 // It as accurate implementation as it was possible
 
-#include "stdafx.h"
-
 #include "string"
 #include "vector"
 #include "map"
@@ -32,8 +30,8 @@ using namespace std;
 vector<string> states;
 vector<string> observations;
 map<string,double> start_probability;
-map<string,map<string, double>> transition_probability;
-map<string,map<string, double>> emission_probability;
+map<string,map<string, double> > transition_probability;
+map<string,map<string, double> > emission_probability;
 
 class Tracking {
 public:
@@ -103,7 +101,7 @@ void print_variables(void) {
 
   // print transition_probability
   cout << "Transition probabilities:" << endl;
-  for(map<string,map<string, double>>::iterator i=transition_probability.begin();i!=transition_probability.end();i++) {
+  for(map<string,map<string, double> >::iterator i=transition_probability.begin();i!=transition_probability.end();i++) {
     for(map<string, double>::iterator j=(*i).second.begin();j!=(*i).second.end();j++) {
       cout << "FS: " << (*i).first << " TS: " << (*j).first << " P: " << (*j).second << endl;
     }
@@ -122,8 +120,8 @@ void print_variables(void) {
 //this method compute total probability for observation, most likely viterbi path 
 //and probability of such path
 void forward_viterbi(vector<string> obs, vector<string> states, map<string, double> start_p, 
-                     map<string, map<string, double>> trans_p, 
-                     map<string, map<string, double>> emit_p) {
+                     map<string, map<string, double> > trans_p, 
+                     map<string, map<string, double> > emit_p) {
   map<string, Tracking> T;
 
   for(vector<string>::iterator state=states.begin(); state!=states.end();state++) {
@@ -183,7 +181,7 @@ void forward_viterbi(vector<string> obs, vector<string> states, map<string, doub
   }
 }
 
-int _tmain(int argc, _TCHAR* argv[])
+int main(int argc, char* argv[])
 {
   cout << "Viterbi STL example" << endl;
   
