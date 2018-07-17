@@ -28,13 +28,13 @@ SOFTWARE.
 #include<array>
 #include<iostream>
 
-#include "key_profiles.hpp"
+#include "key_transitions.hpp"
 
 int main(int argc, char *argv[]) {
     // TODO(napulen): Complete some actual unit tests
-    const hmm::key_profile kp =
-        hmm::normalized_key_profiles.sapp;
-    for (int i = 0; i < 12; i++) {
-        std::cout << kp.major[i] << std::endl;
+    const hmm::key_transition kt =
+        hmm::all_key_transitions.linear;
+    for (int i = 0; i < 24; i++) {
+        std::cout << kt.all_keys[i] << std::endl;
     }
 }
