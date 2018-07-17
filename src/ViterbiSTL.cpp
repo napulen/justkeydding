@@ -31,6 +31,8 @@ SOFTWARE.
 #include<map>
 #include<iostream>
 
+namespace hmm {
+
 std::vector<std::string> states;
 std::vector<int> observations;
 std::map<std::string, double> start_probability;
@@ -189,18 +191,20 @@ void forward_viterbi(std::vector<int> obs,
   }
 }
 
+}  // namespace hmm
+
 int main(int argc, char* argv[]) {
   std::cout << "Viterbi STL example" << std::endl;
 
-  init_variables();
-  print_variables();
+  hmm::init_variables();
+  hmm::print_variables();
 
-  forward_viterbi(
-    observations,
-    states,
-    start_probability,
-    transition_probability,
-    emission_probability);
+  hmm::forward_viterbi(
+    hmm::observations,
+    hmm::states,
+    hmm::start_probability,
+    hmm::transition_probability,
+    hmm::emission_probability);
 
   std::cout << "End" << std::endl;
 
@@ -209,4 +213,3 @@ int main(int argc, char* argv[]) {
 
   return 0;
 }
-
