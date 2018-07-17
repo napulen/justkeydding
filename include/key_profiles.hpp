@@ -34,11 +34,11 @@ SOFTWARE.
 
 namespace hmm {
 
-#define PITCH_CLASSES 12
+#define NUMBER_OF_PITCH_CLASSES 12
 
 struct key_profile {
-    double major[PITCH_CLASSES];
-    double minor[PITCH_CLASSES];
+    double major[NUMBER_OF_PITCH_CLASSES];
+    double minor[NUMBER_OF_PITCH_CLASSES];
 };
 
 struct key_profile_collection {
