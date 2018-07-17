@@ -163,7 +163,6 @@ void forward_viterbi(std::vector<int> obs,
 
       U[*next_state] = next_tracker;
     }
-
     T = U;
   }
 
