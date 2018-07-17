@@ -1,42 +1,28 @@
-// ViterbiSTL.cpp : is an C++ and STL implementatiton of the Wikipedia example
+/*
+Copyright Néstor Nápoles 2018
 
-// Wikipedia: http://en.wikipedia.org/wiki/Viterbi_algorithm#A_concrete_example
+Viterbi algorithm implementation for key detection
 
-// It as accurate implementation as it was possible
+Adapted from Filip Jurcicek's implementation of the
+viterbi algorithm:
+http://bozskyfilip.blogspot.com/2009/01/viterbi-algorithm-in-c-and-using-stl.html 
+*/
 
-#include "string"
-#include "vector"
-#include "map"
-#include "iostream"
+#include<string>
+#include<vector>
+#include<map>
+#include<iostream>
 
-using namespace std;
-
-//states = ('Rainy', 'Sunny')
-// 
-//observations = ('walk', 'shop', 'clean')
-// 
-//start_probability = {'Rainy': 0.6, 'Sunny': 0.4}
-// 
-//transition_probability = {
-//   'Rainy' : {'Rainy': 0.7, 'Sunny': 0.3},
-//   'Sunny' : {'Rainy': 0.4, 'Sunny': 0.6},
-//   }
-// 
-//emission_probability = {
-//   'Rainy' : {'walk': 0.1, 'shop': 0.4, 'clean': 0.5},
-//   'Sunny' : {'walk': 0.6, 'shop': 0.3, 'clean': 0.1},
-//   }
-
-vector<string> states;
-vector<string> observations;
-map<string,double> start_probability;
-map<string,map<string, double> > transition_probability;
-map<string,map<string, double> > emission_probability;
+std::vector<std::string> states;
+std::vector<int> observations;
+std::map<std::string, double> start_probability;
+std::map<std::string, std::map<std::string, double> > transition_probability;
+std::map<std::string, std::map<int, double> > emission_probability;
 
 class Tracking {
-public:
+ public:
   double prob;
-  vector<string> v_path;
+  std::vector<std::string> v_path;
   double v_prob;
 
   Tracking() {
@@ -44,109 +30,113 @@ public:
     v_prob = 0.0;
   }
 
-  Tracking(double p, vector<string> & v_pth, double v_p) {
+  Tracking(double p, const std::vector<std::string> & v_pth, double v_p) {
     prob = p;
     v_path = v_pth;
     v_prob = v_p;
   }
 };
 
-//////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
-
 void init_variables(void) {
-  states.push_back("Rainy");
-	states.push_back("Sunny");
+  states.push_back("C");
+  states.push_back("c");
 
-  observations.push_back("walk");
-  observations.push_back("shop");
-  observations.push_back("clean");
+  observations.push_back(0);
+  observations.push_back(3);
+  observations.push_back(7);
 
-  start_probability["Rainy"] = 0.6;
-  start_probability["Sunny"] = 0.4;
+  start_probability["C"] = 0.5;
+  start_probability["c"] = 0.5;
 
-  transition_probability["Rainy"]["Rainy"] = 0.7;
-  transition_probability["Rainy"]["Sunny"] = 0.3;
-  transition_probability["Sunny"]["Rainy"] = 0.4;
-  transition_probability["Sunny"]["Sunny"] = 0.6;
+  transition_probability["C"]["C"] = 0.66;
+  transition_probability["C"]["c"] = 0.33;
+  transition_probability["c"]["C"] = 0.33;
+  transition_probability["c"]["c"] = 0.66;
 
-  emission_probability["Rainy"]["walk"] = 0.1;
-  emission_probability["Rainy"]["shop"] = 0.4;
-  emission_probability["Rainy"]["clean"] = 0.5;
-  emission_probability["Sunny"]["walk"] = 0.6;
-  emission_probability["Sunny"]["shop"] = 0.3;
-  emission_probability["Sunny"]["clean"] = 0.1;
+  emission_probability["C"][0] = (1.0/9)*2;
+  emission_probability["C"][3] = 0.0;
+  emission_probability["C"][7] = (1.0/9)*2;
+  emission_probability["c"][0] = (1.0/9)*2;
+  emission_probability["c"][3] = (1.0/9);
+  emission_probability["c"][7] = (1.0/9)*2;
 }
-
-//////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
 
 void print_variables(void) {
   // print states
-  cout << "States:" << endl;
-  for(vector<string>::iterator i=states.begin();i!=states.end();i++) {
-    cout << "S: " << (*i) << endl;
+  std::cout << "States:" << std::endl;
+  for (std::vector<std::string>::iterator i=states.begin();
+    i != states.end(); i++) {
+    std::cout << "S: " << (*i) << std::endl;
   }
   // print observations
-  cout << "Observations:" << endl;
-  for(vector<string>::iterator i=observations.begin();i!=observations.end();i++) {
-    cout << "O: " << (*i) << endl;
+  std::cout << "Observations:" << std::endl;
+  for (std::vector<int>::iterator i=observations.begin();
+      i != observations.end(); i++) {
+    std::cout << "O: " << (*i) << std::endl;
   }
 
   // print start probabilities
-  cout << "Start probabilities:" << endl;
-  for(map<string, double>::iterator i=start_probability.begin();i!=start_probability.end();i++) {
-    cout << "S: " << (*i).first << " P: " << (*i).second << endl;
+  std::cout << "Start probabilities:" << std::endl;
+  for (std::map<std::string, double>::iterator i=start_probability.begin();
+      i != start_probability.end(); i++) {
+    std::cout << "S: " << (*i).first << " P: " << (*i).second << std::endl;
   }
 
   // print transition_probability
-  cout << "Transition probabilities:" << endl;
-  for(map<string,map<string, double> >::iterator i=transition_probability.begin();i!=transition_probability.end();i++) {
-    for(map<string, double>::iterator j=(*i).second.begin();j!=(*i).second.end();j++) {
-      cout << "FS: " << (*i).first << " TS: " << (*j).first << " P: " << (*j).second << endl;
+  std::cout << "Transition probabilities:" << std::endl;
+  for (std::map<std::string, std::map<std::string, double> >::iterator i =
+      transition_probability.begin(); i != transition_probability.end(); i++) {
+    for (std::map<std::string, double>::iterator j = (*i).second.begin();
+        j != (*i).second.end(); j++) {
+      std::cout << "FS: " << (*i).first << " TS: " <<
+      (*j).first << " P: " << (*j).second << std::endl;
     }
   }
 
   // print emission probabilities
-  cout << "Emission probabilities:" << endl;
-  for(int i=0; i<states.size(); i++) {
-    for(int j=0; j<observations.size(); j++) {
-      cout << "FS: " << states[i] << " TO: " << observations[j] <<
-        " P: " << emission_probability[states[i]][observations[j]] << endl;
+  std::cout << "Emission probabilities:" << std::endl;
+  for (int i=0; i < states.size(); i++) {
+    for (int j=0; j < observations.size(); j++) {
+      std::cout << "FS: " << states[i] << " TO: " << observations[j] <<
+        " P: " << emission_probability[states[i]][observations[j]] << std::endl;
     }
   }
 }
 
-//this method compute total probability for observation, most likely viterbi path 
-//and probability of such path
-void forward_viterbi(vector<string> obs, vector<string> states, map<string, double> start_p, 
-                     map<string, map<string, double> > trans_p, 
-                     map<string, map<string, double> > emit_p) {
-  map<string, Tracking> T;
+void forward_viterbi(std::vector<int> obs,
+    std::vector<std::string> states,
+    std::map<std::string, double> start_p,
+    std::map<std::string, std::map<std::string, double> > trans_p,
+    std::map<std::string, std::map<int, double> > emit_p) {
+  std::map<std::string, Tracking> T;
 
-  for(vector<string>::iterator state=states.begin(); state!=states.end();state++) {
-    vector<string> v_pth;
+  for (std::vector<std::string>::iterator state=states.begin();
+      state != states.end(); state++) {
+    std::vector<std::string> v_pth;
     v_pth.push_back(*state);
-
     T[*state] = Tracking(start_p[*state], v_pth, start_p[*state]);
   }
 
-  for(vector<string>::iterator output=obs.begin(); output!=obs.end();output++) {
-    map<string, Tracking> U;
+  for (std::vector<int>::iterator output=obs.begin();
+      output != obs.end(); output++) {
+    std::map<std::string, Tracking> U;
 
-    for(vector<string>::iterator next_state=states.begin(); next_state!=states.end(); next_state++) {
+    for (std::vector<std::string>::iterator next_state=states.begin();
+        next_state != states.end(); next_state++) {
       Tracking next_tracker;
 
-      for(vector<string>::iterator source_state=states.begin(); source_state!=states.end(); source_state++) {
+      for (std::vector<std::string>::iterator source_state=states.begin();
+      source_state != states.end(); source_state++) {
         Tracking source_tracker = T[*source_state];
 
-        double p = emit_p[*source_state][*output]*trans_p[*source_state][*next_state];
+        double p = emit_p[*source_state][*output] *
+            trans_p[*source_state][*next_state];
         source_tracker.prob *= p;
         source_tracker.v_prob *= p;
 
         next_tracker.prob += source_tracker.prob;
 
-        if(source_tracker.v_prob > next_tracker.v_prob) {
+        if (source_tracker.v_prob > next_tracker.v_prob) {
           next_tracker.v_path = source_tracker.v_path;
           next_tracker.v_path.push_back(*next_state);
           next_tracker.v_prob = source_tracker.v_prob;
@@ -159,45 +149,46 @@ void forward_viterbi(vector<string> obs, vector<string> states, map<string, doub
     T = U;
   }
 
-  // apply sum/max to the final states
   Tracking final_tracker;
 
-  for(vector<string>::iterator state=states.begin(); state!=states.end(); state++) {
+  for (std::vector<std::string>::iterator state=states.begin();
+  state != states.end(); state++) {
     Tracking tracker = T[*state];
-
     final_tracker.prob += tracker.prob;
-
-    if(tracker.v_prob > final_tracker.v_prob) {
+    if (tracker.v_prob > final_tracker.v_prob) {
       final_tracker.v_path = tracker.v_path;
       final_tracker.v_prob = tracker.v_prob;
     }
   }
 
-  cout << "Total probability of the observation sequence: " << final_tracker.prob << endl;
-  cout << "Probability of the Viterbi path: " << final_tracker.v_prob << endl;
-  cout << "The Viterbi path: " << endl;
-  for(vector<string>::iterator state=final_tracker.v_path.begin(); state!=final_tracker.v_path.end(); state++) {
-    cout << "VState: " << *state << endl;
+  std::cout << "Total probability of the observation sequence: "
+       << final_tracker.prob << std::endl;
+  std::cout << "Probability of the Viterbi path: "
+       << final_tracker.v_prob << std::endl;
+  std::cout << "The Viterbi path: " << std::endl;
+  for (std::vector<std::string>::iterator state=final_tracker.v_path.begin();
+  state != final_tracker.v_path.end(); state++) {
+    std::cout << "VState: " << *state << std::endl;
   }
 }
 
-int main(int argc, char* argv[])
-{
-  cout << "Viterbi STL example" << endl;
-  
+int main(int argc, char* argv[]) {
+  std::cout << "Viterbi STL example" << std::endl;
+
   init_variables();
   print_variables();
 
-  forward_viterbi(observations, 
-                  states, 
-                  start_probability, 
-                  transition_probability, 
-                  emission_probability);
+  forward_viterbi(
+    observations,
+    states,
+    start_probability,
+    transition_probability,
+    emission_probability);
 
-	cout << "End" << endl;
+  std::cout << "End" << std::endl;
 
-  string end;
-  cin >> end;
+  std::string end;
+  std::cin >> end;
 
   return 0;
 }
