@@ -32,10 +32,10 @@ namespace hmm {
 #define NUMBER_OF_KEYS 24
 
 struct key_transition {
-    double all_keys[NUMBER_OF_KEYS];
+    double array[NUMBER_OF_KEYS];
 };
 
-struct all_transitions {
+struct key_transition_collection {
     struct key_transition linear;
     struct key_transition exponential_2;
     struct key_transition exponential_10;
@@ -43,9 +43,9 @@ struct all_transitions {
     struct key_transition heatmap;
 };
 
-const struct all_transitions all_key_transitions = {
+const struct key_transition_collection key_transitions = {
     .linear = {
-        .all_keys = {
+        .array = {
             9.0/132, 4.0/132, 6.0/132, 6.0/132, 5.0/132, 8.0/132,
             1.0/132, 8.0/132, 5.0/132, 6.0/132, 6.0/132, 4.0/132,
             8.0/132, 2.0/132, 7.0/132, 3.0/132, 7.0/132, 7.0/132,
@@ -53,7 +53,7 @@ const struct all_transitions all_key_transitions = {
         }
     },
     .exponential_2 = {
-        .all_keys = {
+        .array = {
             256.0/1245, 8.0/1245, 32.0/1245, 32.0/1245, 16.0/1245, 128.0/1245,
             1.0/1245, 128.0/1245, 16.0/1245, 32.0/1245, 32.0/1245, 8.0/1245,
             128.0/1245, 2.0/1245, 64.0/1245, 4.0/1245, 64.0/1245, 64.0/1245,
@@ -61,7 +61,7 @@ const struct all_transitions all_key_transitions = {
         }
     },
     .exponential_10 = {
-        .all_keys = {
+        .array = {
             100000000.0/144442221, 1000.0/144442221, 100000.0/144442221,
             100000.0/144442221, 10000.0/144442221, 10000000.0/144442221,
             1.0/144442221, 10000000.0/144442221, 10000.0/144442221,
@@ -73,13 +73,13 @@ const struct all_transitions all_key_transitions = {
         }
     },
     .zero = {
-        .all_keys = {
+        .array = {
             1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
         }
     },
     .heatmap = {
-        .all_keys = {
+        .array = {
             1.0, 6.0, 4.0, 4.0, 5.0, 2.0, 9.0, 2.0, 5.0, 4.0, 4.0, 6.0,
             2.0, 8.0, 3.0, 7.0, 3.0, 3.0, 7.0, 3.0, 8.0, 2.0, 5.0, 5.0
         }

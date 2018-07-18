@@ -33,8 +33,8 @@ SOFTWARE.
 int main(int argc, char *argv[]) {
     // TODO(napulen): Complete some actual unit tests
     const hmm::key_transition kt =
-        hmm::all_key_transitions.linear;
+        hmm::key_transitions.linear;
     for (int i = 0; i < 24; i++) {
-        std::cout << kt.all_keys[i] << std::endl;
+        std::cout << kt.array[i] << std::endl;
     }
 }
