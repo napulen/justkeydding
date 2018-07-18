@@ -32,9 +32,15 @@ SOFTWARE.
 
 int main(int argc, char *argv[]) {
     // TODO(napulen): Complete some actual unit tests
-    const hmm::key_profile kp =
-        hmm::normalized_key_profiles.sapp;
-    for (int i = 0; i < 12; i++) {
-        std::cout << kp.major[i] << std::endl;
+    justkeydding::KeyProfile kp("sapp");
+    justkeydding::KeyProfile::KeyProfileArray kpMajor;
+    justkeydding::KeyProfile::KeyProfileArray kpMinor;
+    kpMajor = kp.getMajorKeyProfile();
+    kpMinor = kp.getMinorKeyProfile();
+    for (int i=0; i < kpMajor.size(); i++) {
+        std::cout << kp.whichMajorKeyProfile()
+                << " " << kp.whichMinorKeyProfile()
+                << " " << kpMajor[i]
+                << " " << kpMinor[i] << std::endl;
     }
 }
