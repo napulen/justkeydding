@@ -28,7 +28,7 @@ SOFTWARE.
 #include<string>
 #include<array>
 
-#include "./keytransitions.h"
+#include "./keytransition.h"
 
 namespace justkeydding {
 

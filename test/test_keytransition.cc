@@ -28,7 +28,7 @@ SOFTWARE.
 #include<array>
 #include<iostream>
 
-#include "./keytransitions.h"
+#include "./keytransition.h"
 
 int main(int argc, char *argv[]) {
     // TODO(napulen): Complete some actual unit tests
