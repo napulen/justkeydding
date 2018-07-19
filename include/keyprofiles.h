@@ -39,21 +39,21 @@ class KeyProfile {
  public:
     KeyProfile();
     explicit KeyProfile(std::string keyProfile);
-    explicit KeyProfile(std::string majorKeyProfile,
-            std::string minorKeyProfile);
+    explicit KeyProfile(std::string majKeyProfile, std::string minKeyProfile);
     typedef std::array<double, NUMBER_OF_PITCH_CLASSES> KeyProfileArray;
+    bool isValidMajorKeyProfile(std::string keyProfile);
+    bool isValidMinorKeyProfile(std::string keyProfile);
     std::string whichMajorKeyProfile();
     std::string whichMinorKeyProfile();
     KeyProfileArray getMajorKeyProfile();
     KeyProfileArray getMinorKeyProfile();
 
  private:
-    int m_status;
     std::string m_majorKeyProfile;
     std::string m_minorKeyProfile;
     std::map<std::string, KeyProfileArray> m_majorKeyProfiles;
     std::map<std::string, KeyProfileArray> m_minorKeyProfiles;
-    int init();
+    void initKeyProfileArrays();
 };
 
 }  // namespace justkeydding
