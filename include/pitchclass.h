@@ -63,7 +63,7 @@ class PitchClass {
         PITCHCLASS_B_FLAT = 10,
         PITCHCLASS_B_NATURAL,
         PITCHCLASS_C_FLAT = 11,
-        PITCHCLASS_NUMBER
+        NUMBER_OF_PITCHCLASSES
     };
 
  private:

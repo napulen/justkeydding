@@ -48,7 +48,7 @@ PitchClass::PitchClass(std::string pitchClass) {
 
 PitchClass::PitchClass(int pitchClass) {
     initPitchClassMaps();
-    if (pitchClass >= 0 && pitchClass < PITCHCLASS_NUMBER) {
+    if (pitchClass >= 0 && pitchClass < NUMBER_OF_PITCHCLASSES) {
         m_pitchClass = pitchClass;
         m_pitchClassString = m_intToStringMap.at(m_pitchClass);
     }
