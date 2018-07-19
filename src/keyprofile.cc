@@ -29,7 +29,7 @@ SOFTWARE.
 #include<string>
 #include<array>
 
-#include "./keyprofiles.h"
+#include "./keyprofile.h"
 
 namespace justkeydding {
 
