@@ -24,8 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR sOTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef INCLUDE_HMM_HPP_
-#define INCLUDE_HMM_HPP_
+#ifndef INCLUDE_HMM_H_
+#define INCLUDE_HMM_H_
 
 #include<string>
 #include<map>
@@ -34,4 +34,4 @@ namespace hmm {
 
 }  // namespace hmm
 
-#endif  // INCLUDE_HMM_HPP_
+#endif  // INCLUDE_HMM_H_

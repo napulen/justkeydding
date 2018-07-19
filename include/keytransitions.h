@@ -24,8 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR sOTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef INCLUDE_KEY_TRANSITIONS_HPP_
-#define INCLUDE_KEY_TRANSITIONS_HPP_
+#ifndef INCLUDE_KEYTRANSITIONS_H_
+#define INCLUDE_KEYTRANSITIONS_H_
 
 namespace hmm {
 
@@ -88,4 +88,4 @@ const struct key_transition_collection key_transitions = {
 
 }  // namespace hmm
 
-#endif  // INCLUDE_KEY_TRANSITIONS_HPP_
+#endif  // INCLUDE_KEYTRANSITIONS_H_

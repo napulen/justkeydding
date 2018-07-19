@@ -28,7 +28,7 @@ SOFTWARE.
 #include<array>
 #include<iostream>
 
-#include "key_profiles.hpp"
+#include "keyprofiles.h"
 
 int main(int argc, char *argv[]) {
     // TODO(napulen): Complete some actual unit tests

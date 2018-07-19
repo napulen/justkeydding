@@ -28,13 +28,8 @@ SOFTWARE.
 #include<array>
 #include<iostream>
 
-#include "key_transitions.hpp"
+#include "hmm.h"
 
 int main(int argc, char *argv[]) {
     // TODO(napulen): Complete some actual unit tests
-    const hmm::key_transition kt =
-        hmm::key_transitions.linear;
-    for (int i = 0; i < 24; i++) {
-        std::cout << kt.array[i] << std::endl;
-    }
 }

@@ -24,8 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR sOTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef INCLUDE_KEY_PROFILES_HPP_
-#define INCLUDE_KEY_PROFILES_HPP_
+#ifndef INCLUDE_KEYPROFILES_H_
+#define INCLUDE_KEYPROFILES_H_
 
 #include<map>
 #include<vector>
@@ -135,6 +135,6 @@ KeyProfile::KeyProfileArray KeyProfile::getMinorKeyProfile() {
     return m_minorKeyProfiles[m_minorKeyProfile];
 }
 
-}  // namespace hmm
+}  // namespace justkeydding
 
-#endif  // INCLUDE_KEY_PROFILES_HPP_
+#endif  // INCLUDE_KEYPROFILES_H_
