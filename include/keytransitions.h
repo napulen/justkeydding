@@ -50,62 +50,6 @@ class KeyTransition {
     void initKeyTransitionArrays();
 };
 
-
-KeyTransition::KeyTransition() :
-    KeyTransition("exponential10") {}
-
-KeyTransition::KeyTransition(std::string keyTransition) {
-    initKeyTransitionArrays();
-    if (isValidKeyTransition(keyTransition)) {
-        m_keyTransition = keyTransition;
-    }
-}
-
-bool KeyTransition::isValidKeyTransition(std::string keyTransition) {
-    return m_keyTransitions.find(keyTransition) != m_keyTransitions.end();
-}
-
-std::string KeyTransition::whichKeyTransition() {
-    return m_keyTransition;
-}
-
-KeyTransition::KeyTransitionArray KeyTransition::getKeyTransition() {
-    return m_keyTransitions[m_keyTransition];
-}
-
-void KeyTransition::initKeyTransitionArrays() {
-    m_keyTransitions["linear"] = {
-        9.0/132, 4.0/132, 6.0/132, 6.0/132, 5.0/132, 8.0/132,
-        1.0/132, 8.0/132, 5.0/132, 6.0/132, 6.0/132, 4.0/132,
-        8.0/132, 2.0/132, 7.0/132, 3.0/132, 7.0/132, 7.0/132,
-        3.0/132, 7.0/132, 2.0/132, 8.0/132, 5.0/132, 5.0/132,
-    };
-    m_keyTransitions["exponential2"] = {
-        256.0/1245, 8.0/1245, 32.0/1245, 32.0/1245, 16.0/1245, 128.0/1245,
-        1.0/1245, 128.0/1245, 16.0/1245, 32.0/1245, 32.0/1245, 8.0/1245,
-        128.0/1245, 2.0/1245, 64.0/1245, 4.0/1245, 64.0/1245, 64.0/1245,
-        4.0/1245, 64.0/1245, 2.0/1245, 128.0/1245, 16.0/1245, 16.0/1245,
-    };
-    m_keyTransitions["exponential10"] = {
-        100000000.0/144442221, 1000.0/144442221, 100000.0/144442221,
-        100000.0/144442221, 10000.0/144442221, 10000000.0/144442221,
-        1.0/144442221, 10000000.0/144442221, 10000.0/144442221,
-        100000.0/144442221, 100000.0/144442221, 1000.0/144442221,
-        10000000.0/144442221, 10.0/144442221, 1000000.0/144442221,
-        100.0/144442221, 1000000.0/144442221, 1000000.0/144442221,
-        100.0/144442221, 1000000.0/144442221, 10.0/144442221,
-        10000000.0/144442221, 10000.0/144442221, 10000.0/144442221
-    };
-    m_keyTransitions["zero"] = {
-        1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    };
-    m_keyTransitions["heatmap"] = {
-        1.0, 6.0, 4.0, 4.0, 5.0, 2.0, 9.0, 2.0, 5.0, 4.0, 4.0, 6.0,
-        2.0, 8.0, 3.0, 7.0, 3.0, 3.0, 7.0, 3.0, 8.0, 2.0, 5.0, 5.0
-    };
-}
-
 }  // namespace justkeydding
 
 #endif  // INCLUDE_KEYTRANSITIONS_H_
