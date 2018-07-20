@@ -119,4 +119,8 @@ bool Key::operator!=(const Key &key) const {
     return m_key != key.getInt();
 }
 
+bool Key::operator<(const Key &key) const {
+    return m_key < key.getInt();
+}
+
 }  // namespace justkeydding

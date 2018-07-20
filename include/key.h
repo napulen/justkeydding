@@ -44,6 +44,7 @@ class Key {
     static KeyVector getAllKeysVector();
     bool operator==(const Key &key) const;
     bool operator!=(const Key &key) const;
+    bool operator<(const Key &key) const;
     enum enKey {
         // Major keys
         KEY_B_SHARP_MAJOR, KEY_C_NATURAL_MAJOR = 0,
