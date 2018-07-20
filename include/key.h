@@ -34,6 +34,11 @@ SOFTWARE.
 namespace justkeydding {
 
 class Key {
+    int m_key;
+    std::string m_keyString;
+    std::map<std::string, int> m_stringToIntMap;
+    void initStringToIntMap();
+
  public:
     explicit Key(std::string key);
     explicit Key(int key);
@@ -43,60 +48,34 @@ class Key {
     bool operator!=(const Key &key) const;
     enum enKey {
         // Major keys
-        KEY_B_SHARP_MAJOR,
-        KEY_C_NATURAL_MAJOR = 0,
-        KEY_C_SHARP_MAJOR,
-        KEY_D_FLAT_MAJOR = 1,
+        KEY_B_SHARP_MAJOR, KEY_C_NATURAL_MAJOR = 0,
+        KEY_C_SHARP_MAJOR, KEY_D_FLAT_MAJOR = 1,
         KEY_D_NATURAL_MAJOR,
-        KEY_D_SHARP_MAJOR,
-        KEY_E_FLAT_MAJOR = 3,
-        KEY_E_NATURAL_MAJOR,
-        KEY_F_FLAT_MAJOR = 4,
-        KEY_E_SHARP_MAJOR,
-        KEY_F_NATURAL_MAJOR = 5,
-        KEY_F_SHARP_MAJOR,
-        KEY_G_FLAT_MAJOR = 6,
+        KEY_D_SHARP_MAJOR, KEY_E_FLAT_MAJOR = 3,
+        KEY_E_NATURAL_MAJOR, KEY_F_FLAT_MAJOR = 4,
+        KEY_E_SHARP_MAJOR, KEY_F_NATURAL_MAJOR = 5,
+        KEY_F_SHARP_MAJOR, KEY_G_FLAT_MAJOR = 6,
         KEY_G_NATURAL_MAJOR,
-        KEY_G_SHARP_MAJOR,
-        KEY_A_FLAT_MAJOR = 8,
+        KEY_G_SHARP_MAJOR, KEY_A_FLAT_MAJOR = 8,
         KEY_A_NATURAL_MAJOR,
-        KEY_A_SHARP_MAJOR,
-        KEY_B_FLAT_MAJOR = 10,
-        KEY_B_NATURAL_MAJOR,
-        KEY_C_FLAT_MAJOR = 11,
+        KEY_A_SHARP_MAJOR, KEY_B_FLAT_MAJOR = 10,
+        KEY_B_NATURAL_MAJOR, KEY_C_FLAT_MAJOR = 11,
         // Minor keys
-        KEY_B_SHARP_MINOR,
-        KEY_C_NATURAL_MINOR = 12,
-        KEY_C_SHARP_MINOR,
-        KEY_D_FLAT_MINOR = 13,
+        KEY_B_SHARP_MINOR, KEY_C_NATURAL_MINOR = 12,
+        KEY_C_SHARP_MINOR, KEY_D_FLAT_MINOR = 13,
         KEY_D_NATURAL_MINOR,
-        KEY_D_SHARP_MINOR,
-        KEY_E_FLAT_MINOR = 15,
-        KEY_E_NATURAL_MINOR,
-        KEY_F_FLAT_MINOR = 16,
-        KEY_E_SHARP_MINOR,
-        KEY_F_NATURAL_MINOR = 17,
-        KEY_F_SHARP_MINOR,
-        KEY_G_FLAT_MINOR = 18,
+        KEY_D_SHARP_MINOR, KEY_E_FLAT_MINOR = 15,
+        KEY_E_NATURAL_MINOR, KEY_F_FLAT_MINOR = 16,
+        KEY_E_SHARP_MINOR, KEY_F_NATURAL_MINOR = 17,
+        KEY_F_SHARP_MINOR, KEY_G_FLAT_MINOR = 18,
         KEY_G_NATURAL_MINOR,
-        KEY_G_SHARP_MINOR,
-        KEY_A_FLAT_MINOR = 20,
+        KEY_G_SHARP_MINOR, KEY_A_FLAT_MINOR = 20,
         KEY_A_NATURAL_MINOR,
-        KEY_A_SHARP_MINOR,
-        KEY_B_FLAT_MINOR = 22,
-        KEY_B_NATURAL_MINOR,
-        KEY_C_FLAT_MINOR = 23,
+        KEY_A_SHARP_MINOR, KEY_B_FLAT_MINOR = 22,
+        KEY_B_NATURAL_MINOR, KEY_C_FLAT_MINOR = 23,
         NUMBER_OF_KEYS
     };
-
- private:
-    int m_key;
-    std::string m_keyString;
-    std::map<int, std::string> m_intToStringMap;
-    std::map<std::string, int> m_stringToIntMap;
-    void initKeyMaps();
-    void initIntToStringMap();
-    void initStringToIntMap();
+    static const char *allKeyStrings[NUMBER_OF_KEYS];
 };
 
 }  // namespace justkeydding

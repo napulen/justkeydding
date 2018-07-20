@@ -34,8 +34,15 @@ SOFTWARE.
 
 namespace justkeydding {
 
+const char *Key::allKeyStrings[NUMBER_OF_KEYS] = {
+    "C", "Db", "D", "Eb", "E", "F",
+    "F#", "G", "Ab", "A", "Bb", "B",
+    "c", "c#", "d", "eb", "e", "f",
+    "f#", "g", "ab", "a", "bb", "b"
+};
+
 Key::Key(std::string keyString) {
-    initKeyMaps();
+    initStringToIntMap();
     if (m_stringToIntMap.find(keyString) != m_stringToIntMap.end()) {
         m_key = m_stringToIntMap.at(keyString);
         m_keyString = keyString;
@@ -43,43 +50,11 @@ Key::Key(std::string keyString) {
 }
 
 Key::Key(int key) {
-    initKeyMaps();
-    if (key >= 0 && key < NUMBER_OF_KEYS) {
-        m_key = key;
-        m_keyString = m_intToStringMap.at(m_key);
-    }
-}
-
-void Key::initKeyMaps() {
-    initIntToStringMap();
     initStringToIntMap();
-}
-
-void Key::initIntToStringMap() {
-    m_intToStringMap[KEY_C_NATURAL_MAJOR] = "C";
-    m_intToStringMap[KEY_D_FLAT_MAJOR] = "Db";
-    m_intToStringMap[KEY_D_NATURAL_MAJOR] = "D";
-    m_intToStringMap[KEY_E_FLAT_MAJOR] = "Eb";
-    m_intToStringMap[KEY_E_NATURAL_MAJOR] = "E";
-    m_intToStringMap[KEY_F_NATURAL_MAJOR] = "F";
-    m_intToStringMap[KEY_F_SHARP_MAJOR] = "F#";
-    m_intToStringMap[KEY_G_NATURAL_MAJOR] = "G";
-    m_intToStringMap[KEY_A_FLAT_MAJOR] = "Ab";
-    m_intToStringMap[KEY_A_NATURAL_MAJOR] = "A";
-    m_intToStringMap[KEY_B_FLAT_MAJOR] = "Bb";
-    m_intToStringMap[KEY_B_NATURAL_MAJOR] = "B";
-    m_intToStringMap[KEY_C_NATURAL_MINOR] = "c";
-    m_intToStringMap[KEY_C_SHARP_MINOR] = "c#";
-    m_intToStringMap[KEY_D_NATURAL_MINOR] = "d";
-    m_intToStringMap[KEY_E_FLAT_MINOR] = "eb";
-    m_intToStringMap[KEY_E_NATURAL_MINOR] = "e";
-    m_intToStringMap[KEY_F_NATURAL_MINOR] = "f";
-    m_intToStringMap[KEY_F_SHARP_MINOR] = "f#";
-    m_intToStringMap[KEY_G_NATURAL_MINOR] = "g";
-    m_intToStringMap[KEY_A_FLAT_MINOR] = "ab";
-    m_intToStringMap[KEY_A_NATURAL_MINOR] = "a";
-    m_intToStringMap[KEY_B_FLAT_MINOR] = "bb";
-    m_intToStringMap[KEY_B_NATURAL_MINOR] = "b";
+    if (static_cast<unsigned int>(key) < NUMBER_OF_KEYS) {
+        m_key = key;
+        m_keyString = allKeyStrings[m_key];
+    }
 }
 
 void Key::initStringToIntMap() {
