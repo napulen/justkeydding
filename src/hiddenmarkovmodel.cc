@@ -24,14 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR sOTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef INCLUDE_HMM_H_
-#define INCLUDE_HMM_H_
-
 #include<string>
 #include<map>
 
-namespace hmm {
+#include "./hiddenmarkovmodel.h"
 
-}  // namespace hmm
+namespace justkeydding {
 
-#endif  // INCLUDE_HMM_H_
+
+}  // namespace justkeydding

@@ -24,12 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR sOTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include<string>
 #include<map>
+#include<array>
+#include<iostream>
 
-#include "./hmm.h"
+#include "./hiddenmarkovmodel.h"
 
-namespace hmm {
-
-
-}  // namespace hmm
+int main(int argc, char *argv[]) {
+    // TODO(napulen): Complete some actual unit tests
+}

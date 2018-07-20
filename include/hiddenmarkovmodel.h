@@ -3,7 +3,7 @@ MIT License
 
 Copyright (c) 2018 Nestor Napoles
 
-Common key-profiles for key detection algorithms
+Hidden Markov Model for Key Detection
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR sOTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#ifndef INCLUDE_HIDDENMARKOVMODEL_H_
+#define INCLUDE_HIDDENMARKOVMODEL_H_
+
+#include<string>
 #include<map>
-#include<array>
-#include<iostream>
 
-#include "hmm.h"
+namespace justkeydding {
 
-int main(int argc, char *argv[]) {
-    // TODO(napulen): Complete some actual unit tests
-}
+}  // namespace justkeydding
+
+#endif  // INCLUDE_HIDDENMARKOVMODEL_H_
