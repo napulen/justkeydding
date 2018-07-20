@@ -34,13 +34,6 @@ SOFTWARE.
 
 namespace justkeydding {
 
-const char *Key::allKeyStrings[NUMBER_OF_KEYS] = {
-    "C", "Db", "D", "Eb", "E", "F",
-    "F#", "G", "Ab", "A", "Bb", "B",
-    "c", "c#", "d", "eb", "e", "f",
-    "f#", "g", "ab", "a", "bb", "b"
-};
-
 Key::Key(std::string keyString) {
     initStringToIntMap();
     if (m_stringToIntMap.find(keyString) != m_stringToIntMap.end()) {
@@ -53,8 +46,16 @@ Key::Key(int key) {
     initStringToIntMap();
     if (static_cast<unsigned int>(key) < NUMBER_OF_KEYS) {
         m_key = key;
-        m_keyString = allKeyStrings[m_key];
+        m_keyString = m_allKeyStrings[m_key];
     }
+}
+
+Key::KeyVector Key::getAllKeysVector() {
+    KeyVector keyVector;
+    for (int keyIndex = 0; keyIndex < NUMBER_OF_KEYS; keyIndex++) {
+         keyVector.push_back(Key(keyIndex));
+    }
+    return keyVector;
 }
 
 void Key::initStringToIntMap() {

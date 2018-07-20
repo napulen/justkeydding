@@ -37,8 +37,9 @@ int main(int argc, char *argv[]) {
     bool equal = key1 == key2;
     std::cout << key1.getString() << (equal ? " == " : " != ")
         << key2.getString() << std::endl;
-    const char **allKeyStrings = justkeydding::Key::allKeyStrings;
-    for (int i=0; i < justkeydding::Key::NUMBER_OF_KEYS; i++) {
-        std::cout << allKeyStrings[i] << std::endl;
+    justkeydding::Key::KeyVector allKeys;
+    allKeys = justkeydding::Key::getAllKeysVector();
+    for (int i=0; i < allKeys.size(); i++) {
+        std::cout << allKeys[i].getString() << std::endl;
     }
 }

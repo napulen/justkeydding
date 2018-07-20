@@ -29,21 +29,19 @@ SOFTWARE.
 
 #include<map>
 #include<string>
+#include<vector>
 #include<array>
 
 namespace justkeydding {
 
 class Key {
-    int m_key;
-    std::string m_keyString;
-    std::map<std::string, int> m_stringToIntMap;
-    void initStringToIntMap();
-
  public:
+    typedef std::vector<Key> KeyVector;
     explicit Key(std::string key);
     explicit Key(int key);
     int getInt() const;
     std::string getString() const;
+    static KeyVector getAllKeysVector();
     bool operator==(const Key &key) const;
     bool operator!=(const Key &key) const;
     enum enKey {
@@ -75,7 +73,18 @@ class Key {
         KEY_B_NATURAL_MINOR, KEY_C_FLAT_MINOR = 23,
         NUMBER_OF_KEYS
     };
-    static const char *allKeyStrings[NUMBER_OF_KEYS];
+
+ private:
+    int m_key;
+    std::string m_keyString;
+    std::map<std::string, int> m_stringToIntMap;
+    const std::string m_allKeyStrings[NUMBER_OF_KEYS] = {
+        "C", "Db", "D", "Eb", "E", "F",
+        "F#", "G", "Ab", "A", "Bb", "B",
+        "c", "c#", "d", "eb", "e", "f",
+        "f#", "g", "ab", "a", "bb", "b"
+    };
+    void initStringToIntMap();
 };
 
 }  // namespace justkeydding
