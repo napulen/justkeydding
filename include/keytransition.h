@@ -24,8 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR sOTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef INCLUDE_KEYTRANSITIONS_H_
-#define INCLUDE_KEYTRANSITIONS_H_
+#ifndef INCLUDE_KEYTRANSITION_H_
+#define INCLUDE_KEYTRANSITION_H_
 
 #include<map>
 #include<string>
@@ -52,4 +52,4 @@ class KeyTransition {
 
 }  // namespace justkeydding
 
-#endif  // INCLUDE_KEYTRANSITIONS_H_
+#endif  // INCLUDE_KEYTRANSITION_H_
