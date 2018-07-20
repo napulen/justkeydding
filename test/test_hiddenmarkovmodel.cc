@@ -26,10 +26,54 @@ SOFTWARE.
 
 #include<map>
 #include<array>
+#include<vector>
 #include<iostream>
 
-#include "./hiddenmarkovmodel.h"
+#include "./pitchclass.h"
+#include "./key.h"
+#include "./keytransition.h"
+#include "./keyprofile.h"
+// #include "./hiddenmarkovmodel.h"
+
+using justkeydding::PitchClass;
+using justkeydding::KeyTransition;
+using justkeydding::KeyProfile;
+using justkeydding::Key;
 
 int main(int argc, char *argv[]) {
+    // Observation symbols section
+    std::vector<PitchClass> pitchClassSequence;
+    pitchClassSequence.push_back(PitchClass("C"));
+    pitchClassSequence.push_back(PitchClass("E"));
+    pitchClassSequence.push_back(PitchClass("G"));
+    // States section
+    Key::KeyVector keyVector =
+        Key::getAllKeysVector();
+    // Initial probabilities
+    KeyTransition::KeyTransitionArray symmetrical =
+        KeyTransition("symmetrical").getKeyTransition();
+    std::map<Key, double> initialProbabilities;
+    for (Key::KeyVector::iterator it = keyVector.begin();
+        it != keyVector.end(); it++) {
+        initialProbabilities[*it] = symmetrical[it->getInt()];
+        // std::cout << it->getString() << ", " <<
+        //     initialProbabilities[*it] << std::endl;
+    }
+    // Transition probabilities
+    KeyTransition::KeyTransitionArray zero =
+        KeyTransition("zero").getKeyTransition();
+    std::map<Key, std::map<Key, double> > keyTransitions;
+    for (Key::KeyVector::iterator it = keyVector.begin();
+        it != keyVector.end(); it++) {
+        std::array<double, 12> tonic;
+        std::array<double, 12> relative;
+        std::copy(zero.begin(), zero.begin() + 12, tonic.begin());
+        std::copy(zero.begin() + 12, zero.end(), relative.begin());
+        for (std::array<double, 12>::iterator it = tonic.begin();
+            it != tonic.end(); it++) {
+            std::cout << (*it) << std::endl;
+        }
+    }
+
     // TODO(napulen): Complete some actual unit tests
 }

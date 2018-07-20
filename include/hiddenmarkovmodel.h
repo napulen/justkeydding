@@ -28,9 +28,19 @@ SOFTWARE.
 #define INCLUDE_HIDDENMARKOVMODEL_H_
 
 #include<string>
+#include<vector>
 #include<map>
 
 namespace justkeydding {
+
+class HiddenMarkovModel {
+    std::vector<std::string> states;
+    std::vector<int> observations;
+    std::map<std::string, double> start_probability;
+    std::map<std::string, std::map<std::string, double> > transition_probability;
+    std::map<std::string, std::map<int, double> > emission_probability;
+};
+
 
 }  // namespace justkeydding
 
