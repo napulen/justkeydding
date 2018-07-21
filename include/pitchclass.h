@@ -28,6 +28,7 @@ SOFTWARE.
 #define INCLUDE_PITCHCLASS_H_
 
 #include<map>
+#include<vector>
 #include<string>
 #include<array>
 
@@ -35,12 +36,15 @@ namespace justkeydding {
 
 class PitchClass {
  public:
+    typedef std::vector<PitchClass> PitchClassVector;
     explicit PitchClass(std::string pitchClass);
     explicit PitchClass(int pitchClass);
     int getInt() const;
     std::string getString() const;
+    static PitchClassVector getAllPitchClassesVector();
     bool operator==(const PitchClass &pitchClass) const;
     bool operator!=(const PitchClass &pitchClass) const;
+    bool operator<(const PitchClass &pitchClass) const;
     enum enPitchClass {
         PITCHCLASS_B_SHARP, PITCHCLASS_C_NATURAL = 0,
         PITCHCLASS_C_SHARP, PITCHCLASS_D_FLAT = 1,

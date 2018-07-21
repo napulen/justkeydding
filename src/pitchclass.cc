@@ -59,6 +59,15 @@ void PitchClass::initPitchClassMaps() {
     initStringToIntMap();
 }
 
+PitchClass::PitchClassVector PitchClass::getAllPitchClassesVector() {
+    PitchClassVector pitchClassVector;
+    for (int pitchClassIndex = 0;
+            pitchClassIndex < NUMBER_OF_PITCHCLASSES; pitchClassIndex++) {
+         pitchClassVector.push_back(PitchClass(pitchClassIndex));
+    }
+    return pitchClassVector;
+}
+
 void PitchClass::initIntToStringMap() {
     m_intToStringMap[PITCHCLASS_C_NATURAL] = "c";
     m_intToStringMap[PITCHCLASS_C_SHARP] = "c#";
@@ -112,6 +121,10 @@ bool PitchClass::operator==(const PitchClass &pitchClass) const {
 
 bool PitchClass::operator!=(const PitchClass &pitchClass) const {
     return m_pitchClass != pitchClass.getInt();
+}
+
+bool PitchClass::operator<(const PitchClass &pitchClass) const {
+    return m_pitchClass < pitchClass.getInt();
 }
 
 }  // namespace justkeydding
