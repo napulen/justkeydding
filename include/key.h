@@ -42,12 +42,14 @@ class Key {
     int getInt() const;
     std::string getString() const;
     static KeyVector getAllKeysVector();
+    bool isMajorKey() const;
+    bool isMinorKey() const;
     bool operator==(const Key &key) const;
     bool operator!=(const Key &key) const;
     bool operator<(const Key &key) const;
     enum enKey {
-        // Major keys
-        KEY_B_SHARP_MAJOR, KEY_C_NATURAL_MAJOR = 0,
+        FIRST_MAJOR_KEY,
+        KEY_B_SHARP_MAJOR = 0, KEY_C_NATURAL_MAJOR = 0,
         KEY_C_SHARP_MAJOR, KEY_D_FLAT_MAJOR = 1,
         KEY_D_NATURAL_MAJOR,
         KEY_D_SHARP_MAJOR, KEY_E_FLAT_MAJOR = 3,
@@ -59,8 +61,10 @@ class Key {
         KEY_A_NATURAL_MAJOR,
         KEY_A_SHARP_MAJOR, KEY_B_FLAT_MAJOR = 10,
         KEY_B_NATURAL_MAJOR, KEY_C_FLAT_MAJOR = 11,
-        // Minor keys
-        KEY_B_SHARP_MINOR, KEY_C_NATURAL_MINOR = 12,
+        LAST_MAJOR_KEY = 11,
+
+        FIRST_MINOR_KEY,
+        KEY_B_SHARP_MINOR = 12, KEY_C_NATURAL_MINOR = 12,
         KEY_C_SHARP_MINOR, KEY_D_FLAT_MINOR = 13,
         KEY_D_NATURAL_MINOR,
         KEY_D_SHARP_MINOR, KEY_E_FLAT_MINOR = 15,
@@ -72,6 +76,7 @@ class Key {
         KEY_A_NATURAL_MINOR,
         KEY_A_SHARP_MINOR, KEY_B_FLAT_MINOR = 22,
         KEY_B_NATURAL_MINOR, KEY_C_FLAT_MINOR = 23,
+        LAST_MINOR_KEY = 23,
         NUMBER_OF_KEYS
     };
 

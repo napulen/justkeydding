@@ -111,6 +111,16 @@ std::string Key::getString() const {
     return m_keyString;
 }
 
+bool Key::isMajorKey() const {
+    return m_key >= FIRST_MAJOR_KEY &&
+            m_key <= LAST_MAJOR_KEY;
+}
+
+bool Key::isMinorKey() const {
+    return m_key >= FIRST_MINOR_KEY &&
+            m_key <= LAST_MINOR_KEY;
+}
+
 bool Key::operator==(const Key &key) const {
     return m_key == key.getInt();
 }
