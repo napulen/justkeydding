@@ -41,6 +41,7 @@ using justkeydding::KeyTransition;
 using justkeydding::KeyProfile;
 using justkeydding::Key;
 
+
 int main(int argc, char *argv[]) {
     // Observation symbols section
     std::vector<PitchClass> pitchClassSequence;
@@ -57,43 +58,66 @@ int main(int argc, char *argv[]) {
     for (Key::KeyVector::iterator it = keyVector.begin();
         it != keyVector.end(); it++) {
         initialProbabilities[*it] = symmetrical[it->getInt()];
-        // std::cout << it->getString() << ", " <<
-        //     initialProbabilities[*it] << std::endl;
     }
     // Transition probabilities
-    KeyTransition::KeyTransitionArray zero =
-        KeyTransition("heatmap").getKeyTransition();
+    KeyTransition::KeyTransitionArray ktArray =
+        KeyTransition("exponential10").getKeyTransition();
     KeyTransition::KeyTransitionArray rotated;
     std::map<Key, std::map<Key, double> > keyTransitions;
-    for (Key::KeyVector::iterator it = keyVector.begin();
-        it != keyVector.end(); it++) {
-        int keyIndex = it->getInt();
-        bool isMajorKey = keyIndex < 12;
-        int tonicStart = isMajorKey ? 0 : 12;
-        int tonicEnd = isMajorKey ? 12 : 24;
-        int relativeStart = isMajorKey ? 12 : 0;
-        int relativeEnd = isMajorKey ? 24 : 12;
-        std::array<double, 12> tonic;
-        std::array<double, 12> relative;
-        std::copy(zero.begin() + tonicStart,
-                zero.begin() + tonicEnd, tonic.begin());
-        std::copy(zero.begin() + relativeStart,
-                zero.begin() + relativeEnd, relative.begin());
-        int tonicRotation = isMajorKey ?
-                (12 - keyIndex) :
-                ((24 - keyIndex + 9) % 12);
-        int relativeRotation = (12 - (keyIndex % 12));
-        std::rotate(tonic.begin(), tonic.begin() + tonicRotation, tonic.end());
-        std::rotate(relative.begin(), relative.begin() + relativeRotation, relative.end());
-        std::copy(tonic.begin(), tonic.end(), rotated.begin());
-        std::copy(relative.begin(), relative.end(), rotated.begin() + 12);
-        for (KeyTransition::KeyTransitionArray::iterator it = rotated.begin();
-            it != rotated.end(); it++) {
-            std::cout << (*it) << " ";
+    for (Key::KeyVector::const_iterator itFromKey = keyVector.begin();
+            itFromKey != keyVector.end(); itFromKey++) {
+        int fromKey = itFromKey->getInt() % PitchClass::NUMBER_OF_PITCHCLASSES;
+        int keyRotation = PitchClass::NUMBER_OF_PITCHCLASSES - fromKey;
+        std::array<double, PitchClass::NUMBER_OF_PITCHCLASSES> tonic;
+        std::array<double, PitchClass::NUMBER_OF_PITCHCLASSES> relative;
+        if (itFromKey->isMajorKey()) {
+            std::copy(
+                ktArray.begin() + Key::FIRST_MAJOR_KEY,
+                ktArray.begin() + Key::LAST_MAJOR_KEY + 1,
+                tonic.begin());
+            std::copy(
+                ktArray.begin() + Key::FIRST_MINOR_KEY,
+                ktArray.begin() + Key::LAST_MINOR_KEY + 1,
+                relative.begin());
+        } else if (itFromKey->isMinorKey()) {
+            std::rotate_copy(
+                ktArray.begin() + Key::FIRST_MINOR_KEY,
+                ktArray.begin()
+                    + Key::FIRST_MINOR_KEY
+                    + PitchClass::PITCHCLASS_A_NATURAL,
+                ktArray.begin() + Key::LAST_MINOR_KEY + 1,
+                tonic.begin());
+            std::copy(
+                ktArray.begin() + Key::FIRST_MAJOR_KEY,
+                ktArray.begin() + Key::LAST_MAJOR_KEY + 1,
+                relative.begin());
         }
-        std::cout << tonicRotation << " "
-                << relativeRotation << std::endl;
+        std::rotate(
+            tonic.begin(),
+            tonic.begin() + keyRotation,
+            tonic.end());
+        std::rotate(
+            relative.begin(),
+            relative.begin() + keyRotation,
+            relative.end());
+        std::copy(
+            tonic.begin(),
+            tonic.end(),
+            rotated.begin() + Key::FIRST_MAJOR_KEY);
+        std::copy(
+            relative.begin(),
+            relative.end(),
+            rotated.begin() + Key::FIRST_MINOR_KEY);
+        for (Key::KeyVector::const_iterator itToKey = keyVector.begin();
+                itToKey != keyVector.end(); itToKey++) {
+            int toKey = itToKey->getInt();
+            keyTransitions[*itFromKey][*itToKey] = *(rotated.begin() + toKey);
+            std::cout
+                << itFromKey->getString()
+                << " -> " << itToKey->getString()
+                << " = " << *(rotated.begin() + toKey)
+                << std::endl;
+        }
+        std::cout << std::endl;
     }
-
-    // TODO(napulen): Complete some actual unit tests
 }
