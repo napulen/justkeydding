@@ -28,6 +28,7 @@ SOFTWARE.
 #include<array>
 #include<vector>
 #include<iostream>
+#include<algorithm>
 
 #include "./pitchclass.h"
 #include "./key.h"
@@ -61,18 +62,37 @@ int main(int argc, char *argv[]) {
     }
     // Transition probabilities
     KeyTransition::KeyTransitionArray zero =
-        KeyTransition("zero").getKeyTransition();
+        KeyTransition("heatmap").getKeyTransition();
+    KeyTransition::KeyTransitionArray rotated;
     std::map<Key, std::map<Key, double> > keyTransitions;
     for (Key::KeyVector::iterator it = keyVector.begin();
         it != keyVector.end(); it++) {
+        int keyIndex = it->getInt();
+        bool isMajorKey = keyIndex < 12;
+        int tonicStart = isMajorKey ? 0 : 12;
+        int tonicEnd = isMajorKey ? 12 : 24;
+        int relativeStart = isMajorKey ? 12 : 0;
+        int relativeEnd = isMajorKey ? 24 : 12;
         std::array<double, 12> tonic;
         std::array<double, 12> relative;
-        std::copy(zero.begin(), zero.begin() + 12, tonic.begin());
-        std::copy(zero.begin() + 12, zero.end(), relative.begin());
-        for (std::array<double, 12>::iterator it = tonic.begin();
-            it != tonic.end(); it++) {
-            std::cout << (*it) << std::endl;
+        std::copy(zero.begin() + tonicStart,
+                zero.begin() + tonicEnd, tonic.begin());
+        std::copy(zero.begin() + relativeStart,
+                zero.begin() + relativeEnd, relative.begin());
+        int tonicRotation = isMajorKey ?
+                (12 - keyIndex) :
+                ((24 - keyIndex + 9) % 12);
+        int relativeRotation = (12 - (keyIndex % 12));
+        std::rotate(tonic.begin(), tonic.begin() + tonicRotation, tonic.end());
+        std::rotate(relative.begin(), relative.begin() + relativeRotation, relative.end());
+        std::copy(tonic.begin(), tonic.end(), rotated.begin());
+        std::copy(relative.begin(), relative.end(), rotated.begin() + 12);
+        for (KeyTransition::KeyTransitionArray::iterator it = rotated.begin();
+            it != rotated.end(); it++) {
+            std::cout << (*it) << " ";
         }
+        std::cout << tonicRotation << " "
+                << relativeRotation << std::endl;
     }
 
     // TODO(napulen): Complete some actual unit tests
