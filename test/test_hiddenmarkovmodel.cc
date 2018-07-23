@@ -34,20 +34,25 @@ SOFTWARE.
 #include "./key.h"
 #include "./keytransition.h"
 #include "./keyprofile.h"
-// #include "./hiddenmarkovmodel.h"
+#include "./hiddenmarkovmodel.h"
 
 using justkeydding::PitchClass;
 using justkeydding::KeyTransition;
 using justkeydding::KeyProfile;
 using justkeydding::Key;
+using justkeydding::HiddenMarkovModel;
 
 
 int main(int argc, char *argv[]) {
     // Observation symbols section
     std::vector<PitchClass> pitchClassSequence;
     pitchClassSequence.push_back(PitchClass("C"));
-    pitchClassSequence.push_back(PitchClass("E"));
+    pitchClassSequence.push_back(PitchClass("D"));
+    pitchClassSequence.push_back(PitchClass("Eb"));
+    pitchClassSequence.push_back(PitchClass("F"));
     pitchClassSequence.push_back(PitchClass("G"));
+    pitchClassSequence.push_back(PitchClass("Ab"));
+    pitchClassSequence.push_back(PitchClass("B"));
     // States section
     Key::KeyVector keyVector =
         Key::getAllKeysVector();
@@ -151,4 +156,12 @@ int main(int argc, char *argv[]) {
             //     << std::endl;
         }
     }
+    HiddenMarkovModel hmm(
+        pitchClassSequence,
+        keyVector,
+        initialProbabilities,
+        transitionProbabilities,
+        emissionProbabilities);
+    hmm.printOutput();
+    hmm.runViterbi();
 }

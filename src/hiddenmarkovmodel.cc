@@ -26,48 +26,90 @@ SOFTWARE.
 
 #include "./hiddenmarkovmodel.h"
 
+using std::cout;
+using std::endl;
+
 namespace justkeydding {
 
 HiddenMarkovModel::HiddenMarkovModel(
-    std::vector<PitchClass> observations,
-        Key::KeyVector keyVector states,
-        std::map<Key, double> initialProbabilities,
-        std::map<Key, std::map<Key, double> > transitionProbabilities,
-        std::map<Key, std::map<PitchClass, double> > emissionProbabilities) :
-        m_observations(observations),
-        m_states(states),
-        m_initialProbabilities(initialProbabilities),
-        m_transitionProbabilities(transitionProbabilities),
-        m_emissionProbabilities(emissionProbabilities) {}
-
+  std::vector<PitchClass> observations,
+  Key::KeyVector states,
+  std::map<Key, double> initialProbabilities,
+  std::map<Key, std::map<Key, double> > transitionProbabilities,
+  std::map<Key, std::map<PitchClass, double> > emissionProbabilities) {
+  // Observations
+  for (std::vector<PitchClass>::const_iterator itObs = observations.begin();
+      itObs != observations.end(); itObs++) {
+    m_observations.push_back(itObs->getInt());
+  }
+  // States
+  for (std::vector<Key>::const_iterator itState = states.begin();
+      itState != states.end(); itState++) {
+    m_states.push_back(itState->getString());
+  }
+  // Initial probabilities
+  for (std::map<Key, double>::const_iterator itInitial =
+      initialProbabilities.begin(); itInitial != initialProbabilities.end();
+      itInitial++) {
+    std::string key = (itInitial->first).getString();
+    m_initialProbabilities[key] =
+        itInitial->second;
+  }
+  // Transition probabilities
+  for (std::map<Key, std::map<Key,
+      double> >::const_iterator itTransition = transitionProbabilities.begin();
+      itTransition != transitionProbabilities.end(); itTransition++) {
+    std::string fromKey = (itTransition->first).getString();
+    std::map<Key, double> toKeyMap = itTransition->second;
+    for (std::map<Key, double>::const_iterator itToKey = toKeyMap.begin();
+        itToKey != toKeyMap.end(); itToKey++ ) {
+      std::string toKey = (itToKey->first).getString();
+      m_transitionProbabilities[fromKey][toKey] = itToKey->second;
+    }
+  }
+  // Emission probabilities
+  for (std::map<Key, std::map<PitchClass,
+      double> >::const_iterator itEmission = emissionProbabilities.begin();
+      itEmission != emissionProbabilities.end(); itEmission++) {
+    std::string fromKey = (itEmission->first).getString();
+    std::map<PitchClass, double> emitPcMap = itEmission->second;
+    for (std::map<PitchClass, double>::const_iterator itEmitPc =
+        emitPcMap.begin(); itEmitPc != emitPcMap.end(); itEmitPc++) {
+      int emitPc = (itEmitPc->first).getInt();
+      m_emissionProbabilities[fromKey][emitPc] = itEmitPc->second;
+    }
+  }
+}
 
 void HiddenMarkovModel::printOutput() {
   // print states
   std::cout << "States:" << std::endl;
-  for (std::vector<std::string>::iterator i=states.begin();
-    i != states.end(); i++) {
+  for (std::vector<std::string>::const_iterator i = m_states.begin();
+    i != m_states.end(); i++) {
     std::cout << "S: " << (*i) << std::endl;
   }
+
   // print observations
   std::cout << "Observations:" << std::endl;
-  for (std::vector<int>::iterator i=observations.begin();
-      i != observations.end(); i++) {
+  for (std::vector<int>::const_iterator i = m_observations.begin();
+      i != m_observations.end(); i++) {
     std::cout << "O: " << (*i) << std::endl;
   }
 
   // print start probabilities
   std::cout << "Start probabilities:" << std::endl;
-  for (std::map<std::string, double>::iterator i=start_probability.begin();
-      i != start_probability.end(); i++) {
+  for (std::map<std::string, double>::const_iterator i =
+    m_initialProbabilities.begin(); i != m_initialProbabilities.end(); i++) {
     std::cout << "S: " << (*i).first << " P: " << (*i).second << std::endl;
   }
 
   // print transition_probability
   std::cout << "Transition probabilities:" << std::endl;
-  for (std::map<std::string, std::map<std::string, double> >::iterator i =
-      transition_probability.begin(); i != transition_probability.end(); i++) {
-    for (std::map<std::string, double>::iterator j = (*i).second.begin();
-        j != (*i).second.end(); j++) {
+  for (std::map<std::string, std::map<std::string,
+      double> >::const_iterator i = m_transitionProbabilities.begin();
+      i != m_transitionProbabilities.end(); i++) {
+    for (std::map<std::string, double>::const_iterator j =
+        (*i).second.begin(); j != (*i).second.end(); j++) {
       std::cout << "FS: " << (*i).first << " TS: " <<
       (*j).first << " P: " << (*j).second << std::endl;
     }
@@ -75,10 +117,12 @@ void HiddenMarkovModel::printOutput() {
 
   // print emission probabilities
   std::cout << "Emission probabilities:" << std::endl;
-  for (int i=0; i < states.size(); i++) {
-    for (int j=0; j < observations.size(); j++) {
-      std::cout << "FS: " << states[i] << " TO: " << observations[j] <<
-        " P: " << emission_probability[states[i]][observations[j]] << std::endl;
+  for (int i=0; i < m_states.size(); i++) {
+    for (int j=0; j < m_observations.size(); j++) {
+      std::cout
+        << "FS: " << m_states[i] << " TO: " << m_observations[j] << " P: "
+        << m_emissionProbabilities[m_states[i]][m_observations[j]]
+        << std::endl;
     }
   }
 }
@@ -127,8 +171,8 @@ void HiddenMarkovModel::runViterbi() {
 
   Tracking final_tracker;
 
-  for (std::vector<std::string>::iterator state=states.begin();
-  state != states.end(); state++) {
+  for (std::vector<std::string>::iterator state = m_states.begin();
+  state != m_states.end(); state++) {
     Tracking tracker = T[*state];
     final_tracker.prob += tracker.prob;
     if (tracker.v_prob > final_tracker.v_prob) {
@@ -147,6 +191,5 @@ void HiddenMarkovModel::runViterbi() {
     std::cout << "VState: " << *state << std::endl;
   }
 }
-
 
 }  // namespace justkeydding

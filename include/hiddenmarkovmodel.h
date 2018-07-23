@@ -30,6 +30,8 @@ SOFTWARE.
 #include<string>
 #include<vector>
 #include<map>
+#include<cmath>
+#include<iostream>
 
 #include "./pitchclass.h"
 #include "./key.h"
@@ -39,20 +41,42 @@ SOFTWARE.
 
 namespace justkeydding {
 
+class Tracking {
+ public:
+  double prob;
+  std::vector<std::string> v_path;
+  double v_prob;
+
+  Tracking() {
+    prob = 0.0;
+    v_prob = 0.0;
+  }
+
+  Tracking(double p, const std::vector<std::string> & v_pth, double v_p) {
+    prob = p;
+    v_path = v_pth;
+    v_prob = v_p;
+  }
+};
+
+
 class HiddenMarkovModel {
-    std::vector<PitchClass> m_observations;
-    Key::KeyVector keyVector m_states;
-    std::map<Key, double> m_initialProbabilities;
-    std::map<Key, std::map<Key, double> > m_transitionProbabilities;
-    std::map<Key, std::map<PitchClass, double> > m_emissionProbabilities;
+    std::vector<int> m_observations;
+    std::vector<std::string> m_states;
+    std::map<std::string, double> m_initialProbabilities;
+    std::map<std::string,
+        std::map<std::string, double> > m_transitionProbabilities;
+    std::map<std::string,
+        std::map<int, double> > m_emissionProbabilities;
 
  public:
     HiddenMarkovModel(
         std::vector<PitchClass> observations,
-        Key::KeyVector keyVector states,
+        Key::KeyVector states,
         std::map<Key, double> initialProbabilities,
         std::map<Key, std::map<Key, double> > transitionProbabilities,
         std::map<Key, std::map<PitchClass, double> > emissionProbabilities);
+    void printOutput();
     void runViterbi();
 };
 
