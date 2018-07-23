@@ -28,6 +28,7 @@ SOFTWARE.
 
 using std::cout;
 using std::endl;
+using std::log10;
 
 namespace justkeydding {
 
@@ -134,8 +135,8 @@ void HiddenMarkovModel::runViterbi() {
       state != m_states.end(); state++) {
     std::vector<std::string> v_pth;
     v_pth.push_back(*state);
-    T[*state] = Tracking(m_initialProbabilities[*state], v_pth,
-        m_initialProbabilities[*state]);
+    T[*state] = Tracking(log10(m_initialProbabilities[*state]), v_pth,
+        log10(m_initialProbabilities[*state]));
   }
 
   for (std::vector<int>::iterator output=m_observations.begin();
@@ -150,10 +151,10 @@ void HiddenMarkovModel::runViterbi() {
       source_state != m_states.end(); source_state++) {
         Tracking source_tracker = T[*source_state];
 
-        double p = m_emissionProbabilities[*source_state][*output] *
-            m_transitionProbabilities[*source_state][*next_state];
-        source_tracker.prob *= p;
-        source_tracker.v_prob *= p;
+        double p = log10(m_emissionProbabilities[*source_state][*output]) +
+            log10(m_transitionProbabilities[*source_state][*next_state]);
+        source_tracker.prob += p;
+        source_tracker.v_prob += p;
 
         next_tracker.prob += source_tracker.prob;
 

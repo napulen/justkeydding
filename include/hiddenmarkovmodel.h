@@ -32,6 +32,7 @@ SOFTWARE.
 #include<map>
 #include<cmath>
 #include<iostream>
+#include<limits>
 
 #include "./pitchclass.h"
 #include "./key.h"
@@ -48,8 +49,8 @@ class Tracking {
   double v_prob;
 
   Tracking() {
-    prob = 0.0;
-    v_prob = 0.0;
+    prob = -std::numeric_limits<double>::infinity();
+    v_prob = -std::numeric_limits<double>::infinity();
   }
 
   Tracking(double p, const std::vector<std::string> & v_pth, double v_p) {
