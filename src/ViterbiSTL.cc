@@ -5,7 +5,7 @@ Copyright (c) 2018 Nestor Napoles
 
 Adapted from Filip Jurcicek's implementation of the
 viterbi algorithm:
-http://bozskyfilip.blogspot.com/2009/01/viterbi-algorithm-in-c-and-using-stl.html 
+http://bozskyfilip.blogspot.com/2009/01/viterbi-algorithm-in-c-and-using-stl.html
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,10 +34,10 @@ SOFTWARE.
 namespace hmm {
 
 std::vector<std::string> states;
-std::vector<int> observations;
+std::vector<std::string> observations;
 std::map<std::string, double> start_probability;
 std::map<std::string, std::map<std::string, double> > transition_probability;
-std::map<std::string, std::map<int, double> > emission_probability;
+std::map<std::string, std::map<std::string, double> > emission_probability;
 
 class Tracking {
  public:
@@ -58,27 +58,27 @@ class Tracking {
 };
 
 void init_variables(void) {
-  states.push_back("C");
-  states.push_back("c");
+  states.push_back("Healthy");
+  states.push_back("Fever");
 
-  observations.push_back(0);
-  observations.push_back(3);
-  observations.push_back(7);
+  observations.push_back("normal");
+  observations.push_back("cold");
+  observations.push_back("dizzy");
 
-  start_probability["C"] = 0.5;
-  start_probability["c"] = 0.5;
+  start_probability["Healthy"] = 0.6;
+  start_probability["Fever"] = 0.4;
 
-  transition_probability["C"]["C"] = 0.66;
-  transition_probability["C"]["c"] = 0.33;
-  transition_probability["c"]["C"] = 0.33;
-  transition_probability["c"]["c"] = 0.66;
+  transition_probability["Healthy"]["Healthy"] = 0.7;
+  transition_probability["Healthy"]["Fever"] = 0.3;
+  transition_probability["Fever"]["Healthy"] = 0.4;
+  transition_probability["Fever"]["Fever"] = 0.6;
 
-  emission_probability["C"][0] = (1.0/9)*2;
-  emission_probability["C"][3] = 0.0;
-  emission_probability["C"][7] = (1.0/9)*2;
-  emission_probability["c"][0] = (1.0/9)*2;
-  emission_probability["c"][3] = (1.0/9);
-  emission_probability["c"][7] = (1.0/9)*2;
+  emission_probability["Healthy"]["normal"] = 0.5;
+  emission_probability["Healthy"]["cold"] = 0.4;
+  emission_probability["Healthy"]["dizzy"] = 0.1;
+  emission_probability["Fever"]["normal"] = 0.1;
+  emission_probability["Fever"]["cold"] = 0.3;
+  emission_probability["Fever"]["dizzy"] = 0.6;
 }
 
 void print_variables(void) {
@@ -90,7 +90,7 @@ void print_variables(void) {
   }
   // print observations
   std::cout << "Observations:" << std::endl;
-  for (std::vector<int>::iterator i=observations.begin();
+  for (std::vector<std::string>::iterator i=observations.begin();
       i != observations.end(); i++) {
     std::cout << "O: " << (*i) << std::endl;
   }
@@ -123,11 +123,11 @@ void print_variables(void) {
   }
 }
 
-void forward_viterbi(std::vector<int> obs,
+void forward_viterbi(std::vector<std::string> obs,
     std::vector<std::string> states,
     std::map<std::string, double> start_p,
     std::map<std::string, std::map<std::string, double> > trans_p,
-    std::map<std::string, std::map<int, double> > emit_p) {
+    std::map<std::string, std::map<std::string, double> > emit_p) {
   std::map<std::string, Tracking> T;
 
   for (std::vector<std::string>::iterator state=states.begin();
@@ -137,7 +137,7 @@ void forward_viterbi(std::vector<int> obs,
     T[*state] = Tracking(start_p[*state], v_pth, start_p[*state]);
   }
 
-  for (std::vector<int>::iterator output=obs.begin();
+  for (std::vector<std::string>::iterator output=obs.begin();
       output != obs.end(); output++) {
     std::map<std::string, Tracking> U;
 
