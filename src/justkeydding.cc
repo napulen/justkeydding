@@ -69,7 +69,7 @@ int getChromagrams(char *audioFile, chromagramVector *chromagrams) {
             } else {
                 // NNLS orders chromagrams from A-G#
                 // we want to store them as C-B instead
-                int pcIndex = (3 + (i-1)) % PITCH_CLASSES;
+                int pcIndex = (9 + (i-1)) % PITCH_CLASSES;
                 chr.magnitudes[pcIndex] = std::stof(token);
             }
             i++;
