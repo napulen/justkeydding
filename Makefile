@@ -32,8 +32,8 @@ clean:
 justkeydding: $(BUILD)/justkeydding.o
 	$(CC) -o $(BIN)/justkeydding $(BUILD)/justkeydding.o
 
-$(BUILD)/justkeydding.o: $(SRC)/justkeydding.cpp
-	$(CC) -c -o$(BUILD)/justkeydding.o $(SRC)/justkeydding.cpp $(CFLAGS)
+$(BUILD)/justkeydding.o: $(SRC)/justkeydding.cc
+	$(CC) -c -o$(BUILD)/justkeydding.o $(SRC)/justkeydding.cc $(CFLAGS)
 
 
 test_key: $(BUILD)/test_key.o $(BUILD)/key.o
