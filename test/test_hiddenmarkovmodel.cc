@@ -146,7 +146,7 @@ int main(int argc, char *argv[]) {
                 *(keyProfileArray.begin() + itPc->getInt());
             // std::cout
             //     << itKey->getString()
-            //     << " -> " << itPc->getString()
+            //     << " -> " << itPc->getString~()
             //     << " = " << *(keyProfileArray.begin() + itPc->getInt())
             //     << std::endl;
         }

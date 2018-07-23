@@ -31,14 +31,29 @@ SOFTWARE.
 #include<vector>
 #include<map>
 
+#include "./pitchclass.h"
+#include "./key.h"
+#include "./keyprofile.h"
+#include "./keytransition.h"
+
+
 namespace justkeydding {
 
 class HiddenMarkovModel {
-    std::vector<std::string> states;
-    std::vector<int> observations;
-    std::map<std::string, double> start_probability;
-    std::map<std::string, std::map<std::string, double> > transition_probability;
-    std::map<std::string, std::map<int, double> > emission_probability;
+    std::vector<PitchClass> m_observations;
+    Key::KeyVector keyVector m_states;
+    std::map<Key, double> m_initialProbabilities;
+    std::map<Key, std::map<Key, double> > m_transitionProbabilities;
+    std::map<Key, std::map<PitchClass, double> > m_emissionProbabilities;
+
+ public:
+    HiddenMarkovModel(
+        std::vector<PitchClass> observations,
+        Key::KeyVector keyVector states,
+        std::map<Key, double> initialProbabilities,
+        std::map<Key, std::map<Key, double> > transitionProbabilities,
+        std::map<Key, std::map<PitchClass, double> > emissionProbabilities);
+    void runViterbi();
 };
 
 
