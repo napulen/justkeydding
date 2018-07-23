@@ -76,8 +76,8 @@ $(BUILD)/keytransition.o: $(SRC)/keytransition.cc
 	$(CC) -c -o $(BUILD)/keytransition.o $(SRC)/keytransition.cc $(CFLAGS)
 
 
-test_hiddenmarkovmodel: $(BUILD)/test_hiddenmarkovmodel.o $(BUILD)/pitchclass.o $(BUILD)/key.o $(BUILD)/keytransition.o $(BUILD)/keyprofile.o
-	$(CC) -o $(BIN)/test_hiddenmarkovmodel $(BUILD)/test_hiddenmarkovmodel.o $(BUILD)/pitchclass.o $(BUILD)/key.o $(BUILD)/keytransition.o $(BUILD)/keyprofile.o
+test_hiddenmarkovmodel: $(BUILD)/test_hiddenmarkovmodel.o $(BUILD)/pitchclass.o $(BUILD)/key.o $(BUILD)/keytransition.o $(BUILD)/keyprofile.o $(BUILD)/hiddenmarkovmodel.o
+	$(CC) -o $(BIN)/test_hiddenmarkovmodel $(BUILD)/test_hiddenmarkovmodel.o $(BUILD)/pitchclass.o $(BUILD)/key.o $(BUILD)/keytransition.o $(BUILD)/keyprofile.o $(BUILD)/hiddenmarkovmodel.o
 
 $(BUILD)/test_hiddenmarkovmodel.o: $(TEST)/test_hiddenmarkovmodel.cc
 	$(CC) -c -o $(BUILD)/test_hiddenmarkovmodel.o $(TEST)/test_hiddenmarkovmodel.cc $(CFLAGS)
