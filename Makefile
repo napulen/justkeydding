@@ -56,8 +56,8 @@ $(BUILD)/pitchclass.o: $(SRC)/pitchclass.cc
 	$(CC) -c -o $(BUILD)/pitchclass.o $(SRC)/pitchclass.cc $(CFLAGS)
 
 
-test_keyprofile: $(BUILD)/test_keyprofile.o $(BUILD)/keyprofile.o
-	$(CC) -o $(BIN)/test_keyprofile $(BUILD)/test_keyprofile.o $(BUILD)/keyprofile.o
+test_keyprofile: $(BUILD)/test_keyprofile.o $(BUILD)/keyprofile.o $(BUILD)/pitchclass.o $(BUILD)/key.o
+	$(CC) -o $(BIN)/test_keyprofile $(BUILD)/test_keyprofile.o $(BUILD)/keyprofile.o $(BUILD)/pitchclass.o $(BUILD)/key.o
 
 $(BUILD)/test_keyprofile.o: $(TEST)/test_keyprofile.cc
 	$(CC) -c -o $(BUILD)/test_keyprofile.o $(TEST)/test_keyprofile.cc $(CFLAGS)
@@ -66,8 +66,8 @@ $(BUILD)/keyprofile.o: $(SRC)/keyprofile.cc
 	$(CC) -c -o $(BUILD)/keyprofile.o $(SRC)/keyprofile.cc $(CFLAGS)
 
 
-test_keytransition: $(BUILD)/test_keytransition.o $(BUILD)/keytransition.o
-	$(CC) -o $(BIN)/test_keytransition $(BUILD)/test_keytransition.o $(BUILD)/keytransition.o
+test_keytransition: $(BUILD)/test_keytransition.o $(BUILD)/keytransition.o $(BUILD)/key.o $(BUILD)/pitchclass.o
+	$(CC) -o $(BIN)/test_keytransition $(BUILD)/test_keytransition.o $(BUILD)/keytransition.o $(BUILD)/key.o $(BUILD)/pitchclass.o
 
 $(BUILD)/test_keytransition.o: $(TEST)/test_keytransition.cc
 	$(CC) -c -o $(BUILD)/test_keytransition.o $(TEST)/test_keytransition.cc $(CFLAGS)
