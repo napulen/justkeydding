@@ -37,6 +37,7 @@ namespace justkeydding {
 class PitchClass {
  public:
     typedef std::vector<PitchClass> PitchClassVector;
+    typedef std::vector<PitchClass> PitchClassSequence;
     explicit PitchClass(std::string pitchClass);
     explicit PitchClass(int pitchClass);
     int getInt() const;
