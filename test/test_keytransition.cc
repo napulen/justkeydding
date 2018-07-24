@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
     // TODO(napulen): Complete some actual unit tests
     justkeydding::KeyTransition kt("zero");
     justkeydding::KeyTransition::KeyTransitionArray ktArray;
-    ktArray = kt.getKeyTransition();
+    ktArray = kt.getKeyTransitionArray();
     for (int i = 0; i < ktArray.size(); i++) {
         std::cout << ktArray[i] << std::endl;
     }

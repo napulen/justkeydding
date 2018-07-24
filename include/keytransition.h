@@ -30,6 +30,10 @@ SOFTWARE.
 #include<map>
 #include<string>
 #include<array>
+#include<algorithm>
+
+#include "./key.h"
+#include "./pitchclass.h"
 
 namespace justkeydding {
 
@@ -40,9 +44,11 @@ class KeyTransition {
     KeyTransition();
     explicit KeyTransition(std::string keyTransition);
     typedef std::array<double, NUMBER_OF_KEYS> KeyTransitionArray;
+    typedef std::map<Key, std::map<Key, double> > KeyTransitionMap;
     bool isValidKeyTransition(std::string keyTransition);
     std::string whichKeyTransition();
-    KeyTransitionArray getKeyTransition();
+    KeyTransitionArray getKeyTransitionArray();
+    KeyTransitionMap getKeyTransitionMap();
 
  private:
     std::string m_keyTransition;

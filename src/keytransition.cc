@@ -24,10 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR sOTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include<map>
-#include<string>
-#include<array>
-
 #include "./keytransition.h"
 
 namespace justkeydding {
@@ -50,8 +46,73 @@ std::string KeyTransition::whichKeyTransition() {
     return m_keyTransition;
 }
 
-KeyTransition::KeyTransitionArray KeyTransition::getKeyTransition() {
+KeyTransition::KeyTransitionArray KeyTransition::getKeyTransitionArray() {
     return m_keyTransitions[m_keyTransition];
+}
+
+KeyTransition::KeyTransitionMap KeyTransition::getKeyTransitionMap() {
+    KeyTransition::KeyTransitionArray ktArray = getKeyTransitionArray();
+    Key::KeyVector keyVector = Key::getAllKeysVector();
+    KeyTransitionMap keyTransitionMap;
+    KeyTransition::KeyTransitionArray rotated;
+    for (Key::KeyVector::const_iterator itFromKey = keyVector.begin();
+            itFromKey != keyVector.end(); itFromKey++) {
+        int fromKey = itFromKey->getInt() % PitchClass::NUMBER_OF_PITCHCLASSES;
+        int keyRotation = PitchClass::NUMBER_OF_PITCHCLASSES - fromKey;
+        std::array<double, PitchClass::NUMBER_OF_PITCHCLASSES> tonic;
+        std::array<double, PitchClass::NUMBER_OF_PITCHCLASSES> relative;
+        if (itFromKey->isMajorKey()) {
+            std::copy(
+                ktArray.begin() + Key::FIRST_MAJOR_KEY,
+                ktArray.begin() + Key::LAST_MAJOR_KEY + 1,
+                tonic.begin());
+            std::copy(
+                ktArray.begin() + Key::FIRST_MINOR_KEY,
+                ktArray.begin() + Key::LAST_MINOR_KEY + 1,
+                relative.begin());
+        } else if (itFromKey->isMinorKey()) {
+            std::rotate_copy(
+                ktArray.begin() + Key::FIRST_MINOR_KEY,
+                ktArray.begin()
+                    + Key::FIRST_MINOR_KEY
+                    + PitchClass::PITCHCLASS_A_NATURAL,
+                ktArray.begin() + Key::LAST_MINOR_KEY + 1,
+                tonic.begin());
+            std::copy(
+                ktArray.begin() + Key::FIRST_MAJOR_KEY,
+                ktArray.begin() + Key::LAST_MAJOR_KEY + 1,
+                relative.begin());
+        }
+        std::rotate(
+            tonic.begin(),
+            tonic.begin() + keyRotation,
+            tonic.end());
+        std::rotate(
+            relative.begin(),
+            relative.begin() + keyRotation,
+            relative.end());
+        std::copy(
+            tonic.begin(),
+            tonic.end(),
+            rotated.begin() + Key::FIRST_MAJOR_KEY);
+        std::copy(
+            relative.begin(),
+            relative.end(),
+            rotated.begin() + Key::FIRST_MINOR_KEY);
+        for (Key::KeyVector::const_iterator itToKey = keyVector.begin();
+                itToKey != keyVector.end(); itToKey++) {
+            int toKey = itToKey->getInt();
+            keyTransitionMap[*itFromKey][*itToKey] =
+                *(rotated.begin() + toKey);
+            // std::cout
+            //     << itFromKey->getString()
+            //     << " -> " << itToKey->getString()
+            //     << " = " << *(rotated.begin() + toKey)
+            //     << std::endl;
+        }
+        // std::cout << std::endl;
+    }
+    return keyTransitionMap;
 }
 
 void KeyTransition::initKeyTransitionArrays() {
