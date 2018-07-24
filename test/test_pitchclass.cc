@@ -32,10 +32,10 @@ SOFTWARE.
 
 int main(int argc, char *argv[]) {
     // TODO(napulen): Complete some actual unit tests
-    justkeydding::PitchClass pc1("A#");
-    justkeydding::PitchClass pc2("Bb");
+    justkeydding::PitchClass pc1(1);
+    justkeydding::PitchClass pc2(10);
     bool equal = pc1 == pc2;
-    std::cout <<
-        pc1.getString() << (equal ? " == " : " != ") << pc2.getString() <<
-        ". It is" << (equal ? " " : " not ") << "working." << std::endl;
+    std::cout
+        << pc1.getString() << (equal ? " == " : " != ")
+        << pc2.getString() << std::endl;
 }

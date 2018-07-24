@@ -64,10 +64,12 @@ class PitchClass {
  private:
     int m_pitchClass;
     std::string m_pitchClassString;
-    std::map<int, std::string> m_intToStringMap;
     std::map<std::string, int> m_stringToIntMap;
-    void initPitchClassMaps();
-    void initIntToStringMap();
+    const std::string m_allPitchClassStrings[
+        NUMBER_OF_PITCHCLASSES] = {
+        "c", "c#", "d", "d#", "e", "f",
+        "f#", "g", "g#", "a", "a#", "b"
+    };
     void initStringToIntMap();
 };
 

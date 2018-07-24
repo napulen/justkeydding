@@ -35,27 +35,22 @@ SOFTWARE.
 namespace justkeydding {
 
 PitchClass::PitchClass(std::string pitchClass) {
-    initPitchClassMaps();
+    initStringToIntMap();
     std::transform(
         pitchClass.begin(), pitchClass.end(),
         pitchClass.begin(), ::tolower);
     if (m_stringToIntMap.find(pitchClass) != m_stringToIntMap.end()) {
         m_pitchClass = m_stringToIntMap.at(pitchClass);
-        m_pitchClassString = m_intToStringMap.at(m_pitchClass);
+        m_pitchClassString = m_allPitchClassStrings[m_pitchClass];
     }
 }
 
 PitchClass::PitchClass(int pitchClass) {
-    initPitchClassMaps();
+    initStringToIntMap();
     if (pitchClass >= 0 && pitchClass < NUMBER_OF_PITCHCLASSES) {
         m_pitchClass = pitchClass;
-        m_pitchClassString = m_intToStringMap.at(m_pitchClass);
+        m_pitchClassString = m_allPitchClassStrings[m_pitchClass];
     }
-}
-
-void PitchClass::initPitchClassMaps() {
-    initIntToStringMap();
-    initStringToIntMap();
 }
 
 PitchClass::PitchClassVector PitchClass::getAllPitchClassesVector() {
@@ -65,21 +60,6 @@ PitchClass::PitchClassVector PitchClass::getAllPitchClassesVector() {
          pitchClassVector.push_back(PitchClass(pitchClassIndex));
     }
     return pitchClassVector;
-}
-
-void PitchClass::initIntToStringMap() {
-    m_intToStringMap[PITCHCLASS_C_NATURAL] = "c";
-    m_intToStringMap[PITCHCLASS_C_SHARP] = "c#";
-    m_intToStringMap[PITCHCLASS_D_NATURAL] = "d";
-    m_intToStringMap[PITCHCLASS_D_SHARP] = "d#";
-    m_intToStringMap[PITCHCLASS_E_NATURAL] = "e";
-    m_intToStringMap[PITCHCLASS_F_NATURAL] = "f";
-    m_intToStringMap[PITCHCLASS_F_SHARP] = "f#";
-    m_intToStringMap[PITCHCLASS_G_NATURAL] = "g";
-    m_intToStringMap[PITCHCLASS_G_SHARP] = "g#";
-    m_intToStringMap[PITCHCLASS_A_NATURAL] = "a";
-    m_intToStringMap[PITCHCLASS_A_SHARP] = "a#";
-    m_intToStringMap[PITCHCLASS_B_NATURAL] = "b";
 }
 
 void PitchClass::initStringToIntMap() {
