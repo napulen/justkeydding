@@ -47,121 +47,31 @@ int main(int argc, char *argv[]) {
     // Observation symbols section
     std::vector<PitchClass> pitchClassSequence;
     pitchClassSequence.push_back(PitchClass("C"));
-    pitchClassSequence.push_back(PitchClass("D"));
     pitchClassSequence.push_back(PitchClass("Eb"));
-    pitchClassSequence.push_back(PitchClass("F"));
     pitchClassSequence.push_back(PitchClass("G"));
-    pitchClassSequence.push_back(PitchClass("Ab"));
-    pitchClassSequence.push_back(PitchClass("B"));
     // States section
     Key::KeyVector keyVector =
         Key::getAllKeysVector();
     // Initial probabilities
     KeyTransition::KeyTransitionArray symmetrical =
-        KeyTransition("symmetrical").getKeyTransition();
+        KeyTransition("symmetrical").getKeyTransitionArray();
     std::map<Key, double> initialProbabilities;
     for (Key::KeyVector::iterator it = keyVector.begin();
         it != keyVector.end(); it++) {
         initialProbabilities[*it] = symmetrical[it->getInt()];
     }
     // Transition probabilities
-    KeyTransition::KeyTransitionArray ktArray =
-        KeyTransition("exponential10").getKeyTransition();
-    KeyTransition::KeyTransitionArray rotated;
-    std::map<Key, std::map<Key, double> > transitionProbabilities;
-    for (Key::KeyVector::const_iterator itFromKey = keyVector.begin();
-            itFromKey != keyVector.end(); itFromKey++) {
-        int fromKey = itFromKey->getInt() % PitchClass::NUMBER_OF_PITCHCLASSES;
-        int keyRotation = PitchClass::NUMBER_OF_PITCHCLASSES - fromKey;
-        std::array<double, PitchClass::NUMBER_OF_PITCHCLASSES> tonic;
-        std::array<double, PitchClass::NUMBER_OF_PITCHCLASSES> relative;
-        if (itFromKey->isMajorKey()) {
-            std::copy(
-                ktArray.begin() + Key::FIRST_MAJOR_KEY,
-                ktArray.begin() + Key::LAST_MAJOR_KEY + 1,
-                tonic.begin());
-            std::copy(
-                ktArray.begin() + Key::FIRST_MINOR_KEY,
-                ktArray.begin() + Key::LAST_MINOR_KEY + 1,
-                relative.begin());
-        } else if (itFromKey->isMinorKey()) {
-            std::rotate_copy(
-                ktArray.begin() + Key::FIRST_MINOR_KEY,
-                ktArray.begin()
-                    + Key::FIRST_MINOR_KEY
-                    + PitchClass::PITCHCLASS_A_NATURAL,
-                ktArray.begin() + Key::LAST_MINOR_KEY + 1,
-                tonic.begin());
-            std::copy(
-                ktArray.begin() + Key::FIRST_MAJOR_KEY,
-                ktArray.begin() + Key::LAST_MAJOR_KEY + 1,
-                relative.begin());
-        }
-        std::rotate(
-            tonic.begin(),
-            tonic.begin() + keyRotation,
-            tonic.end());
-        std::rotate(
-            relative.begin(),
-            relative.begin() + keyRotation,
-            relative.end());
-        std::copy(
-            tonic.begin(),
-            tonic.end(),
-            rotated.begin() + Key::FIRST_MAJOR_KEY);
-        std::copy(
-            relative.begin(),
-            relative.end(),
-            rotated.begin() + Key::FIRST_MINOR_KEY);
-        for (Key::KeyVector::const_iterator itToKey = keyVector.begin();
-                itToKey != keyVector.end(); itToKey++) {
-            int toKey = itToKey->getInt();
-            transitionProbabilities[*itFromKey][*itToKey] =
-                *(rotated.begin() + toKey);
-            // std::cout
-            //     << itFromKey->getString()
-            //     << " -> " << itToKey->getString()
-            //     << " = " << *(rotated.begin() + toKey)
-            //     << std::endl;
-        }
-        // std::cout << std::endl;
-    }
+    KeyTransition::KeyTransitionMap transitionProbabilities =
+        KeyTransition("exponential10").getKeyTransitionMap();
     // Emission probabilities
-    PitchClass::PitchClassVector pitchClassVector =
-        PitchClass::getAllPitchClassesVector();
-    KeyProfile keyProfile("sapp");
-    KeyProfile::KeyProfileArray keyProfileArray;
-    std::map<Key, std::map<PitchClass, double> > emissionProbabilities;
-    for (Key::KeyVector::const_iterator itKey = keyVector.begin();
-             itKey != keyVector.end(); itKey++) {
-        int key = itKey->getInt() % PitchClass::NUMBER_OF_PITCHCLASSES;
-        int rotation = PitchClass::NUMBER_OF_PITCHCLASSES - key;
-        keyProfileArray =
-            itKey->isMajorKey() ?
-            keyProfile.getMajorKeyProfile() :
-            keyProfile.getMinorKeyProfile();
-        std::rotate(
-            keyProfileArray.begin(),
-            keyProfileArray.begin() + rotation,
-            keyProfileArray.end());
-        for (PitchClass::PitchClassVector::const_iterator itPc =
-                pitchClassVector.begin();
-                itPc != pitchClassVector.end(); itPc++) {
-            emissionProbabilities[*itKey][*itPc] =
-                *(keyProfileArray.begin() + itPc->getInt());
-            // std::cout
-            //     << itKey->getString()
-            //     << " -> " << itPc->getString~()
-            //     << " = " << *(keyProfileArray.begin() + itPc->getInt())
-            //     << std::endl;
-        }
-    }
+    KeyProfile::KeyProfileMap emissionProbabilities =
+        KeyProfile("sapp").getKeyProfileMap();
+    // HiddenMarkovModel stuff
     HiddenMarkovModel hmm(
         pitchClassSequence,
         keyVector,
         initialProbabilities,
         transitionProbabilities,
         emissionProbabilities);
-    hmm.printOutput();
     hmm.runViterbi();
 }
