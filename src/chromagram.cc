@@ -60,8 +60,8 @@ PitchClass::PitchClassSequence Chromagram::getPitchClassSequence() {
 }
 
 void Chromagram::printChromagram() {
-    for (ChromagramMap::const_iterator itChr = m_originalChromagramMap.begin();
-         itChr != m_originalChromagramMap.end(); itChr++) {
+    for (ChromagramMap::const_iterator itChr = m_discreteChromagramMap.begin();
+         itChr != m_discreteChromagramMap.end(); itChr++) {
         double timestamp = itChr->first;
         ChromagramVector chrVector = itChr->second;
         std::cout << timestamp << ": ";

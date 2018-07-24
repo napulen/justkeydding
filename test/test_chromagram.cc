@@ -27,8 +27,15 @@ SOFTWARE.
 #include "./chromagram.h"
 
 using justkeydding::Chromagram;
+using justkeydding::PitchClass;
 
 int main(int argc, char *argv[]) {
     Chromagram::enFileType fileType = Chromagram::FILETYPE_CSV;
-    Chromagram("Misunderstanding.csv", fileType);
+    Chromagram chr("Misunderstanding.csv", fileType);
+    PitchClass::PitchClassSequence pcSequence;
+    pcSequence = chr.getPitchClassSequence();
+    for (PitchClass::PitchClassSequence::const_iterator itPcSeq =
+        pcSequence.begin(); itPcSeq != pcSequence.end(); itPcSeq++) {
+        std::cout << (itPcSeq->getString()) << " ";
+    }
 }
