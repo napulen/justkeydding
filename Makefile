@@ -15,7 +15,7 @@ CFLAGS=-I$(INCLUDE) --std=c++11
 
 all: directories justkeydding
 
-test: $(TESTS)
+test: directories $(TESTS)
 
 directories: $(BUILD) $(BIN)
 
