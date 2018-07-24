@@ -44,35 +44,14 @@ using justkeydding::HiddenMarkovModel;
 
 
 int main(int argc, char *argv[]) {
+    ////////////////////////////
+    // First Hidden Markov Model
+    ////////////////////////////
     // Observation symbols section
     std::vector<PitchClass> pitchClassSequence;
     pitchClassSequence.push_back(PitchClass("C"));
-    pitchClassSequence.push_back(PitchClass("D"));
     pitchClassSequence.push_back(PitchClass("E"));
-    pitchClassSequence.push_back(PitchClass("F"));
     pitchClassSequence.push_back(PitchClass("G"));
-    pitchClassSequence.push_back(PitchClass("A"));
-    pitchClassSequence.push_back(PitchClass("B"));
-    pitchClassSequence.push_back(PitchClass("A"));
-    pitchClassSequence.push_back(PitchClass("G"));
-    pitchClassSequence.push_back(PitchClass("F#"));
-    pitchClassSequence.push_back(PitchClass("E"));
-    pitchClassSequence.push_back(PitchClass("D"));
-    pitchClassSequence.push_back(PitchClass("C#"));
-    pitchClassSequence.push_back(PitchClass("D"));
-    pitchClassSequence.push_back(PitchClass("E"));
-    pitchClassSequence.push_back(PitchClass("F#"));
-    pitchClassSequence.push_back(PitchClass("G"));
-    pitchClassSequence.push_back(PitchClass("A"));
-    pitchClassSequence.push_back(PitchClass("B"));
-    pitchClassSequence.push_back(PitchClass("C"));
-    pitchClassSequence.push_back(PitchClass("B"));
-    pitchClassSequence.push_back(PitchClass("A"));
-    pitchClassSequence.push_back(PitchClass("G"));
-    pitchClassSequence.push_back(PitchClass("F"));
-    pitchClassSequence.push_back(PitchClass("E"));
-    pitchClassSequence.push_back(PitchClass("D"));
-    pitchClassSequence.push_back(PitchClass("C"));
     // States section
     Key::KeyVector keyVector =
         Key::getAllKeysVector();
@@ -90,12 +69,24 @@ int main(int argc, char *argv[]) {
     // Emission probabilities
     KeyProfile::KeyProfileMap emissionProbabilities =
         KeyProfile("temperley", "sapp").getKeyProfileMap();
+    HiddenMarkovModel::KeySequence keySequence;
     HiddenMarkovModel hmm(
         pitchClassSequence,
         keyVector,
         initialProbabilities,
         transitionProbabilities,
         emissionProbabilities);
-    // hmm.printOutput();
-    hmm.runViterbi();
+    keySequence = hmm.runViterbi();
+    /////////////////////////////
+    // Second Hidden Markov Model
+    /////////////////////////////
+    KeyTransition::KeyTransitionMap zeroTransiionProbabilities =
+        KeyTransition("zero").getKeyTransitionMap();
+    HiddenMarkovModel hmm2(
+        keySequence,
+        keyVector,
+        initialProbabilities,
+        zeroTransiionProbabilities,
+        transitionProbabilities);
+    HiddenMarkovModel::KeySequence mainKeySequence = hmm2.runViterbi();
 }
