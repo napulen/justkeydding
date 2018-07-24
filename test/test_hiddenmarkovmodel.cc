@@ -90,13 +90,12 @@ int main(int argc, char *argv[]) {
     // Emission probabilities
     KeyProfile::KeyProfileMap emissionProbabilities =
         KeyProfile("temperley", "sapp").getKeyProfileMap();
-    // HiddenMarkovModel stuff
     HiddenMarkovModel hmm(
         pitchClassSequence,
         keyVector,
         initialProbabilities,
         transitionProbabilities,
         emissionProbabilities);
-    hmm.printOutput();
+    // hmm.printOutput();
     hmm.runViterbi();
 }
