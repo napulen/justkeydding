@@ -37,14 +37,13 @@ SOFTWARE.
 
 namespace justkeydding {
 
-#define NUMBER_OF_PITCH_CLASSES 12
-
 class KeyProfile {
  public:
     KeyProfile();
     explicit KeyProfile(std::string keyProfile);
     explicit KeyProfile(std::string majKeyProfile, std::string minKeyProfile);
-    typedef std::array<double, NUMBER_OF_PITCH_CLASSES> KeyProfileArray;
+    typedef std::array<double,
+        PitchClass::NUMBER_OF_PITCHCLASSES> KeyProfileArray;
     typedef std::map<Key, std::map<PitchClass, double> > KeyProfileMap;
     bool isValidMajorKeyProfile(std::string keyProfile);
     bool isValidMinorKeyProfile(std::string keyProfile);

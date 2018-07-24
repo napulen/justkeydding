@@ -147,8 +147,8 @@ KeyProfile::KeyProfileMap KeyProfile::getKeyProfileMap() {
             keyProfileArray.begin(),
             keyProfileArray.begin() + rotation,
             keyProfileArray.end());
-        for (PitchClass::PitchClassVector::const_iterator itPc =
-                pitchClassVector.begin();
+        for (PitchClass::PitchClassVector::const_iterator
+                itPc = pitchClassVector.begin();
                 itPc != pitchClassVector.end(); itPc++) {
             keyProfileMap[*itKey][*itPc] =
                 *(keyProfileArray.begin() + itPc->getInt());
