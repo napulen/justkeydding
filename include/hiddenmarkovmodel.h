@@ -62,13 +62,13 @@ class Tracking {
 
 
 class HiddenMarkovModel {
-    std::vector<int> m_observations;
+    std::vector<std::string> m_observations;
     std::vector<std::string> m_states;
     std::map<std::string, double> m_initialProbabilities;
     std::map<std::string,
         std::map<std::string, double> > m_transitionProbabilities;
     std::map<std::string,
-        std::map<int, double> > m_emissionProbabilities;
+        std::map<std::string, double> > m_emissionProbabilities;
 
  public:
     HiddenMarkovModel(
@@ -77,6 +77,12 @@ class HiddenMarkovModel {
         std::map<Key, double> initialProbabilities,
         std::map<Key, std::map<Key, double> > transitionProbabilities,
         std::map<Key, std::map<PitchClass, double> > emissionProbabilities);
+    // HiddenMarkovModel(
+    //     std::vector<Key> observations,
+    //     Key::KeyVector states,
+    //     std::map<Key, double> initialProbabilities,
+    //     std::map<Key, std::map<Key, double> > transitionProbabilities,
+    //     std::map<Key, std::map<Key, double> > emissionProbabilities);
     void printOutput();
     void runViterbi();
 };

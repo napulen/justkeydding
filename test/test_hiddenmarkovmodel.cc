@@ -47,8 +47,32 @@ int main(int argc, char *argv[]) {
     // Observation symbols section
     std::vector<PitchClass> pitchClassSequence;
     pitchClassSequence.push_back(PitchClass("C"));
-    pitchClassSequence.push_back(PitchClass("Eb"));
+    pitchClassSequence.push_back(PitchClass("D"));
+    pitchClassSequence.push_back(PitchClass("E"));
+    pitchClassSequence.push_back(PitchClass("F"));
     pitchClassSequence.push_back(PitchClass("G"));
+    pitchClassSequence.push_back(PitchClass("A"));
+    pitchClassSequence.push_back(PitchClass("B"));
+    pitchClassSequence.push_back(PitchClass("A"));
+    pitchClassSequence.push_back(PitchClass("G"));
+    pitchClassSequence.push_back(PitchClass("F#"));
+    pitchClassSequence.push_back(PitchClass("E"));
+    pitchClassSequence.push_back(PitchClass("D"));
+    pitchClassSequence.push_back(PitchClass("C#"));
+    pitchClassSequence.push_back(PitchClass("D"));
+    pitchClassSequence.push_back(PitchClass("E"));
+    pitchClassSequence.push_back(PitchClass("F#"));
+    pitchClassSequence.push_back(PitchClass("G"));
+    pitchClassSequence.push_back(PitchClass("A"));
+    pitchClassSequence.push_back(PitchClass("B"));
+    pitchClassSequence.push_back(PitchClass("C"));
+    pitchClassSequence.push_back(PitchClass("B"));
+    pitchClassSequence.push_back(PitchClass("A"));
+    pitchClassSequence.push_back(PitchClass("G"));
+    pitchClassSequence.push_back(PitchClass("F"));
+    pitchClassSequence.push_back(PitchClass("E"));
+    pitchClassSequence.push_back(PitchClass("D"));
+    pitchClassSequence.push_back(PitchClass("C"));
     // States section
     Key::KeyVector keyVector =
         Key::getAllKeysVector();
@@ -65,7 +89,7 @@ int main(int argc, char *argv[]) {
         KeyTransition("exponential10").getKeyTransitionMap();
     // Emission probabilities
     KeyProfile::KeyProfileMap emissionProbabilities =
-        KeyProfile("sapp").getKeyProfileMap();
+        KeyProfile("temperley", "sapp").getKeyProfileMap();
     // HiddenMarkovModel stuff
     HiddenMarkovModel hmm(
         pitchClassSequence,
@@ -73,5 +97,6 @@ int main(int argc, char *argv[]) {
         initialProbabilities,
         transitionProbabilities,
         emissionProbabilities);
+    hmm.printOutput();
     hmm.runViterbi();
 }
