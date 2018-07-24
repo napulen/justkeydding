@@ -35,14 +35,13 @@ SOFTWARE.
 namespace justkeydding {
 
 PitchClass::PitchClass(std::string pitchClass) {
-    std::string lowerCase = pitchClass;
     initPitchClassMaps();
     std::transform(
-        lowerCase.begin(), lowerCase.end(),
-        lowerCase.begin(), ::tolower);
-    if (m_stringToIntMap.find(lowerCase) != m_stringToIntMap.end()) {
-        m_pitchClass = m_stringToIntMap.at(lowerCase);
-        m_pitchClassString = pitchClass;
+        pitchClass.begin(), pitchClass.end(),
+        pitchClass.begin(), ::tolower);
+    if (m_stringToIntMap.find(pitchClass) != m_stringToIntMap.end()) {
+        m_pitchClass = m_stringToIntMap.at(pitchClass);
+        m_pitchClassString = m_intToStringMap.at(m_pitchClass);
     }
 }
 
