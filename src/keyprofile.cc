@@ -24,11 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR sOTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include<map>
-#include<vector>
-#include<string>
-#include<array>
-
 #include "./keyprofile.h"
 
 namespace justkeydding {
@@ -132,6 +127,39 @@ KeyProfile::KeyProfileArray KeyProfile::getMajorKeyProfile() {
 }
 KeyProfile::KeyProfileArray KeyProfile::getMinorKeyProfile() {
     return m_minorKeyProfiles[m_minorKeyProfile];
+}
+
+KeyProfile::KeyProfileMap KeyProfile::getKeyProfileMap() {
+    Key::KeyVector keyVector = Key::getAllKeysVector();
+    PitchClass::PitchClassVector pitchClassVector =
+        PitchClass::getAllPitchClassesVector();
+    KeyProfileArray keyProfileArray;
+    KeyProfileMap keyProfileMap;
+    for (Key::KeyVector::const_iterator itKey = keyVector.begin();
+            itKey != keyVector.end(); itKey++) {
+        int key = itKey->getInt() % PitchClass::NUMBER_OF_PITCHCLASSES;
+        int rotation = PitchClass::NUMBER_OF_PITCHCLASSES - key;
+        keyProfileArray =
+            itKey->isMajorKey() ?
+            getMajorKeyProfile() :
+            getMinorKeyProfile();
+        std::rotate(
+            keyProfileArray.begin(),
+            keyProfileArray.begin() + rotation,
+            keyProfileArray.end());
+        for (PitchClass::PitchClassVector::const_iterator itPc =
+                pitchClassVector.begin();
+                itPc != pitchClassVector.end(); itPc++) {
+            keyProfileMap[*itKey][*itPc] =
+                *(keyProfileArray.begin() + itPc->getInt());
+            // std::cout
+            //     << itKey->getString()
+            //     << " -> " << itPc->getString~()
+            //     << " = " << *(keyProfileArray.begin() + itPc->getInt())
+            //     << std::endl;
+        }
+    }
+    return keyProfileMap;
 }
 
 }  // namespace justkeydding

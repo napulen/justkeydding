@@ -24,12 +24,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR sOTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef INCLUDE_KEYPROFILES_H_
-#define INCLUDE_KEYPROFILES_H_
+#ifndef INCLUDE_KEYPROFILE_H_
+#define INCLUDE_KEYPROFILE_H_
 
 #include<map>
 #include<string>
 #include<array>
+#include<algorithm>
+
+#include "./pitchclass.h"
+#include "./key.h"
 
 namespace justkeydding {
 
@@ -41,12 +45,14 @@ class KeyProfile {
     explicit KeyProfile(std::string keyProfile);
     explicit KeyProfile(std::string majKeyProfile, std::string minKeyProfile);
     typedef std::array<double, NUMBER_OF_PITCH_CLASSES> KeyProfileArray;
+    typedef std::map<Key, std::map<PitchClass, double> > KeyProfileMap;
     bool isValidMajorKeyProfile(std::string keyProfile);
     bool isValidMinorKeyProfile(std::string keyProfile);
     std::string whichMajorKeyProfile();
     std::string whichMinorKeyProfile();
     KeyProfileArray getMajorKeyProfile();
     KeyProfileArray getMinorKeyProfile();
+    KeyProfileMap getKeyProfileMap();
 
  private:
     std::string m_majorKeyProfile;
@@ -58,4 +64,4 @@ class KeyProfile {
 
 }  // namespace justkeydding
 
-#endif  // INCLUDE_KEYPROFILES_H_
+#endif  // INCLUDE_KEYPROFILE_H_
