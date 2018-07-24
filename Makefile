@@ -7,7 +7,7 @@ INCLUDE=include
 TEST=test
 MKDIR_P=mkdir -p
 
-TESTS = test_key test_pitchclass test_keyprofile test_keytransition test_hiddenmarkovmodel
+TESTS = test_key test_pitchclass test_keyprofile test_keytransition test_hiddenmarkovmodel test_chromagram
 
 CFLAGS=-I$(INCLUDE) --std=c++11
 
@@ -84,3 +84,13 @@ $(BUILD)/test_hiddenmarkovmodel.o: $(TEST)/test_hiddenmarkovmodel.cc
 
 $(BUILD)/hiddenmarkovmodel.o: $(SRC)/hiddenmarkovmodel.cc
 	$(CC) -c -o $(BUILD)/hiddenmarkovmodel.o $(SRC)/hiddenmarkovmodel.cc $(CFLAGS)
+
+
+test_chromagram: $(BUILD)/test_chromagram.o $(BUILD)/chromagram.o $(BUILD)/pitchclass.o $(BUILD)/key.o $(BUILD)/keytransition.o $(BUILD)/keyprofile.o $(BUILD)/hiddenmarkovmodel.o
+	$(CC) -o $(BIN)/test_chromagram $(BUILD)/test_chromagram.o $(BUILD)/chromagram.o $(BUILD)/pitchclass.o $(BUILD)/key.o $(BUILD)/keytransition.o $(BUILD)/keyprofile.o $(BUILD)/hiddenmarkovmodel.o
+
+$(BUILD)/test_chromagram.o: $(TEST)/test_chromagram.cc
+	$(CC) -c -o $(BUILD)/test_chromagram.o $(TEST)/test_chromagram.cc $(CFLAGS)
+
+$(BUILD)/chromagram.o: $(SRC)/chromagram.cc
+	$(CC) -c -o $(BUILD)/chromagram.o $(SRC)/chromagram.cc $(CFLAGS)
