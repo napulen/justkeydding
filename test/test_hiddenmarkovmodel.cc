@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
     // Emission probabilities
     KeyProfile::KeyProfileMap emissionProbabilities =
         KeyProfile("temperley", "sapp").getKeyProfileMap();
-    HiddenMarkovModel::KeySequence keySequence;
+    Key::KeySequence keySequence;
     HiddenMarkovModel hmm(
         pitchClassSequence,
         keyVector,
@@ -88,5 +88,5 @@ int main(int argc, char *argv[]) {
         initialProbabilities,
         zeroTransiionProbabilities,
         transitionProbabilities);
-    HiddenMarkovModel::KeySequence mainKeySequence = hmm2.runViterbi();
+    Key::KeySequence mainKeySequence = hmm2.runViterbi();
 }

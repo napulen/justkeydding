@@ -178,8 +178,8 @@ void HiddenMarkovModel::printOutput() {
   }
 }
 
-HiddenMarkovModel::KeySequence HiddenMarkovModel::runViterbi() {
-  KeySequence keySequence;
+Key::KeySequence HiddenMarkovModel::runViterbi() {
+  Key::KeySequence keySequence;
   std::map<std::string, Tracking> T;
 
   for (std::vector<std::string>::iterator state=m_states.begin();

@@ -71,21 +71,20 @@ class HiddenMarkovModel {
         std::map<std::string, double> > m_emissionProbabilities;
 
  public:
-    typedef std::vector<Key> KeySequence;
     HiddenMarkovModel(
-        std::vector<PitchClass> observations,
-        Key::KeyVector states,
-        std::map<Key, double> initialProbabilities,
-        std::map<Key, std::map<Key, double> > transitionProbabilities,
-        std::map<Key, std::map<PitchClass, double> > emissionProbabilities);
+      std::vector<PitchClass> observations,
+      Key::KeyVector states,
+      std::map<Key, double> initialProbabilities,
+      std::map<Key, std::map<Key, double> > transitionProbabilities,
+      std::map<Key, std::map<PitchClass, double> > emissionProbabilities);
     HiddenMarkovModel(
-        std::vector<Key> observations,
-        Key::KeyVector states,
-        std::map<Key, double> initialProbabilities,
-        std::map<Key, std::map<Key, double> > transitionProbabilities,
-        std::map<Key, std::map<Key, double> > emissionProbabilities);
+      std::vector<Key> observations,
+      Key::KeyVector states,
+      std::map<Key, double> initialProbabilities,
+      std::map<Key, std::map<Key, double> > transitionProbabilities,
+      std::map<Key, std::map<Key, double> > emissionProbabilities);
     void printOutput();
-    KeySequence runViterbi();
+    Key::KeySequence runViterbi();
 };
 
 
