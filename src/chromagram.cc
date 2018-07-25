@@ -45,7 +45,6 @@ PitchClass::PitchClassSequence Chromagram::getPitchClassSequence() {
     for (ChromagramMap::const_iterator itChr = m_discreteChromagramMap.begin();
         itChr != m_discreteChromagramMap.end(); itChr++) {
         if (itChr->second == std::next(itChr)->second) {
-            // Remove duplicates
             continue;
         }
         ChromagramVector chrVector = itChr->second;
