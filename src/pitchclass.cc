@@ -24,12 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR sOTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include<map>
-#include<string>
-#include<array>
-#include<algorithm>
-#include<iostream>
-
 #include "./pitchclass.h"
 
 namespace justkeydding {
