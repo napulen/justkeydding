@@ -30,6 +30,7 @@ SOFTWARE.
 #include<map>
 #include<string>
 #include<array>
+#include<vector>
 #include<algorithm>
 #include<iostream>
 
@@ -38,6 +39,7 @@ namespace justkeydding {
 class Key {
  public:
     typedef std::vector<Key> KeyVector;
+    typedef std::vector<Key> KeySequence;
     explicit Key(std::string key);
     explicit Key(int key);
     int getInt() const;
