@@ -29,8 +29,9 @@ SOFTWARE.
 
 #include<map>
 #include<string>
-#include<vector>
 #include<array>
+#include<algorithm>
+#include<iostream>
 
 namespace justkeydding {
 
