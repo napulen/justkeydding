@@ -31,6 +31,8 @@ SOFTWARE.
 #include<vector>
 #include<string>
 #include<array>
+#include<algorithm>
+#include<iostream>
 
 namespace justkeydding {
 
@@ -68,8 +70,8 @@ class PitchClass {
     std::map<std::string, int> m_stringToIntMap;
     const std::string m_allPitchClassStrings[
         NUMBER_OF_PITCHCLASSES] = {
-        "c", "c#", "d", "d#", "e", "f",
-        "f#", "g", "g#", "a", "a#", "b"
+        "c", "c#", "d", "eb", "e", "f",
+        "f#", "g", "ab", "a", "bb", "b"
     };
     void initStringToIntMap();
 };
