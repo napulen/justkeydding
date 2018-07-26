@@ -42,7 +42,6 @@ int main(int argc, char *argv[]) {
     // Turn into a PitchcClassSequence
     PitchClass::PitchClassSequence pitchClassSequence;
     pitchClassSequence = chr.getPitchClassSequence();
-    std::cout << "Got the sequence..." << std::endl;
     // States section
     Key::KeyVector keyVector =
         Key::getAllKeysVector();
@@ -61,14 +60,22 @@ int main(int argc, char *argv[]) {
     KeyProfile::KeyProfileMap emissionProbabilities =
         KeyProfile("temperley", "sapp").getKeyProfileMap();
     Key::KeySequence keySequence;
+    double maximumProbability;
     HiddenMarkovModel hmm(
         pitchClassSequence,
         keyVector,
         initialProbabilities,
         transitionProbabilities,
         emissionProbabilities);
-    std::cout << "Entering first layer" << std::endl;
-    keySequence = hmm.runViterbi();
+    hmm.runViterbi();
+    keySequence = hmm.getKeySequence();
+    maximumProbability = hmm.getMaximumProbability();
+    // std::cout << "Maximum probability of the sequence: "
+    //     << maximumProbability << std::endl;
+    // for (Key::KeySequence::const_iterator itKey = keySequence.begin();
+    //     itKey != keySequence.end(); itKey++) {
+    //     std::cout << itKey->getString() << " ";
+    // }
     /////////////////////////////
     // Second Hidden Markov Model
     /////////////////////////////
@@ -80,7 +87,15 @@ int main(int argc, char *argv[]) {
         initialProbabilities,
         zeroTransiionProbabilities,
         transitionProbabilities);
-    std::cout << "Entering second layer" << std::endl;
-    Key::KeySequence mainKeySequence = hmm2.runViterbi();
+    hmm2.runViterbi();
+    keySequence = hmm2.getKeySequence();
+    maximumProbability = hmm2.getMaximumProbability();
+    // std::cout << "Maximum probability of the sequence: "
+    //     << maximumProbability << std::endl;
+    // for (Key::KeySequence::const_iterator itKey = keySequence.begin();
+    //     itKey != keySequence.end(); itKey++) {
+    //     std::cout << itKey->getString() << " ";
+    // }
+    std::cout << keySequence.front().getString() << std::endl;
     return justkeydding::STATUS_OK;
 }
