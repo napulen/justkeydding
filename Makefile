@@ -6,12 +6,15 @@ BIN=bin
 INCLUDE=include
 TEST=test
 MKDIR_P=mkdir -p
+NNLS_CHROMA=nnls-chroma-1.1
 
 TESTS = test_key test_pitchclass test_keyprofile test_keytransition test_hiddenmarkovmodel test_chromagram
 
 CFLAGS=-I$(INCLUDE) --std=c++11 -O3
 
 LFLAGS=-O3
+
+ADDITIONAL_LIBRARIES=-lsndfile -lvamp-hostsdk -ldl
 
 .PHONY: directories clean
 
@@ -88,11 +91,23 @@ $(BUILD)/hiddenmarkovmodel.o: $(SRC)/hiddenmarkovmodel.cc
 	$(CC) -c -o $(BUILD)/hiddenmarkovmodel.o $(SRC)/hiddenmarkovmodel.cc $(CFLAGS)
 
 
-test_chromagram: $(BUILD)/test_chromagram.o $(BUILD)/chromagram.o $(BUILD)/pitchclass.o $(BUILD)/key.o $(BUILD)/keytransition.o $(BUILD)/keyprofile.o $(BUILD)/hiddenmarkovmodel.o
-	$(CC) -o $(BIN)/test_chromagram $(BUILD)/test_chromagram.o $(BUILD)/chromagram.o $(BUILD)/pitchclass.o $(BUILD)/key.o $(BUILD)/keytransition.o $(BUILD)/keyprofile.o $(BUILD)/hiddenmarkovmodel.o $(LFLAGS)
+test_chromagram: $(BUILD)/test_chromagram.o $(BUILD)/chromagram.o $(BUILD)/pitchclass.o $(BUILD)/key.o $(BUILD)/keytransition.o $(BUILD)/keyprofile.o $(BUILD)/hiddenmarkovmodel.o $(BUILD)/NNLSChroma.o $(BUILD)/NNLSBase.o $(BUILD)/chromamethods.o $(BUILD)/nnls.o
+	$(CC) -o $(BIN)/test_chromagram $(BUILD)/test_chromagram.o $(BUILD)/chromagram.o $(BUILD)/pitchclass.o $(BUILD)/key.o $(BUILD)/keytransition.o $(BUILD)/keyprofile.o $(BUILD)/hiddenmarkovmodel.o $(BUILD)/NNLSChroma.o $(BUILD)/NNLSBase.o $(BUILD)/chromamethods.o $(BUILD)/nnls.o $(LFLAGS) $(ADDITIONAL_LIBRARIES)
 
 $(BUILD)/test_chromagram.o: $(TEST)/test_chromagram.cc
-	$(CC) -c -o $(BUILD)/test_chromagram.o $(TEST)/test_chromagram.cc $(CFLAGS)
+	$(CC) -c -o $(BUILD)/test_chromagram.o $(TEST)/test_chromagram.cc $(CFLAGS) -I$(NNLS_CHROMA)
+
+$(BUILD)/NNLSChroma.o: $(NNLS_CHROMA)/NNLSChroma.cpp
+	$(CC) -c -o $(BUILD)/NNLSChroma.o $(NNLS_CHROMA)/NNLSChroma.cpp
+
+$(BUILD)/NNLSBase.o: $(NNLS_CHROMA)/NNLSBase.cpp
+	$(CC) -c -o $(BUILD)/NNLSBase.o $(NNLS_CHROMA)/NNLSBase.cpp
+
+$(BUILD)/chromamethods.o: $(NNLS_CHROMA)/chromamethods.cpp
+	$(CC) -c -o $(BUILD)/chromamethods.o $(NNLS_CHROMA)/chromamethods.cpp
+
+$(BUILD)/nnls.o: $(NNLS_CHROMA)/nnls.c
+	$(CC) -c -o $(BUILD)/nnls.o $(NNLS_CHROMA)/nnls.c
 
 $(BUILD)/chromagram.o: $(SRC)/chromagram.cc
-	$(CC) -c -o $(BUILD)/chromagram.o $(SRC)/chromagram.cc $(CFLAGS)
+	$(CC) -c -o $(BUILD)/chromagram.o $(SRC)/chromagram.cc $(CFLAGS) -I$(NNLS_CHROMA) -D_VAMP_PLUGIN_IN_HOST_NAMESPACE
