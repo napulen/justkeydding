@@ -76,7 +76,8 @@ int main(int argc, char *argv[]) {
         initialProbabilities,
         transitionProbabilities,
         emissionProbabilities);
-    keySequence = hmm.runViterbi();
+    hmm.runViterbi();
+    keySequence = hmm.getKeySequence();
     /////////////////////////////
     // Second Hidden Markov Model
     /////////////////////////////
@@ -88,5 +89,7 @@ int main(int argc, char *argv[]) {
         initialProbabilities,
         zeroTransiionProbabilities,
         transitionProbabilities);
-    Key::KeySequence mainKeySequence = hmm2.runViterbi();
+    Key::KeySequence mainKeySequence;
+    hmm2.runViterbi();
+    mainKeySequence = hmm2.getKeySequence();
 }
