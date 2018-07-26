@@ -30,6 +30,7 @@ SOFTWARE.
 #include<string>
 #include<vector>
 #include<map>
+#include<unordered_map>
 #include<cmath>
 #include<iostream>
 #include<limits>
@@ -44,17 +45,14 @@ namespace justkeydding {
 
 class Tracking {
  public:
-  double prob;
-  std::vector<std::string> v_path;
+  std::vector<int> v_path;
   double v_prob;
 
   Tracking() {
-    prob = -std::numeric_limits<double>::infinity();
     v_prob = -std::numeric_limits<double>::infinity();
   }
 
-  Tracking(double p, const std::vector<std::string> & v_pth, double v_p) {
-    prob = p;
+  Tracking(const std::vector<int> & v_pth, double v_p) {
     v_path = v_pth;
     v_prob = v_p;
   }
@@ -62,15 +60,25 @@ class Tracking {
 
 
 class HiddenMarkovModel {
-    std::vector<std::string> m_observations;
-    std::vector<std::string> m_states;
-    std::map<std::string, double> m_initialProbabilities;
-    std::map<std::string,
-        std::map<std::string, double> > m_transitionProbabilities;
-    std::map<std::string,
-        std::map<std::string, double> > m_emissionProbabilities;
+    std::vector<int> m_observations;
+    std::vector<int> m_states;
+    std::unordered_map<int, double> m_initialProbabilities;
+    std::unordered_map<int,
+        std::unordered_map<int, double> > m_transitionProbabilities;
+    std::unordered_map<int,
+        std::unordered_map<int, double> > m_emissionProbabilities;
+
+    struct ViterbiNode {
+      double probability;
+      int previousState;
+      ViterbiNode(
+        double p = -std::numeric_limits<double>::infinity(),
+        int s = -1) : probability(p), previousState(s) { }
+    };
 
  public:
+    typedef std::unordered_map<int, ViterbiNode> ViterbiLayer;
+    std::vector<ViterbiLayer> m_viterbi;
     HiddenMarkovModel(
       std::vector<PitchClass> observations,
       Key::KeyVector states,
