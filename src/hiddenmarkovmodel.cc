@@ -25,16 +25,12 @@ SOFTWARE.
 */
 
 #include "./hiddenmarkovmodel.h"
-#include <chrono>
 
 using std::cout;
 using std::endl;
 using std::log10;
 
 namespace justkeydding {
-
-typedef std::chrono::high_resolution_clock Time;
-typedef std::chrono::milliseconds ms;
 
 HiddenMarkovModel::HiddenMarkovModel(
   std::vector<PitchClass> observations,
@@ -139,31 +135,31 @@ HiddenMarkovModel::HiddenMarkovModel(
 void HiddenMarkovModel::printOutput() {
   // print states
   std::cout << "States:" << std::endl;
-  for (std::vector<int>::const_iterator i = m_states.begin();
+  for (States::const_iterator i = m_states.begin();
     i != m_states.end(); i++) {
     std::cout << "S: " << (*i) << std::endl;
   }
 
   // print observations
   std::cout << "Observations:" << std::endl;
-  for (std::vector<int>::const_iterator i = m_observations.begin();
+  for (Observations::const_iterator i = m_observations.begin();
       i != m_observations.end(); i++) {
     std::cout << "O: " << (*i) << std::endl;
   }
 
   // print start probabilities
   std::cout << "Start probabilities:" << std::endl;
-  for (std::unordered_map<int, double>::const_iterator i =
+  for (InitialProbabilities::const_iterator i =
     m_initialProbabilities.begin(); i != m_initialProbabilities.end(); i++) {
     std::cout << "S: " << (*i).first << " P: " << (*i).second << std::endl;
   }
 
   // print transition_probability
   std::cout << "Transition probabilities:" << std::endl;
-  for (std::unordered_map<int, std::unordered_map<int,
-      double> >::const_iterator i = m_transitionProbabilities.begin();
-      i != m_transitionProbabilities.end(); i++) {
-    for (std::unordered_map<int, double>::const_iterator j =
+  for (TransitionProbabilities::const_iterator i =
+    m_transitionProbabilities.begin();
+    i != m_transitionProbabilities.end(); i++) {
+    for (TransitionProbability::const_iterator j =
         (*i).second.begin(); j != (*i).second.end(); j++) {
       std::cout << "FS: " << (*i).first << " TS: " <<
       (*j).first << " P: " << (*j).second << std::endl;
@@ -182,13 +178,12 @@ void HiddenMarkovModel::printOutput() {
   }
 }
 
-Key::KeySequence HiddenMarkovModel::runViterbi() {
-  Key::KeySequence keySequence;
+void HiddenMarkovModel::runViterbi() {
+  std::vector<ViterbiLayer> m_viterbi;
   ViterbiLayer currentLayer;
   ViterbiNode currentNode;
   double transition, emission, trialProbability;
   double maximumProbability = -std::numeric_limits<double>::infinity();
-  int lastState;
   for (std::vector<int>::const_iterator itState=m_states.begin();
       itState != m_states.end(); itState++) {
     int firstObservation = m_observations[0];
@@ -210,7 +205,8 @@ Key::KeySequence HiddenMarkovModel::runViterbi() {
         currentNode = currentLayer[*itCurrentState];
         transition = m_transitionProbabilities[*itCurrentState][*itNextState];
         emission = m_emissionProbabilities[*itNextState][*itObservation];
-        trialProbability = currentNode.probability + log10(transition * emission);
+        trialProbability =
+          currentNode.probability + log10(transition * emission);
         if (trialProbability > nextNode.probability) {
           nextNode.probability = trialProbability;
           nextNode.previousState = *itCurrentState;
@@ -221,115 +217,36 @@ Key::KeySequence HiddenMarkovModel::runViterbi() {
     currentLayer = nextLayer;
     m_viterbi.push_back(currentLayer);
   }
-  ViterbiLayer lastLayer = m_viterbi.back();
-  for (ViterbiLayer::const_iterator itLastState = lastLayer.begin();
-    itLastState != lastLayer.end(); itLastState++) {
-    ViterbiNode lastNode = itLastState->second;
-    if (lastNode.probability > maximumProbability) {
-      maximumProbability = lastNode.probability;
-      lastState = itLastState->first;
+  ViterbiLayer lastLayer;
+  int lastState = -1;
+  while (!m_viterbi.empty()) {
+    lastLayer = m_viterbi.back();
+    if (lastState == -1) {
+      for (ViterbiLayer::const_iterator itLastState = lastLayer.begin();
+          itLastState != lastLayer.end(); itLastState++) {
+        ViterbiNode lastNode = itLastState->second;
+        if (lastNode.probability > maximumProbability) {
+          maximumProbability = lastNode.probability;
+          lastState = itLastState->first;
+        }
+      }
     }
-  }
-  for (std::vector<ViterbiLayer>::const_reverse_iterator itLayer =
-      m_viterbi.rbegin(); itLayer != m_viterbi.rend(); itLayer++) {
-    Key::KeySequence::iterator itBegin = keySequence.begin();
-    keySequence.push_back(Key(lastState));
-    ViterbiNode currentNode = itLayer->at(lastState);
+    m_keySequence.push_back(Key(lastState));
+    currentNode = lastLayer.at(lastState);
     lastState = currentNode.previousState;
+    m_viterbi.pop_back();
   }
-  // std::reverse(keySequence.begin(), keySequence.end());
-
-  std::cout << "Probability of the Viterbi path: "
-       << maximumProbability << std::endl;
-  std::cout << "The Viterbi path: " << std::endl;
-  for (Key::KeySequence::const_iterator itKey = keySequence.begin();
-      itKey != keySequence.end(); itKey++) {
-     std::cout << itKey->getString() << " ";
-  }
-
-  return keySequence;
+  std::reverse(m_keySequence.begin(), m_keySequence.end());
+  m_maximumProbability = maximumProbability;
+  return;
 }
 
+Key::KeySequence HiddenMarkovModel::getKeySequence() {
+  return m_keySequence;
+}
 
-// Key::KeySequence HiddenMarkovModel::runViterbi() {
-//   Key::KeySequence keySequence;
-//   std::map<int, Tracking> T;
-//   auto beginning = Time::now();
-
-//   for (std::vector<int>::iterator state=m_states.begin();
-//       state != m_states.end(); state++) {
-//     std::vector<int> v_pth;
-//     v_pth.push_back(*state);
-//     T[*state] = Tracking(v_pth,
-//         log10(m_initialProbabilities[*state]));
-//   }
-//   ms elapsed;
-//   Tracking source_tracker;
-//   for (std::vector<int>::iterator output=m_observations.begin();
-//       output != m_observations.end(); output++) {
-//     std::map<int, Tracking> U;
-//     auto entry = Time::now();
-//     std::cout << "Observation " << output - m_observations.begin() << "/"
-//       << m_observations.size() << std::endl;
-
-//     for (std::vector<int>::iterator next_state=m_states.begin();
-//         next_state != m_states.end(); next_state++) {
-//       Tracking next_tracker;
-
-//       for (std::vector<int>::iterator source_state=m_states.begin();
-//       source_state != m_states.end(); source_state++) {
-//         source_tracker = T[*source_state];
-
-//         double p = log10(m_emissionProbabilities[*source_state][*output]) +
-//             log10(m_transitionProbabilities[*source_state][*next_state]);
-//         source_tracker.v_prob += p;
-
-//         if (source_tracker.v_prob > next_tracker.v_prob) {
-//           // next_tracker.v_path = source_tracker.v_path;
-//           // next_tracker.v_path.push_back(*next_state);
-//           next_tracker.v_prob = source_tracker.v_prob;
-//         }
-//       }
-//       U[*next_state] = next_tracker;
-//     }
-//     T = U;
-//     auto exit = Time::now();
-//     elapsed = std::chrono::duration_cast<ms>(exit-entry);
-//     std::cout << "\t" << elapsed.count() << "ms" << std::endl;
-//   }
-
-//   Tracking final_tracker;
-
-//   for (std::vector<int>::iterator state = m_states.begin();
-//   state != m_states.end(); state++) {
-//     Tracking tracker = T[*state];
-//     if (tracker.v_prob > final_tracker.v_prob) {
-//       final_tracker.v_path = tracker.v_path;
-//       final_tracker.v_prob = tracker.v_prob;
-//     }
-//   }
-
-//   // final_tracker.v_path.pop_back();
-
-//   // for (std::vector<int>::const_iterator itNode =
-//   //   final_tracker.v_path.begin(); itNode != final_tracker.v_path.end();
-//   //   itNode++) {
-//   //   keySequence.push_back(Key(*itNode));
-//   // }
-
-//   std::cout << "Probability of the Viterbi path: "
-//        << final_tracker.v_prob << std::endl;
-//   std::cout << "The Viterbi path: " << std::endl;
-//   // for (std::vector<int>::iterator state=final_tracker.v_path.begin();
-//   // state != final_tracker.v_path.end(); state++) {
-//   //   std::cout << "VState: " << *state << std::endl;
-//   // }
-
-//   auto end = Time::now();
-//   elapsed = std::chrono::duration_cast<ms>(end - beginning);
-//   std::cout << "HiddenMarkovModel took " << elapsed.count() << "ms" << std::endl;
-
-//   return keySequence;
-// }
+double HiddenMarkovModel::getMaximumProbability() const {
+  return m_maximumProbability;
+}
 
 }  // namespace justkeydding

@@ -40,45 +40,28 @@ SOFTWARE.
 #include "./keyprofile.h"
 #include "./keytransition.h"
 
-
 namespace justkeydding {
 
-class Tracking {
- public:
-  std::vector<int> v_path;
-  double v_prob;
-
-  Tracking() {
-    v_prob = -std::numeric_limits<double>::infinity();
-  }
-
-  Tracking(const std::vector<int> & v_pth, double v_p) {
-    v_path = v_pth;
-    v_prob = v_p;
-  }
-};
-
-
 class HiddenMarkovModel {
-    std::vector<int> m_observations;
-    std::vector<int> m_states;
-    std::unordered_map<int, double> m_initialProbabilities;
-    std::unordered_map<int,
-        std::unordered_map<int, double> > m_transitionProbabilities;
-    std::unordered_map<int,
-        std::unordered_map<int, double> > m_emissionProbabilities;
-
-    struct ViterbiNode {
+  struct ViterbiNode {
       double probability;
       int previousState;
       ViterbiNode(
         double p = -std::numeric_limits<double>::infinity(),
         int s = -1) : probability(p), previousState(s) { }
-    };
+  };
 
  public:
+    typedef std::vector<int> Observations;
+    typedef std::vector<int> States;
+    typedef std::unordered_map<int, double> InitialProbabilities;
+    typedef std::unordered_map<int, double> TransitionProbability;
+    typedef std::unordered_map<int, double> EmissionProbability;
+    typedef std::unordered_map<int,
+      TransitionProbability> TransitionProbabilities;
+    typedef std::unordered_map<int,
+      EmissionProbability> EmissionProbabilities;
     typedef std::unordered_map<int, ViterbiNode> ViterbiLayer;
-    std::vector<ViterbiLayer> m_viterbi;
     HiddenMarkovModel(
       std::vector<PitchClass> observations,
       Key::KeyVector states,
@@ -92,7 +75,18 @@ class HiddenMarkovModel {
       std::map<Key, std::map<Key, double> > transitionProbabilities,
       std::map<Key, std::map<Key, double> > emissionProbabilities);
     void printOutput();
-    Key::KeySequence runViterbi();
+    void runViterbi();
+    Key::KeySequence getKeySequence();
+    double getMaximumProbability() const;
+
+ private:
+    Observations m_observations;
+    States m_states;
+    InitialProbabilities m_initialProbabilities;
+    TransitionProbabilities m_transitionProbabilities;
+    EmissionProbabilities m_emissionProbabilities;
+    double m_maximumProbability;
+    Key::KeySequence m_keySequence;
 };
 
 
