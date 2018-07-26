@@ -127,4 +127,10 @@ bool Key::operator<(const Key &key) const {
     return m_key < key.getInt();
 }
 
+Key& Key::operator=(const Key &key) {
+    m_key = key.getInt();
+    m_keyString = key.getString();
+    return *this;
+}
+
 }  // namespace justkeydding

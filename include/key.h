@@ -50,6 +50,7 @@ class Key {
     bool operator==(const Key &key) const;
     bool operator!=(const Key &key) const;
     bool operator<(const Key &key) const;
+    Key& operator=(const Key &key);
     enum enKey {
         FIRST_MAJOR_KEY,
         KEY_B_SHARP_MAJOR = 0, KEY_C_NATURAL_MAJOR = 0,
