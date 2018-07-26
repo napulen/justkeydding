@@ -104,8 +104,100 @@ void Chromagram::getChromagramFromCsv(std::string csvFilename) {
 }
 
 void Chromagram::getChromagramFromAudio(std::string fileName) {
-    std::cout << "Can't, sorry." << std::endl;
-    return;
+    SF_INFO sfinfo;
+    SNDFILE *sndfile = sf_open(fileName.c_str(), SFM_READ, &sfinfo);
+
+    if (!sndfile) {
+        // TODO(napulen): It is the logger's job to deal with this
+        return;
+    }
+
+    NNLSChroma *chroma = new NNLSChroma(sfinfo.samplerate);
+    Vamp::HostExt::PluginInputDomainAdapter *ia =
+    new Vamp::HostExt::PluginInputDomainAdapter(chroma);
+    ia->setProcessTimestampMethod(
+        Vamp::HostExt::PluginInputDomainAdapter::ShiftData);
+    Vamp::HostExt::PluginBufferingAdapter *adapter =
+    new Vamp::HostExt::PluginBufferingAdapter(ia);
+
+    int blocksize = adapter->getPreferredBlockSize();
+
+    // Plugin requires 1 channel (we will mix down)
+    if (!adapter->initialise(1, blocksize, blocksize)) {
+        // cerr << myname << ": Failed to initialise Chordino adapter!" << endl;
+        return;
+    }
+
+    float *filebuf = new float[sfinfo.channels * blocksize];
+    float *mixbuf = new float[blocksize];
+
+    Vamp::Plugin::FeatureList chromaFeatures;
+    Vamp::Plugin::FeatureSet fs;
+
+    int chromaFeatureNo = -1;
+    Vamp::Plugin::OutputList outputs = adapter->getOutputDescriptors();
+    for (int i = 0; i < static_cast<int>(outputs.size()); ++i) {
+        if (outputs[i].identifier == "chroma") {
+            chromaFeatureNo = i;
+        }
+    }
+    if (chromaFeatureNo < 0) {
+        // cerr << myname << ": Failed to identify chords output!" << endl;
+        return;
+    }
+
+    int frame = 0;
+    while (frame < sfinfo.frames) {
+        int count = -1;
+        if ((count = sf_readf_float(sndfile, filebuf, blocksize)) <= 0) break;
+
+        // mix down
+        for (int i = 0; i < blocksize; ++i) {
+            mixbuf[i] = 0.f;
+            if (i < count) {
+                for (int c = 0; c < sfinfo.channels; ++c) {
+                    mixbuf[i] +=
+                        filebuf[i * sfinfo.channels + c] / sfinfo.channels;
+                }
+            }
+        }
+
+        Vamp::RealTime timestamp =
+            Vamp::RealTime::frame2RealTime(frame, sfinfo.samplerate);
+
+        // feed to plugin: can just take address of buffer, as only one channel
+        fs = adapter->process(&mixbuf, timestamp);
+
+        chromaFeatures.insert(chromaFeatures.end(),
+            fs[chromaFeatureNo].begin(),
+            fs[chromaFeatureNo].end());
+
+        frame += count;
+    }
+
+    sf_close(sndfile);
+
+    // features at end of processing (actually Chordino does all its work here)
+    fs = adapter->getRemainingFeatures();
+
+    // chord output is output index 0
+    chromaFeatures.insert(chromaFeatures.end(),
+        fs[chromaFeatureNo].begin(),
+        fs[chromaFeatureNo].end());
+
+    for (int i = 0; i < static_cast<int>(chromaFeatures.size()); ++i) {
+        cout << chromaFeatures[i].timestamp.toString() << ",";
+        for (vector<float>::iterator it = chromaFeatures[i].values.begin();
+            it != chromaFeatures[i].values.end(); it++) {
+            cout << *it << ",";
+        }
+        cout << endl;
+    }
+
+    delete[] filebuf;
+    delete[] mixbuf;
+
+    delete adapter;
 }
 
 void Chromagram::discretizeChromagram() {

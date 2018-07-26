@@ -27,6 +27,11 @@ SOFTWARE.
 #ifndef INCLUDE_CHROMAGRAM_H_
 #define INCLUDE_CHROMAGRAM_H_
 
+#include <vamp-hostsdk/PluginInputDomainAdapter.h>
+#include <vamp-hostsdk/PluginBufferingAdapter.h>
+#include <NNLSChroma.h>
+#include <sndfile.h>
+
 #include<string>
 #include<vector>
 #include<map>
