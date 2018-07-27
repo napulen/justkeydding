@@ -42,26 +42,6 @@ SOFTWARE.
 #include "./hiddenmarkovmodel.h"
 #include "optparse/optparse.h"
 
-namespace justkeydding {
-
-// TODO(napulen): Make an actual logger as a separate header
-//               and source that everyone should include
-// void logError(int status) {
-//     std::string msg;
-//     switch (status) {
-//         case STATUS_MISSING_ARG:
-//             msg = "Missing an argument.";
-//             break;
-//         case STATUS_FILE_ERROR:
-//             msg = "Couldn't open your file.";
-//             break;
-//         default:
-//         msg = "There was an error running the program.";
-//     }
-//     msg += "\n\nUsage:\n" + std::string(programName) + " <input_file>";
-//     std::cerr << "Error " << status << ": " << msg << std::endl;
-// }
-
-}  // namespace justkeydding
+void initOptionParser(optparse::OptionParserExcept *parser);
 
 #endif  // INCLUDE_JUSTKEYDDING_H_
