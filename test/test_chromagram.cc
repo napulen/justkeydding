@@ -30,12 +30,12 @@ using justkeydding::Chromagram;
 using justkeydding::PitchClass;
 
 int main(int argc, char *argv[]) {
-    Chromagram::enFileType fileType = Chromagram::FILETYPE_AUDIO;
-    Chromagram chr("Misunderstanding.wav", fileType);
-    // PitchClass::PitchClassSequence pcSequence;
-    // pcSequence = chr.getPitchClassSequence();
-    // for (PitchClass::PitchClassSequence::const_iterator itPcSeq =
-    //     pcSequence.begin(); itPcSeq != pcSequence.end(); itPcSeq++) {
-    //     std::cout << (itPcSeq->getString()) << " ";
-    // }
+    Chromagram::enFileType fileType = Chromagram::FILETYPE_CSV;
+    Chromagram chr("test_the_keys.csv", fileType);
+    PitchClass::PitchClassSequence pcSequence;
+    pcSequence = chr.getPitchClassSequence();
+    for (PitchClass::PitchClassSequence::const_iterator itPcSeq =
+        pcSequence.begin(); itPcSeq != pcSequence.end(); itPcSeq++) {
+        std::cout << (itPcSeq->getString()) << " ";
+    }
 }
