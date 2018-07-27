@@ -103,9 +103,9 @@ void Chromagram::getChromagramFromCsv(std::string csvFilename) {
     return;
 }
 
-void Chromagram::getChromagramFromAudio(std::string fileName) {
+void Chromagram::getChromagramFromAudio(std::string audioFile) {
     SF_INFO sfinfo;
-    SNDFILE *sndfile = sf_open(fileName.c_str(), SFM_READ, &sfinfo);
+    SNDFILE *sndfile = sf_open(audioFile.c_str(), SFM_READ, &sfinfo);
 
     if (!sndfile) {
         // TODO(napulen): It is the logger's job to deal with this
@@ -184,14 +184,17 @@ void Chromagram::getChromagramFromAudio(std::string fileName) {
     chromaFeatures.insert(chromaFeatures.end(),
         fs[chromaFeatureNo].begin(),
         fs[chromaFeatureNo].end());
-
+    int pcIndex;
+    double timestamp;
     for (int i = 0; i < static_cast<int>(chromaFeatures.size()); ++i) {
-        cout << chromaFeatures[i].timestamp.toString() << ",";
-        for (vector<float>::iterator it = chromaFeatures[i].values.begin();
-            it != chromaFeatures[i].values.end(); it++) {
-            cout << *it << ",";
+        timestamp = std::stof(chromaFeatures[i].timestamp.toString());
+        for (int c = 0; c < chromaFeatures[i].values.size(); c++) {
+            pcIndex =
+                (PitchClass::PITCHCLASS_A_NATURAL + c)
+                % PitchClass::NUMBER_OF_PITCHCLASSES;
+            m_originalChromagramMap[timestamp][pcIndex] =
+                chromaFeatures[i].values[c];
         }
-        cout << endl;
     }
 
     delete[] filebuf;
