@@ -34,11 +34,95 @@ using justkeydding::HiddenMarkovModel;
 using justkeydding::Chromagram;
 
 int main(int argc, char *argv[]) {
-    if (argc != 2) {
-        return justkeydding::STATUS_MISSING_ARG;
+    const std::string usage =
+        "usage: %prog [options] inputfile";
+
+    const std::string version =
+        "%prog v0.4.0\nCopyright (C) Nestor Napoles 2018.";
+
+    optparse::OptionParserExcept parser;
+    parser
+        .usage(usage)
+        .version(version)
+        .description(
+            "Audio Key Detection program based on NNLS-Chroma"
+            " features and a Hidden Markov Model");
+
+    std::array<std::string, 3> formatOptions =
+        {"wav", "csv", "midi"};
+    parser.add_option("-f", "--inputformat")
+        .choices(formatOptions.begin(), formatOptions.end());
+    parser.set_defaults("inputformat", "wav");
+
+    std::array<std::string, 3> majorKeyProfiles =
+        {"krumhansl_kessler", "sapp", "temperley"};
+    parser.add_option("-M", "--majorprofile")
+        .choices(majorKeyProfiles.begin(), majorKeyProfiles.end());
+    parser.set_defaults("majorprofile", "temperley");
+
+    std::array<std::string, 3> minorKeyProfiles =
+        {"krumhansl_kessler", "sapp", "temperley"};
+    parser.add_option("-m", "--minorprofile")
+        .choices(minorKeyProfiles.begin(), minorKeyProfiles.end());
+    parser.set_defaults("minorprofile", "sapp");
+
+    std::array<std::string, 3> keyTransitions =
+        {"exponential", "exponential10"};
+    parser.add_option("-t", "--keytransition")
+        .choices(keyTransitions.begin(), keyTransitions.end());
+    parser.set_defaults("keytransition", "exponential10");
+
+    Chromagram::enFileType fileformat;
+    std::string keyTransition;
+    std::string majorKeyProfile;
+    std::string minorKeyProfile;
+    std::string filename;
+
+    try {
+        const optparse::Values &options = parser.parse_args(argc, argv);
+        const std::vector<std::string> args = parser.args();
+
+        if (args.size() != 1) {
+            std::cout << "Missing input file." << std::endl;
+            parser.print_help();
+            return 0;
+        } else {
+            if (options.is_set("inputformat")) {
+                std::string format = static_cast<std::string>(
+                    options.get("inputformat"));
+                if (format == "wav") {
+                    fileformat = Chromagram::FILETYPE_AUDIO;
+                } else if (format == "csv") {
+                    fileformat = Chromagram::FILETYPE_CSV;
+                } else if (format == "midi") {
+                    std:: cout << "We don't support midi yet!"
+                        << std::endl;
+                    parser.print_help();
+                    return 0;
+                }
+            }
+            if (options.is_set("majorprofile")) {
+                majorKeyProfile = static_cast<std::string>(
+                    options.get("majorprofile"));
+            }
+            if (options.is_set("minorprofile")) {
+                minorKeyProfile = static_cast<std::string>(
+                    options.get("minorprofile"));
+            }
+            if (options.is_set("keytransition")) {
+                keyTransition = static_cast<std::string>(
+                    options.get("keytransition"));
+            }
+            filename = args.front();
+        }
     }
+    catch (int ret_code) {
+        std::cout << "OptionParser has thrown " << ret_code << std::endl;
+        return ret_code;
+    }
+
     // Get the chromagrams
-    Chromagram chr = Chromagram(argv[1], Chromagram::FILETYPE_AUDIO);
+    Chromagram chr = Chromagram(filename, fileformat);
     // Turn into a PitchcClassSequence
     PitchClass::PitchClassSequence pitchClassSequence;
     pitchClassSequence = chr.getPitchClassSequence();
@@ -55,10 +139,11 @@ int main(int argc, char *argv[]) {
     }
     // Transition probabilities
     KeyTransition::KeyTransitionMap transitionProbabilities =
-        KeyTransition("exponential10").getKeyTransitionMap();
+        KeyTransition(keyTransition).getKeyTransitionMap();
     // Emission probabilities
     KeyProfile::KeyProfileMap emissionProbabilities =
-        KeyProfile("temperley", "sapp").getKeyProfileMap();
+        KeyProfile(majorKeyProfile, minorKeyProfile)
+            .getKeyProfileMap();
     Key::KeySequence keySequence;
     double maximumProbability;
     HiddenMarkovModel hmm(
@@ -96,6 +181,16 @@ int main(int argc, char *argv[]) {
     //     itKey != keySequence.end(); itKey++) {
     //     std::cout << itKey->getString() << " ";
     // }
-    std::cout << keySequence.front().getString() << std::endl;
-    return justkeydding::STATUS_OK;
+    Key mainKey = keySequence.front();
+    std::string mainKeyStr = mainKey.getString();
+    std::transform(
+        mainKeyStr.begin(),
+        std::next(mainKeyStr.begin()),
+        mainKeyStr.begin(),
+        ::toupper);
+    std::cout
+        << mainKeyStr << '\t'
+        << (mainKey.isMajorKey() ? "major" : "minor")
+        << std::endl;
+    return 0;
 }

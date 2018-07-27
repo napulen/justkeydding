@@ -24,6 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#ifndef INCLUDE_JUSTKEYDDING_H_
+#define INCLUDE_JUSTKEYDDING_H_
+
 #include<iostream>
 #include<fstream>
 #include<sstream>
@@ -37,14 +40,9 @@ SOFTWARE.
 #include "./keytransition.h"
 #include "./chromagram.h"
 #include "./hiddenmarkovmodel.h"
+#include "optparse/optparse.h"
 
 namespace justkeydding {
-
-enum status {
-    STATUS_OK,
-    STATUS_MISSING_ARG,
-    STATUS_FILE_ERROR
-};
 
 // TODO(napulen): Make an actual logger as a separate header
 //               and source that everyone should include
@@ -65,3 +63,5 @@ enum status {
 // }
 
 }  // namespace justkeydding
+
+#endif  // INCLUDE_JUSTKEYDDING_H_
