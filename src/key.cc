@@ -133,4 +133,36 @@ Key& Key::operator=(const Key &key) {
     return *this;
 }
 
+Key Key::getRelativeKey() const {
+    if (this->isMajorKey()) {
+        return Key(((m_key + 9) % 12) + 12);
+    } else {
+        return Key((m_key + 3) % 12);
+    }
+}
+
+Key Key::getDominantKey() const {
+    if (this->isMajorKey()) {
+        return Key((m_key + 7) % 12);
+    } else {
+        return Key(((m_key + 7) % 12) + 12);
+    }
+}
+
+Key Key::getSubDominantKey() const {
+    if (this->isMajorKey()) {
+        return Key((m_key + 5) % 12);
+    } else {
+        return Key(((m_key + 5) % 12) + 12);
+    }
+}
+
+Key Key::getParallelKey() const {
+    if (this->isMajorKey()) {
+        return Key(m_key + 12);
+    } else {
+        return Key(m_key % 12);
+    }
+}
+
 }  // namespace justkeydding
