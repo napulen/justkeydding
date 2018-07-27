@@ -34,50 +34,14 @@ using justkeydding::HiddenMarkovModel;
 using justkeydding::Chromagram;
 
 int main(int argc, char *argv[]) {
-    const std::string usage =
-        "usage: %prog [options] inputfile";
-
-    const std::string version =
-        "%prog v0.4.0\nCopyright (C) Nestor Napoles 2018.";
-
     optparse::OptionParserExcept parser;
-    parser
-        .usage(usage)
-        .version(version)
-        .description(
-            "Audio Key Detection program based on NNLS-Chroma"
-            " features and a Hidden Markov Model");
-
-    std::array<std::string, 3> formatOptions =
-        {"wav", "csv", "midi"};
-    parser.add_option("-f", "--inputformat")
-        .choices(formatOptions.begin(), formatOptions.end());
-    parser.set_defaults("inputformat", "wav");
-
-    std::array<std::string, 3> majorKeyProfiles =
-        {"krumhansl_kessler", "sapp", "temperley"};
-    parser.add_option("-M", "--majorprofile")
-        .choices(majorKeyProfiles.begin(), majorKeyProfiles.end());
-    parser.set_defaults("majorprofile", "temperley");
-
-    std::array<std::string, 3> minorKeyProfiles =
-        {"krumhansl_kessler", "sapp", "temperley"};
-    parser.add_option("-m", "--minorprofile")
-        .choices(minorKeyProfiles.begin(), minorKeyProfiles.end());
-    parser.set_defaults("minorprofile", "sapp");
-
-    std::array<std::string, 3> keyTransitions =
-        {"exponential", "exponential10"};
-    parser.add_option("-t", "--keytransition")
-        .choices(keyTransitions.begin(), keyTransitions.end());
-    parser.set_defaults("keytransition", "exponential10");
-
+    initOptionParser(&parser);
     Chromagram::enFileType fileformat;
     std::string keyTransition;
     std::string majorKeyProfile;
     std::string minorKeyProfile;
     std::string filename;
-
+    bool shouldEvaluate;
     try {
         const optparse::Values &options = parser.parse_args(argc, argv);
         const std::vector<std::string> args = parser.args();
@@ -95,32 +59,27 @@ int main(int argc, char *argv[]) {
                 } else if (format == "csv") {
                     fileformat = Chromagram::FILETYPE_CSV;
                 } else if (format == "midi") {
-                    std:: cout << "We don't support midi yet!"
+                    std::cout
+                        << "We don't support midi yet!"
                         << std::endl;
                     parser.print_help();
                     return 0;
                 }
             }
-            if (options.is_set("majorprofile")) {
-                majorKeyProfile = static_cast<std::string>(
-                    options.get("majorprofile"));
-            }
-            if (options.is_set("minorprofile")) {
-                minorKeyProfile = static_cast<std::string>(
-                    options.get("minorprofile"));
-            }
-            if (options.is_set("keytransition")) {
-                keyTransition = static_cast<std::string>(
-                    options.get("keytransition"));
-            }
+            majorKeyProfile = static_cast<std::string>(
+                options.get("majorprofile"));
+            minorKeyProfile = static_cast<std::string>(
+                options.get("minorprofile"));
+            keyTransition = static_cast<std::string>(
+                options.get("keytransition"));
+            shouldEvaluate = options.is_set_by_user("evaluate");
             filename = args.front();
         }
     }
     catch (int ret_code) {
-        std::cout << "OptionParser has thrown " << ret_code << std::endl;
+        std::cout << "Error " << ret_code << std::endl;
         return ret_code;
     }
-
     // Get the chromagrams
     Chromagram chr = Chromagram(filename, fileformat);
     // Turn into a PitchcClassSequence
@@ -182,15 +141,72 @@ int main(int argc, char *argv[]) {
     //     std::cout << itKey->getString() << " ";
     // }
     Key mainKey = keySequence.front();
-    std::string mainKeyStr = mainKey.getString();
-    std::transform(
-        mainKeyStr.begin(),
-        std::next(mainKeyStr.begin()),
-        mainKeyStr.begin(),
-        ::toupper);
-    std::cout
-        << mainKeyStr << '\t'
-        << (mainKey.isMajorKey() ? "major" : "minor")
-        << std::endl;
+    if (!shouldEvaluate) {
+        std::string mainKeyStr = mainKey.getString();
+        std::transform(
+            mainKeyStr.begin(),
+            std::next(mainKeyStr.begin()),
+            mainKeyStr.begin(),
+            ::toupper);
+        std::cout
+            << mainKeyStr << '\t'
+            << (mainKey.isMajorKey() ? "major" : "minor")
+            << std::endl;
+    } else {
+        std::size_t underscore = filename.find_last_of("_");
+        std::size_t dot = filename.find_last_of(".");
+        if (underscore != std::string::npos && dot != std::string::npos) {
+            underscore++;
+            std::string groundTruthString =
+                filename.substr(underscore, dot - underscore);
+            Key groundTruth = Key(groundTruthString);
+            std::cout
+                << groundTruth.getString() << " -> "
+                << mainKey.getString() << std::endl;
+        }
+    }
     return 0;
 }
+
+void initOptionParser(optparse::OptionParserExcept *parser) {
+    const std::string usage =
+        "usage: %prog [options] inputfile";
+
+    const std::string version =
+        "%prog v0.4.0\nCopyright (C) Nestor Napoles 2018.";
+
+    (*parser)
+        .usage(usage)
+        .version(version)
+        .description(
+            "Audio Key Detection program based on NNLS-Chroma"
+            " features and a Hidden Markov Model");
+
+    std::array<std::string, 3> formatOptions =
+        {"wav", "csv", "midi"};
+    (*parser).add_option("-f", "--inputformat")
+        .choices(formatOptions.begin(), formatOptions.end())
+        .set_default("wav");
+
+    std::array<std::string, 3> majorKeyProfiles =
+        {"krumhansl_kessler", "sapp", "temperley"};
+    (*parser).add_option("-M", "--majorprofile")
+        .choices(majorKeyProfiles.begin(), majorKeyProfiles.end())
+        .set_default("temperley");
+
+    std::array<std::string, 3> minorKeyProfiles =
+        {"krumhansl_kessler", "sapp", "temperley"};
+    (*parser).add_option("-m", "--minorprofile")
+        .choices(minorKeyProfiles.begin(), minorKeyProfiles.end())
+        .set_default("sapp");
+
+    std::array<std::string, 3> keyTransitions =
+        {"exponential", "exponential10"};
+    (*parser).add_option("-t", "--keytransition")
+        .choices(keyTransitions.begin(), keyTransitions.end())
+        .set_default("exponential10");
+
+    (*parser).add_option("-e", "--evaluate")
+        .action("store_true");
+}
+
