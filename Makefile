@@ -34,11 +34,11 @@ clean:
 	rm -R $(BUILD)
 	rm -R $(BIN)
 
-justkeydding: $(BUILD)/justkeydding.o $(BUILD)/key.o $(BUILD)/pitchclass.o $(BUILD)/keyprofile.o $(BUILD)/keytransition.o $(BUILD)/chromagram.o $(BUILD)/hiddenmarkovmodel.o
-	$(CC) -o $(BIN)/justkeydding $(BUILD)/justkeydding.o $(BUILD)/key.o $(BUILD)/pitchclass.o $(BUILD)/keyprofile.o $(BUILD)/keytransition.o $(BUILD)/chromagram.o $(BUILD)/hiddenmarkovmodel.o $(LFLAGS)
+justkeydding: $(BUILD)/justkeydding.o $(BUILD)/key.o $(BUILD)/pitchclass.o $(BUILD)/keyprofile.o $(BUILD)/keytransition.o $(BUILD)/chromagram.o $(BUILD)/hiddenmarkovmodel.o $(BUILD)/NNLSChroma.o $(BUILD)/NNLSBase.o $(BUILD)/chromamethods.o $(BUILD)/nnls.o
+	$(CC) -o $(BIN)/justkeydding $(BUILD)/justkeydding.o $(BUILD)/key.o $(BUILD)/pitchclass.o $(BUILD)/keyprofile.o $(BUILD)/keytransition.o $(BUILD)/chromagram.o $(BUILD)/hiddenmarkovmodel.o $(BUILD)/NNLSChroma.o $(BUILD)/NNLSBase.o $(BUILD)/chromamethods.o $(BUILD)/nnls.o $(LFLAGS) $(ADDITIONAL_LIBRARIES)
 
 $(BUILD)/justkeydding.o: $(SRC)/justkeydding.cc
-	$(CC) -c -o$(BUILD)/justkeydding.o $(SRC)/justkeydding.cc $(CFLAGS)
+	$(CC) -c -o$(BUILD)/justkeydding.o $(SRC)/justkeydding.cc $(CFLAGS) -I$(NNLS_CHROMA)
 
 
 test_key: $(BUILD)/test_key.o $(BUILD)/key.o
