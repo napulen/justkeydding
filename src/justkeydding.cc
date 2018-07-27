@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
         return justkeydding::STATUS_MISSING_ARG;
     }
     // Get the chromagrams
-    Chromagram chr = Chromagram(argv[1], Chromagram::FILETYPE_CSV);
+    Chromagram chr = Chromagram(argv[1], Chromagram::FILETYPE_AUDIO);
     // Turn into a PitchcClassSequence
     PitchClass::PitchClassSequence pitchClassSequence;
     pitchClassSequence = chr.getPitchClassSequence();
