@@ -1,0 +1,3 @@
+[submodule "include/optparse"]
+	path = include/optparse
+	url = git@github.com:myint/optparse.git
