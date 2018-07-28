@@ -160,9 +160,17 @@ int main(int argc, char *argv[]) {
             std::string groundTruthString =
                 filename.substr(underscore, dot - underscore);
             Key groundTruth = Key(groundTruthString);
-            std::cout
-                << groundTruth.getString() << " -> "
-                << mainKey.getString() << std::endl;
+            double score = 0.0;
+            if (mainKey == groundTruth) {
+                score = 1.0;
+            } else if (mainKey == groundTruth.getDominantKey()) {
+                score = 0.5;
+            } else if (mainKey == groundTruth.getRelativeKey()) {
+                score = 0.3;
+            } else if (mainKey == groundTruth.getParallelKey()) {
+                score = 0.2;
+            }
+            std::cout << score << std::endl;
         }
     }
     return 0;
