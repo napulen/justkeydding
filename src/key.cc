@@ -134,35 +134,35 @@ Key& Key::operator=(const Key &key) {
 }
 
 Key Key::getRelativeKey() const {
+    int relative;
     if (this->isMajorKey()) {
-        return Key(((m_key + 9) % 12) + 12);
+        relative = ((m_key + 9) % 12) + 12;
     } else {
-        return Key((m_key + 3) % 12);
+        relative = (m_key - 9) % 12;
     }
-}
-
-Key Key::getDominantKey() const {
-    if (this->isMajorKey()) {
-        return Key((m_key + 7) % 12);
-    } else {
-        return Key(((m_key + 7) % 12) + 12);
-    }
-}
-
-Key Key::getSubDominantKey() const {
-    if (this->isMajorKey()) {
-        return Key((m_key + 5) % 12);
-    } else {
-        return Key(((m_key + 5) % 12) + 12);
-    }
+    return Key(relative);
 }
 
 Key Key::getParallelKey() const {
+    int parallel = m_key;
     if (this->isMajorKey()) {
-        return Key(m_key + 12);
+      parallel += 12;
     } else {
-        return Key(m_key % 12);
+      parallel -= 12;
     }
+    return Key(parallel);
+}
+
+Key Key::getDominantKey() const {
+    int dominant = (m_key + 7) % 12;
+    dominant += this->isMinorKey() ? 12 : 0;
+    return Key(dominant);
+}
+
+Key Key::getSubDominantKey() const {
+    int subdominant = (m_key + 5) % 12;
+    subdominant += this->isMinorKey() ? 12 : 0;
+    return Key(subdominant);
 }
 
 }  // namespace justkeydding
