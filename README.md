@@ -2,7 +2,7 @@
 Audio Key Detection algorithm based on [nnls-chroma](http://www.isophonics.net/nnls-chroma) and a Hidden Markov Model.
 
 ## About the project
-This project is an extension to a symbolic key detection algorithm developed [previously](https://github.com/napulen/keytracker). The original algorithm requires a sequence of pitch-classes that can easily be obtained from the symbolic music file. In the audio version, they have been replaced by a chromagram. This chromagram has been obtained from the nnls-chroma Vamp plugin developed by Matthias Mauch and Chris Cannam.
+This project is the extension of a previous [symbolic key detection algorithm](https://github.com/napulen/keytracker). The original algorithm requires a sequence of pitch-classes that can easily be obtained from the symbolic music file. In the audio version, they have been replaced by a chromagram. This chromagram has been obtained from the nnls-chroma Vamp plugin developed by Matthias Mauch and Chris Cannam.
 
 ## Building from source
 ### Vagrantfile
