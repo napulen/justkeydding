@@ -119,6 +119,12 @@ int main(int argc, char *argv[]) {
         transitionProbabilities,
         emissionProbabilities);
     hmm.runViterbi();
+    if ((status = hmm.getStatus()) !=
+        Status::HIDDENMARKOVMODEL_VITERBI_READY) {
+        std::cerr << "There was an error while"
+                    " running the model." << std::endl;
+        return status;
+    }
     keySequence = hmm.getKeySequence();
     maximumProbability = hmm.getMaximumProbability();
     // std::cout << "Maximum probability of the sequence: "
@@ -141,12 +147,6 @@ int main(int argc, char *argv[]) {
     hmm2.runViterbi();
     keySequence = hmm2.getKeySequence();
     maximumProbability = hmm2.getMaximumProbability();
-    // std::cout << "Maximum probability of the sequence: "
-    //     << maximumProbability << std::endl;
-    // for (Key::KeySequence::const_iterator itKey = keySequence.begin();
-    //     itKey != keySequence.end(); itKey++) {
-    //     std::cout << itKey->getString() << " ";
-    // }
     Key mainKey = keySequence.front();
     if (!shouldEvaluate) {
         std::string mainKeyStr = mainKey.getString();

@@ -39,6 +39,7 @@ SOFTWARE.
 #include "./key.h"
 #include "./keyprofile.h"
 #include "./keytransition.h"
+#include "./status.h"
 
 namespace justkeydding {
 
@@ -78,8 +79,10 @@ class HiddenMarkovModel {
     void runViterbi();
     Key::KeySequence getKeySequence();
     double getMaximumProbability() const;
+    int getStatus() const;
 
  private:
+    int m_status;
     Observations m_observations;
     States m_states;
     InitialProbabilities m_initialProbabilities;

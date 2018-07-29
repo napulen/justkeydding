@@ -80,6 +80,7 @@ HiddenMarkovModel::HiddenMarkovModel(
       m_emissionProbabilities[fromKey][emitPc] = itEmitPc->second;
     }
   }
+  m_status = Status::HIDDENMARKOVMODEL_UNINITIALIZED;
 }
 
 HiddenMarkovModel::HiddenMarkovModel(
@@ -130,6 +131,7 @@ HiddenMarkovModel::HiddenMarkovModel(
       m_emissionProbabilities[fromKey][emitKey] = itEmitKey->second;
     }
   }
+  m_status = Status::HIDDENMARKOVMODEL_UNINITIALIZED;
 }
 
 void HiddenMarkovModel::printOutput() {
@@ -238,6 +240,7 @@ void HiddenMarkovModel::runViterbi() {
   }
   std::reverse(m_keySequence.begin(), m_keySequence.end());
   m_maximumProbability = maximumProbability;
+  m_status = Status::HIDDENMARKOVMODEL_VITERBI_READY;
   return;
 }
 
@@ -247,6 +250,10 @@ Key::KeySequence HiddenMarkovModel::getKeySequence() {
 
 double HiddenMarkovModel::getMaximumProbability() const {
   return m_maximumProbability;
+}
+
+int HiddenMarkovModel::getStatus() const {
+  return m_status;
 }
 
 }  // namespace justkeydding
