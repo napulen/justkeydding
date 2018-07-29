@@ -44,6 +44,7 @@ SOFTWARE.
 #include "./key.h"
 #include "./keyprofile.h"
 #include "./keytransition.h"
+#include "./status.h"
 
 using std::cout;
 using std::endl;
@@ -63,7 +64,9 @@ class Chromagram {
   Chromagram(std::string fileName, enFileType fileType);
   PitchClass::PitchClassSequence getPitchClassSequence();
   void printChromagram();
+  int getStatus() const;
  private:
+  int m_status;
   ChromagramMap m_originalChromagramMap;
   ChromagramMap m_discreteChromagramMap;
   void getChromagramFromCsv(std::string csvFilename);

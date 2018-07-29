@@ -29,6 +29,7 @@ SOFTWARE.
 namespace justkeydding {
 
 Chromagram::Chromagram(std::string fileName, enFileType fileType) {
+    m_status = Status::CHROMAGRAM_UNINITIALIZED;
     switch (fileType) {
         case FILETYPE_CSV:
             getChromagramFromCsv(fileName);
@@ -37,7 +38,9 @@ Chromagram::Chromagram(std::string fileName, enFileType fileType) {
             getChromagramFromAudio(fileName);
             break;
     }
-    discretizeChromagram();
+    if (m_status == Status::CHROMAGRAM_ORIGINAL_READY) {
+        discretizeChromagram();
+    }
 }
 
 PitchClass::PitchClassSequence Chromagram::getPitchClassSequence() {
@@ -76,6 +79,7 @@ void Chromagram::getChromagramFromCsv(std::string csvFilename) {
     std::ifstream infile;
     infile.open(csvFilename);
     if (!infile.is_open()) {
+        m_status = Status::CHROMAGRAM_INPUTFILE_ERROR;
         return;
     }
     std::string line;
@@ -100,18 +104,17 @@ void Chromagram::getChromagramFromCsv(std::string csvFilename) {
         }
     }
     infile.close();
+    m_status = Status::CHROMAGRAM_ORIGINAL_READY;
     return;
 }
 
 void Chromagram::getChromagramFromAudio(std::string audioFile) {
     SF_INFO sfinfo;
     SNDFILE *sndfile = sf_open(audioFile.c_str(), SFM_READ, &sfinfo);
-
     if (!sndfile) {
-        // TODO(napulen): It is the logger's job to deal with this
+        m_status = Status::CHROMAGRAM_INPUTFILE_ERROR;
         return;
     }
-
     NNLSChroma *chroma = new NNLSChroma(sfinfo.samplerate);
     Vamp::HostExt::PluginInputDomainAdapter *ia =
     new Vamp::HostExt::PluginInputDomainAdapter(chroma);
@@ -122,9 +125,8 @@ void Chromagram::getChromagramFromAudio(std::string audioFile) {
 
     int blocksize = adapter->getPreferredBlockSize();
 
-    // Plugin requires 1 channel (we will mix down)
     if (!adapter->initialise(1, blocksize, blocksize)) {
-        // cerr << myname << ": Failed to initialise Chordino adapter!" << endl;
+        m_status = Status::CHROMAGRAM_NNLS_ERROR;
         return;
     }
 
@@ -142,7 +144,7 @@ void Chromagram::getChromagramFromAudio(std::string audioFile) {
         }
     }
     if (chromaFeatureNo < 0) {
-        // cerr << myname << ": Failed to identify chords output!" << endl;
+        m_status = Status::CHROMAGRAM_NNLS_ERROR;
         return;
     }
 
@@ -151,7 +153,6 @@ void Chromagram::getChromagramFromAudio(std::string audioFile) {
         int count = -1;
         if ((count = sf_readf_float(sndfile, filebuf, blocksize)) <= 0) break;
 
-        // mix down
         for (int i = 0; i < blocksize; ++i) {
             mixbuf[i] = 0.f;
             if (i < count) {
@@ -165,7 +166,6 @@ void Chromagram::getChromagramFromAudio(std::string audioFile) {
         Vamp::RealTime timestamp =
             Vamp::RealTime::frame2RealTime(frame, sfinfo.samplerate);
 
-        // feed to plugin: can just take address of buffer, as only one channel
         fs = adapter->process(&mixbuf, timestamp);
 
         chromaFeatures.insert(chromaFeatures.end(),
@@ -177,10 +177,8 @@ void Chromagram::getChromagramFromAudio(std::string audioFile) {
 
     sf_close(sndfile);
 
-    // features at end of processing (actually Chordino does all its work here)
     fs = adapter->getRemainingFeatures();
 
-    // chord output is output index 0
     chromaFeatures.insert(chromaFeatures.end(),
         fs[chromaFeatureNo].begin(),
         fs[chromaFeatureNo].end());
@@ -201,6 +199,7 @@ void Chromagram::getChromagramFromAudio(std::string audioFile) {
     delete[] mixbuf;
 
     delete adapter;
+    m_status = Status::CHROMAGRAM_ORIGINAL_READY;
 }
 
 void Chromagram::discretizeChromagram() {
@@ -212,7 +211,12 @@ void Chromagram::discretizeChromagram() {
             m_discreteChromagramMap[itChr->first][i] = discreteMagnitude;
         }
     }
+    m_status = Status::CHROMAGRAM_DISCRETE_READY;
     return;
+}
+
+int Chromagram::getStatus() const {
+    return m_status;
 }
 
 }  // namespace justkeydding
