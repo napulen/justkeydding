@@ -32,6 +32,7 @@ using justkeydding::KeyProfile;
 using justkeydding::KeyTransition;
 using justkeydding::HiddenMarkovModel;
 using justkeydding::Chromagram;
+using justkeydding::Status;
 
 int main(int argc, char *argv[]) {
     optparse::OptionParserExcept parser;
@@ -41,6 +42,7 @@ int main(int argc, char *argv[]) {
     std::string majorKeyProfile;
     std::string minorKeyProfile;
     std::string filename;
+    int status;
     bool shouldEvaluate;
     try {
         const optparse::Values &options = parser.parse_args(argc, argv);
@@ -77,11 +79,16 @@ int main(int argc, char *argv[]) {
         }
     }
     catch (int ret_code) {
-        std::cout << "Error " << ret_code << std::endl;
+        std::cerr << "Error " << ret_code << std::endl;
         return ret_code;
     }
     // Get the chromagrams
     Chromagram chr = Chromagram(filename, fileformat);
+    if ((status = chr.getStatus()) != Status::CHROMAGRAM_DISCRETE_READY) {
+        std::cerr << "There was an error while"
+                    " reading the input file." << std::endl;
+        return status;
+    }
     // Turn into a PitchcClassSequence
     PitchClass::PitchClassSequence pitchClassSequence;
     pitchClassSequence = chr.getPitchClassSequence();

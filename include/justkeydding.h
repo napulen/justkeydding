@@ -40,6 +40,7 @@ SOFTWARE.
 #include "./keytransition.h"
 #include "./chromagram.h"
 #include "./hiddenmarkovmodel.h"
+#include "./status.h"
 #include "optparse/optparse.h"
 
 void initOptionParser(optparse::OptionParserExcept *parser);
