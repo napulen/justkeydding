@@ -34,3 +34,5 @@ After compiling, the binary should be located in `bin/justkeydding`. The program
 ```
 bin/justkeydding <audio_filename>.wav
 ```
+## Acknowledgments
+Thanks to [Claire Arthur](https://github.com/musicnerd) for providing a dataset for testing the performance of this algorithm.
