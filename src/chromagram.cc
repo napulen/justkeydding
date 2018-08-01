@@ -53,9 +53,10 @@ PitchClass::PitchClassSequence Chromagram::getPitchClassSequence() {
         ChromagramVector chrVector = itChr->second;
         for (int pc = 0; pc < chrVector.size(); pc++) {
             int n = static_cast<int>(chrVector[pc]);
-            do {
+            while (n) {
                 pitchClassSequence.push_back(PitchClass(pc));
-            } while (n--);
+                n--;
+            }
         }
     }
     return pitchClassSequence;
