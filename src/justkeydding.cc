@@ -204,7 +204,8 @@ void initOptionParser(optparse::OptionParserExcept *parser) {
         .set_default("wav");
 
     std::array<std::string, 3> majorKeyProfiles =
-        {"krumhansl_kessler", "sapp", "temperley"};
+        {"krumhansl_kessler", "aarden_essen",
+        "bellman_budge",  "sapp", "temperley"};
     (*parser).add_option("-M", "--majorprofile")
         .choices(majorKeyProfiles.begin(), majorKeyProfiles.end())
         .set_default("temperley");
@@ -216,7 +217,7 @@ void initOptionParser(optparse::OptionParserExcept *parser) {
         .set_default("sapp");
 
     std::array<std::string, 3> keyTransitions =
-        {"exponential", "exponential10"};
+        {"exponential2", "exponential10"};
     (*parser).add_option("-t", "--keytransition")
         .choices(keyTransitions.begin(), keyTransitions.end())
         .set_default("exponential10");
