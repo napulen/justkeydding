@@ -203,20 +203,21 @@ void initOptionParser(optparse::OptionParserExcept *parser) {
         .choices(formatOptions.begin(), formatOptions.end())
         .set_default("wav");
 
-    std::array<std::string, 3> majorKeyProfiles =
+    std::array<std::string, 5> majorKeyProfiles =
         {"krumhansl_kessler", "aarden_essen",
         "bellman_budge",  "sapp", "temperley"};
     (*parser).add_option("-M", "--majorprofile")
         .choices(majorKeyProfiles.begin(), majorKeyProfiles.end())
         .set_default("temperley");
 
-    std::array<std::string, 3> minorKeyProfiles =
-        {"krumhansl_kessler", "sapp", "temperley"};
+    std::array<std::string, 5> minorKeyProfiles =
+        {"krumhansl_kessler", "aarden_essen",
+        "bellman_budge",  "sapp", "temperley"};
     (*parser).add_option("-m", "--minorprofile")
         .choices(minorKeyProfiles.begin(), minorKeyProfiles.end())
         .set_default("sapp");
 
-    std::array<std::string, 3> keyTransitions =
+    std::array<std::string, 2> keyTransitions =
         {"exponential2", "exponential10"};
     (*parser).add_option("-t", "--keytransition")
         .choices(keyTransitions.begin(), keyTransitions.end())
