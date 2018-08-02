@@ -208,7 +208,7 @@ void initOptionParser(optparse::OptionParserExcept *parser) {
         "bellman_budge",  "sapp", "temperley"};
     (*parser).add_option("-M", "--majorprofile")
         .choices(majorKeyProfiles.begin(), majorKeyProfiles.end())
-        .set_default("temperley");
+        .set_default("sapp");
 
     std::array<std::string, 5> minorKeyProfiles =
         {"krumhansl_kessler", "aarden_essen",
