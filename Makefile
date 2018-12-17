@@ -38,22 +38,8 @@ clean:
 	rm -R $(BUILD)
 	rm -R $(BIN)
 
-midiparser: $(BUILD)/midiparser.o \
-		$(BUILD)/Binasc.o \
-		$(BUILD)/MidiEvent.o \
-		$(BUILD)/MidiEventList.o \
-		$(BUILD)/MidiFile.o \
-		$(BUILD)/MidiMessage.o
-	$(CC) -o $(BIN)/midiparser \
-	$(BUILD)/midiparser.o \
-	$(BUILD)/Binasc.o \
-	$(BUILD)/MidiEvent.o \
-	$(BUILD)/MidiEventList.o \
-	$(BUILD)/MidiFile.o \
-	$(BUILD)/MidiMessage.o
-
-$(BUILD)/midiparser.o: $(SRC)/midiparser.cc
-	$(CC) -c -o $(BUILD)/midiparser.o $(SRC)/midiparser.cc \
+$(BUILD)/midi.o: $(SRC)/midi.cc
+	$(CC) -c -o $(BUILD)/midi.o $(SRC)/midi.cc \
 	$(CFLAGS) -I$(MIDIFILE_INC)
 
 $(BUILD)/Binasc.o: $(MIDIFILE_SRC)/Binasc.cpp
@@ -81,17 +67,22 @@ justkeydding: $(BUILD)/justkeydding.o \
 		$(BUILD)/keyprofile.o $(BUILD)/keytransition.o \
 		$(BUILD)/chromagram.o $(BUILD)/hiddenmarkovmodel.o \
 		$(BUILD)/NNLSChroma.o $(BUILD)/NNLSBase.o \
-		$(BUILD)/chromamethods.o $(BUILD)/nnls.o
+		$(BUILD)/chromamethods.o $(BUILD)/nnls.o \
+		$(BUILD)/midi.o $(BUILD)/Binasc.o \
+		$(BUILD)/MidiEvent.o $(BUILD)/MidiEventList.o \
+		$(BUILD)/MidiFile.o $(BUILD)/MidiMessage.o
 	$(CC) -o $(BIN)/justkeydding $(BUILD)/justkeydding.o \
 	$(BUILD)/key.o $(BUILD)/pitchclass.o $(BUILD)/keyprofile.o \
 	$(BUILD)/keytransition.o $(BUILD)/chromagram.o \
 	$(BUILD)/hiddenmarkovmodel.o $(BUILD)/NNLSChroma.o \
 	$(BUILD)/NNLSBase.o $(BUILD)/chromamethods.o $(BUILD)/nnls.o \
+	$(BUILD)/midi.o $(BUILD)/Binasc.o $(BUILD)/MidiEvent.o \
+	$(BUILD)/MidiEventList.o $(BUILD)/MidiFile.o $(BUILD)/MidiMessage.o \
 	$(LFLAGS) $(ADDITIONAL_LIBRARIES)
 
 $(BUILD)/justkeydding.o: $(SRC)/justkeydding.cc
 	$(CC) -c -o$(BUILD)/justkeydding.o $(SRC)/justkeydding.cc \
-	$(CFLAGS) -I$(NNLS_CHROMA)
+	$(CFLAGS) -I$(NNLS_CHROMA) -I$(MIDIFILE_INC)
 
 test_key: $(BUILD)/test_key.o $(BUILD)/key.o
 	$(CC) -o $(BIN)/test_key $(BUILD)/test_key.o \

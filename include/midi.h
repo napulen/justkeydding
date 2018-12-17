@@ -56,7 +56,7 @@ class Midi {
   int getStatus() const;
  private:
   int m_status;
-  smf::MidiFile midifile;
+  smf::MidiFile m_midifile;
 };
 
 }  // namespace justkeydding

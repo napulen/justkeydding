@@ -42,7 +42,18 @@ SOFTWARE.
 #include "./hiddenmarkovmodel.h"
 #include "./status.h"
 #include "optparse/optparse.h"
+#include "./midi.h"
 
 void initOptionParser(optparse::OptionParserExcept *parser);
+
+namespace justkeydding {
+
+enum enInputType {
+    INPUT_CSV,
+    INPUT_WAV,
+    INPUT_MIDI
+};
+
+} // namespace justkeydding
 
 #endif  // INCLUDE_JUSTKEYDDING_H_

@@ -30,27 +30,32 @@ SOFTWARE.
 namespace justkeydding {
 
 Midi::Midi(std::string fileName) {
-   smf::Midifile
+   // TODO: Don't trust the user's input
+   m_status = Status::MIDI_UNINITIALIZED;
+   m_midifile.read(fileName);
+   m_status = Status::MIDI_READY;
 }
 
-void Midi::getPitchClassSequence(smf::MidiFile& midifile) {
-   midifile.absoluteTicks();
-   midifile.joinTracks();
-   int key = 0;
-   for (int i=0; i < midifile.getNumEvents(0); i++) {
-      int command = midifile[0][i][0] & 0xf0;
+PitchClass::PitchClassSequence Midi::getPitchClassSequence() {
+   PitchClass::PitchClassSequence pcSequence;
+   if(m_status != Status::MIDI_READY) {
+      return pcSequence;
+   } 
+   m_midifile.absoluteTicks();
+   m_midifile.joinTracks();
+   int pitch = 0;
+   for (int i=0; i < m_midifile.getNumEvents(0); i++) {
+      int command = m_midifile[0][i][0] & 0xf0;
       // noteOn event with velocity > 0
-      if (command == 0x90 && midifile[0][i][2] != 0) {
-         pitch = midifile[0][i][1];
-         std::cout << key % 12 << " ";
+      if (command == 0x90 && m_midifile[0][i][2] != 0) {
+         pitch = m_midifile[0][i][1];
+         pcSequence.push_back(PitchClass(pitch % 12));         
       }
    }
 }
 
-int main(int argc, char* argv[]) {   
-   smf::MidiFile midifile(argv[1]);
-   parseMidiNoteOnEvents(midifile);
-   return 0;
+int Midi::getStatus() const {
+   return m_status;
 }
 
 } // namespace justkeydding

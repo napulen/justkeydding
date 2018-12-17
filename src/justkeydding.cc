@@ -33,11 +33,12 @@ using justkeydding::KeyTransition;
 using justkeydding::HiddenMarkovModel;
 using justkeydding::Chromagram;
 using justkeydding::Status;
+using justkeydding::Midi;
 
 int main(int argc, char *argv[]) {
     optparse::OptionParserExcept parser;
     initOptionParser(&parser);
-    Chromagram::enFileType fileformat;
+    justkeydding::enInputType inputType;
     std::string keyTransition;
     std::string majorKeyProfile;
     std::string minorKeyProfile;
@@ -57,15 +58,11 @@ int main(int argc, char *argv[]) {
                 std::string format = static_cast<std::string>(
                     options.get("inputformat"));
                 if (format == "wav") {
-                    fileformat = Chromagram::FILETYPE_AUDIO;
+                    inputType = justkeydding::INPUT_WAV;
                 } else if (format == "csv") {
-                    fileformat = Chromagram::FILETYPE_CSV;
+                    inputType = justkeydding::INPUT_CSV;
                 } else if (format == "midi") {
-                    std::cout
-                        << "We don't support midi yet!"
-                        << std::endl;
-                    parser.print_help();
-                    return 0;
+                    inputType = justkeydding::INPUT_MIDI;
                 }
             }
             majorKeyProfile = static_cast<std::string>(
@@ -82,16 +79,35 @@ int main(int argc, char *argv[]) {
         std::cerr << "Error " << ret_code << std::endl;
         return ret_code;
     }
-    // Get the chromagrams
-    Chromagram chr = Chromagram(filename, fileformat);
-    if ((status = chr.getStatus()) != Status::CHROMAGRAM_DISCRETE_READY) {
-        std::cerr << "There was an error while"
+    // MIDI Input
+    PitchClass::PitchClassSequence pitchClassSequence;    
+    if (inputType == justkeydding::INPUT_MIDI) {
+        Midi midi = Midi(filename);
+        if  ((status = midi.getStatus()) != Status::MIDI_READY) {
+            std::cerr << "There was an error while"
                     " reading the input file." << std::endl;
-        return status;
+            return status;
+        }
+        pitchClassSequence = midi.getPitchClassSequence();
     }
-    // Turn into a PitchcClassSequence
-    PitchClass::PitchClassSequence pitchClassSequence;
-    pitchClassSequence = chr.getPitchClassSequence();
+    // Audio (WAV or CSV)
+    else {
+        Chromagram::enFileType fileType;
+        if (inputType == justkeydding::INPUT_CSV) {
+            fileType = Chromagram::FILETYPE_CSV;
+        } else if (inputType == justkeydding::INPUT_WAV) {
+            fileType = Chromagram::FILETYPE_AUDIO;
+        }
+        // Get the chromagrams
+        Chromagram chr = Chromagram(filename, fileType);
+        if ((status = chr.getStatus()) != Status::CHROMAGRAM_DISCRETE_READY) {
+            std::cerr << "There was an error while"
+                        " reading the input file." << std::endl;
+            return status;
+        }
+        // Turn into a PitchcClassSequence        
+        pitchClassSequence = chr.getPitchClassSequence();    
+    }
     // States section
     Key::KeyVector keyVector =
         Key::getAllKeysVector();
