@@ -3,8 +3,7 @@ MIT License
 
 Copyright (c) 2018 Nestor Napoles
 
-Status object to be used by all the modules of the key detector.
-For now, it is nothing else but an enum.
+MIDI parser that uses the MidiFile library by Craig Sapp
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,26 +24,41 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR sOTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef INCLUDE_STATUS_H_
-#define INCLUDE_STATUS_H_
+#ifndef INCLUDE_MIDI_H_
+#define INCLUDE_MIDI_H_
+
+#include <MidiFile.h>
+
+#include "./pitchclass.h"
+#include "./key.h"
+#include "./keyprofile.h"
+#include "./keytransition.h"
+#include "./status.h"
+
+#include<string>
+#include<vector>
+#include<map>
+#include<cmath>
+#include<iostream>
+#include<fstream>
+#include<sstream>
+
+using std::cout;
+using std::endl;
+using std::ifstream;
 
 namespace justkeydding {
 
-class Status {
+class Midi {
  public:
-  enum enStatus {
-    CHROMAGRAM_UNINITIALIZED,
-    CHROMAGRAM_INPUTFILE_ERROR,
-    CHROMAGRAM_NNLS_ERROR,
-    CHROMAGRAM_ORIGINAL_READY,
-    CHROMAGRAM_DISCRETE_READY,
-    MIDI_UNINITIALIZED,
-    MIDI_READY,
-    HIDDENMARKOVMODEL_UNINITIALIZED,
-    HIDDENMARKOVMODEL_VITERBI_READY
-  };
+  Midi(std::string fileName);
+  PitchClass::PitchClassSequence getPitchClassSequence();
+  int getStatus() const;
+ private:
+  int m_status;
+  smf::MidiFile midifile;
 };
 
 }  // namespace justkeydding
 
-#endif  // INCLUDE_STATUS_H_
+#endif  // INCLUDE_MIDI_H_
