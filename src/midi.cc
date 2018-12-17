@@ -49,7 +49,7 @@ PitchClass::PitchClassSequence Midi::getPitchClassSequence() {
       // noteOn event with velocity > 0
       if (command == 0x90 && m_midifile[0][i][2] != 0) {
          pitch = m_midifile[0][i][1];
-         pcSequence.push_back(PitchClass(pitch % 12));         
+         pcSequence.push_back(PitchClass(pitch % 12));
       }
    }
 }
