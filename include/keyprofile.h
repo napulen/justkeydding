@@ -39,12 +39,15 @@ namespace justkeydding {
 
 class KeyProfile {
  public:
-    KeyProfile();
-    explicit KeyProfile(std::string keyProfile);
-    explicit KeyProfile(std::string majKeyProfile, std::string minKeyProfile);
     typedef std::array<double,
         PitchClass::NUMBER_OF_PITCHCLASSES> KeyProfileArray;
     typedef std::map<Key, std::map<PitchClass, double> > KeyProfileMap;
+    KeyProfile();
+    explicit KeyProfile(std::string keyProfile);
+    explicit KeyProfile(std::string majKeyProfile, std::string minKeyProfile);
+    explicit KeyProfile(
+        KeyProfileArray customMajor, 
+        KeyProfileArray customMinor);
     bool isValidMajorKeyProfile(std::string keyProfile);
     bool isValidMinorKeyProfile(std::string keyProfile);
     std::string whichMajorKeyProfile();
@@ -54,6 +57,7 @@ class KeyProfile {
     KeyProfileMap getKeyProfileMap();
 
  private:
+    void Init(std::string majKeyProfile, std::string minKeyProfile);
     std::string m_majorKeyProfile;
     std::string m_minorKeyProfile;
     std::map<std::string, KeyProfileArray> m_majorKeyProfiles;

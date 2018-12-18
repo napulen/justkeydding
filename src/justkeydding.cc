@@ -225,6 +225,11 @@ void initOptionParser(optparse::OptionParserExcept *parser) {
     (*parser).add_option("-M", "--majorprofile")
         .choices(majorKeyProfiles.begin(), majorKeyProfiles.end())
         .set_default("sapp");
+    
+    (*parser).add_option("-K", "--customkeyprofiles")
+        .dest("customProfiles")
+        .help("Provide your own Key Profiles")
+        .metavar("Array[24]");
 
     std::array<std::string, 5> minorKeyProfiles =
         {"krumhansl_kessler", "aarden_essen",
