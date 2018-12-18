@@ -37,13 +37,11 @@ SOFTWARE.
 
 namespace justkeydding {
 
-#define NUMBER_OF_KEYS 24
-
 class KeyTransition {
  public:
     KeyTransition();
     explicit KeyTransition(std::string keyTransition);
-    typedef std::array<double, NUMBER_OF_KEYS> KeyTransitionArray;
+    typedef std::array<double, Key::NUMBER_OF_KEYS> KeyTransitionArray;
     typedef std::map<Key, std::map<Key, double> > KeyTransitionMap;
     bool isValidKeyTransition(std::string keyTransition);
     std::string whichKeyTransition();

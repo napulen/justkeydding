@@ -65,10 +65,30 @@ int main(int argc, char *argv[]) {
                     inputType = justkeydding::INPUT_MIDI;
                 }
             }
-            majorKeyProfile = static_cast<std::string>(
-                options.get("majorprofile"));
-            minorKeyProfile = static_cast<std::string>(
-                options.get("minorprofile"));
+            if (!options.is_set("customkeyprofiles")) {
+                majorKeyProfile = static_cast<std::string>(
+                    options.get("majorprofile"));
+                minorKeyProfile = static_cast<std::string>(
+                    options.get("minorprofile"));
+            } else {
+                std::string arrayStr = static_cast<std::string>(
+                    options.get("customkeyprofiles"));
+                std::stringstream arrayStream(arrayStr);
+                KeyProfile::KeyProfileArray majCustom;
+                KeyProfile::KeyProfileArray minCustom;
+                for (int i = 0; i < Key::NUMBER_OF_KEYS; i++) {
+                    double value;
+                    arrayStream >> value;
+                    if (i < Key::FIRST_MINOR_KEY) {
+                        majCustom[i] = value;
+                    } else{
+                        minCustom[i % PitchClass::NUMBER_OF_PITCHCLASSES] =
+                            value;
+                    }
+                    if (!arrayStream) break;
+                }         
+            }
+            
             keyTransition = static_cast<std::string>(
                 options.get("keytransition"));
             shouldEvaluate = options.is_set_by_user("evaluate");
@@ -217,32 +237,36 @@ void initOptionParser(optparse::OptionParserExcept *parser) {
         {"wav", "csv", "midi"};
     (*parser).add_option("-f", "--inputformat")
         .choices(formatOptions.begin(), formatOptions.end())
-        .set_default("wav");
+        .set_default("wav")
+        .help("Type of input")
+        .metavar("wav|csv|midi");
 
     std::array<std::string, 5> majorKeyProfiles =
         {"krumhansl_kessler", "aarden_essen",
         "bellman_budge",  "sapp", "temperley"};
     (*parser).add_option("-M", "--majorprofile")
         .choices(majorKeyProfiles.begin(), majorKeyProfiles.end())
-        .set_default("sapp");
-    
-    (*parser).add_option("-K", "--customkeyprofiles")
-        .dest("customProfiles")
-        .help("Provide your own Key Profiles")
-        .metavar("Array[24]");
+        .set_default("sapp")
+        .help("Major key profiles");
 
     std::array<std::string, 5> minorKeyProfiles =
         {"krumhansl_kessler", "aarden_essen",
         "bellman_budge",  "sapp", "temperley"};
     (*parser).add_option("-m", "--minorprofile")
         .choices(minorKeyProfiles.begin(), minorKeyProfiles.end())
-        .set_default("sapp");
+        .set_default("sapp")
+        .help("Minor key profiles");
+    
+    (*parser).add_option("-K", "--customkeyprofiles")        
+        .help("Provide your own key profiles")
+        .metavar("Array[24]");
 
     std::array<std::string, 2> keyTransitions =
         {"exponential2", "exponential10"};
     (*parser).add_option("-t", "--keytransition")
         .choices(keyTransitions.begin(), keyTransitions.end())
-        .set_default("exponential10");
+        .set_default("exponential10")
+        .help("Key transition profiles");
 
     (*parser).add_option("-e", "--evaluate")
         .action("store_true");
