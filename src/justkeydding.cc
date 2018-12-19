@@ -42,65 +42,114 @@ int main(int argc, char *argv[]) {
     std::string keyTransition;
     std::string majorKeyProfile;
     std::string minorKeyProfile;
+    KeyProfile::KeyProfileArray majorCustomKeyProfile;
+    KeyProfile::KeyProfileArray minorCustomKeyProfile;
+    KeyTransition::KeyTransitionArray customKeyTransition;
     std::string filename;
     int status;
     bool shouldEvaluate;
     try {
         const optparse::Values &options = parser.parse_args(argc, argv);
         const std::vector<std::string> args = parser.args();
-
         if (args.size() != 1) {
             std::cout << "Missing input file." << std::endl;
             parser.print_help();
             return 0;
+        }
+        filename = args.front();
+        if (options.is_set("inputformat")) {
+            // What kind of file are we reading
+            std::string format = static_cast<std::string>(
+                options.get("inputformat"));
+            if (format == ".wav") {
+                inputType = justkeydding::INPUT_WAV;
+            } else if (format == ".csv") {
+                inputType = justkeydding::INPUT_CSV;
+            } else if (format == ".midi") {
+                inputType = justkeydding::INPUT_MIDI;
+            }
         } else {
-            if (options.is_set("inputformat")) {
-                std::string format = static_cast<std::string>(
-                    options.get("inputformat"));
-                if (format == "wav") {
-                    inputType = justkeydding::INPUT_WAV;
-                } else if (format == "csv") {
-                    inputType = justkeydding::INPUT_CSV;
-                } else if (format == "midi") {
-                    inputType = justkeydding::INPUT_MIDI;
-                }
-            }
-            if (!options.is_set("customkeyprofiles")) {
-                majorKeyProfile = static_cast<std::string>(
-                    options.get("majorprofile"));
-                minorKeyProfile = static_cast<std::string>(
-                    options.get("minorprofile"));
+            // The user did not provide a file format, let's find out
+            std::string extension =
+                filename.substr(filename.find_last_of("."));
+            std::transform(
+                extension.begin(),
+                extension.end(),
+                extension.begin(),
+                ::tolower);
+            if (extension == ".wav") {
+                inputType = justkeydding::INPUT_WAV;
+            } else if (extension == ".csv") {
+                inputType = justkeydding::INPUT_CSV;
+            } else if (extension == ".midi" || extension == ".mid") {
+                inputType = justkeydding::INPUT_MIDI;
             } else {
-                std::string arrayStr = static_cast<std::string>(
-                    options.get("customkeyprofiles"));
-                std::stringstream arrayStream(arrayStr);
-                KeyProfile::KeyProfileArray majCustom;
-                KeyProfile::KeyProfileArray minCustom;
-                for (int i = 0; i < Key::NUMBER_OF_KEYS; i++) {
-                    double value;
-                    arrayStream >> value;
-                    if (i < Key::FIRST_MINOR_KEY) {
-                        majCustom[i] = value;
-                    } else{
-                        minCustom[i % PitchClass::NUMBER_OF_PITCHCLASSES] =
-                            value;
-                    }
-                    if (!arrayStream) break;
-                }         
+                std::cout << "It seems the input is neither a wav, csv, nor midi file. If it is, please specify explicitly using -f." << std::endl;
+                parser.print_help();
+                return 0;
             }
-            
+        }
+        if (options.is_set("customkeyprofiles")) {
+            // The user wants to define custom key profiles
+            std::string arrayStr = static_cast<std::string>(
+                options.get("customkeyprofiles"));
+            majorKeyProfile = "custom";
+            minorKeyProfile = "custom";
+            std::stringstream arrayStream(arrayStr);
+            double val = 0;
+            int i = 0;
+            while (arrayStream >> val) {
+                if (i < Key::FIRST_MINOR_KEY) {
+                    majorCustomKeyProfile[i] = val;
+                } else{
+                    int pitchClasses = PitchClass::NUMBER_OF_PITCHCLASSES;
+                    minorCustomKeyProfile[i % pitchClasses] = val;
+                }
+                i++;
+            }
+            if (i != Key::NUMBER_OF_KEYS) {
+                std::cout << "You must provide exactly 24 values for the custom key profiles. You provided " << i << "." << std::endl;
+                parser.print_help();
+                return 0;
+            }
+        } else {
+            // The user wants one of the predefined key profiles
+            majorKeyProfile = static_cast<std::string>(
+                options.get("majorprofile"));
+            minorKeyProfile = static_cast<std::string>(
+                options.get("minorprofile"));
+        }
+        if (options.is_set("customkeytransitions")) {
+            // The user wants to define custom key transitions
+            std::string arrayStr = static_cast<std::string>(
+                options.get("customkeytransitions"));
+            keyTransition = "custom";
+            std::stringstream arrayStream(arrayStr);
+            double val = 0;
+            int i = 0;
+            while (arrayStream >> val) {
+                customKeyTransition[i] = val;
+                i++;
+            }
+            if (i != Key::NUMBER_OF_KEYS) {
+                std::cout << "You must provide exactly 24 values for the custom key transitions. You provided " << i << "." << std::endl;
+                parser.print_help();
+                return 0;
+            }
+        }
+        else {
+            // The user wants one of the predefined key transitions
             keyTransition = static_cast<std::string>(
                 options.get("keytransition"));
-            shouldEvaluate = options.is_set_by_user("evaluate");
-            filename = args.front();
         }
+        shouldEvaluate = options.is_set_by_user("evaluate");
     }
     catch (int ret_code) {
         std::cerr << "Error " << ret_code << std::endl;
         return ret_code;
     }
-    // MIDI Input
-    PitchClass::PitchClassSequence pitchClassSequence;    
+    // Receiving MIDI input
+    PitchClass::PitchClassSequence pitchClassSequence;
     if (inputType == justkeydding::INPUT_MIDI) {
         Midi midi = Midi(filename);
         if  ((status = midi.getStatus()) != Status::MIDI_READY) {
@@ -110,7 +159,7 @@ int main(int argc, char *argv[]) {
         }
         pitchClassSequence = midi.getPitchClassSequence();
     }
-    // Audio (WAV or CSV)
+    // Receiving Audio (WAV or CSV) input
     else {
         Chromagram::enFileType fileType;
         if (inputType == justkeydding::INPUT_CSV) {
@@ -125,8 +174,8 @@ int main(int argc, char *argv[]) {
                         " reading the input file." << std::endl;
             return status;
         }
-        // Turn into a PitchcClassSequence        
-        pitchClassSequence = chr.getPitchClassSequence();    
+        // Turn into a PitchcClassSequence
+        pitchClassSequence = chr.getPitchClassSequence();
     }
     // States section
     Key::KeyVector keyVector =
@@ -141,11 +190,16 @@ int main(int argc, char *argv[]) {
     }
     // Transition probabilities
     KeyTransition::KeyTransitionMap transitionProbabilities =
-        KeyTransition(keyTransition).getKeyTransitionMap();
+        KeyTransition(
+            keyTransition,
+            customKeyTransition).getKeyTransitionMap();
     // Emission probabilities
     KeyProfile::KeyProfileMap emissionProbabilities =
-        KeyProfile(majorKeyProfile, minorKeyProfile)
-            .getKeyProfileMap();
+        KeyProfile(
+            majorKeyProfile,
+            minorKeyProfile,
+            majorCustomKeyProfile,
+            minorCustomKeyProfile).getKeyProfileMap();
     Key::KeySequence keySequence;
     double maximumProbability;
     HiddenMarkovModel hmm(
@@ -163,12 +217,13 @@ int main(int argc, char *argv[]) {
     }
     keySequence = hmm.getKeySequence();
     maximumProbability = hmm.getMaximumProbability();
-    // std::cout << "Maximum probability of the sequence: "
-    //     << maximumProbability << std::endl;
-    // for (Key::KeySequence::const_iterator itKey = keySequence.begin();
-    //     itKey != keySequence.end(); itKey++) {
-    //     std::cout << itKey->getString() << " ";
-    // }
+    std::cout << "Maximum probability of the sequence: "
+        << maximumProbability << std::endl;
+    for (Key::KeySequence::const_iterator itKey = keySequence.begin();
+        itKey != keySequence.end(); itKey++) {
+        std::cout << itKey->getString() << " ";
+    }
+    std::cout << std::endl;
     /////////////////////////////
     // Second Hidden Markov Model
     /////////////////////////////
@@ -237,7 +292,6 @@ void initOptionParser(optparse::OptionParserExcept *parser) {
         {"wav", "csv", "midi"};
     (*parser).add_option("-f", "--inputformat")
         .choices(formatOptions.begin(), formatOptions.end())
-        .set_default("wav")
         .help("Type of input")
         .metavar("wav|csv|midi");
 
@@ -256,8 +310,8 @@ void initOptionParser(optparse::OptionParserExcept *parser) {
         .choices(minorKeyProfiles.begin(), minorKeyProfiles.end())
         .set_default("sapp")
         .help("Minor key profiles");
-    
-    (*parser).add_option("-K", "--customkeyprofiles")        
+
+    (*parser).add_option("-K", "--customkeyprofiles")
         .help("Provide your own key profiles")
         .metavar("Array[24]");
 
@@ -267,6 +321,10 @@ void initOptionParser(optparse::OptionParserExcept *parser) {
         .choices(keyTransitions.begin(), keyTransitions.end())
         .set_default("exponential10")
         .help("Key transition profiles");
+
+    (*parser).add_option("-T", "--customkeytransitions")
+        .help("Provide your own key transitions")
+        .metavar("Array[24]");
 
     (*parser).add_option("-e", "--evaluate")
         .action("store_true");

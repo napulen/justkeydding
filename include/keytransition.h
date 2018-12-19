@@ -39,10 +39,12 @@ namespace justkeydding {
 
 class KeyTransition {
  public:
-    KeyTransition();
-    explicit KeyTransition(std::string keyTransition);
     typedef std::array<double, Key::NUMBER_OF_KEYS> KeyTransitionArray;
     typedef std::map<Key, std::map<Key, double> > KeyTransitionMap;
+    KeyTransition();
+    explicit KeyTransition(std::string keyTransition);
+    explicit KeyTransition(
+         std::string keyTransition, KeyTransitionArray customKeyTransition);
     bool isValidKeyTransition(std::string keyTransition);
     std::string whichKeyTransition();
     KeyTransitionArray getKeyTransitionArray();
