@@ -46,8 +46,10 @@ class KeyProfile {
     explicit KeyProfile(std::string keyProfile);
     explicit KeyProfile(std::string majKeyProfile, std::string minKeyProfile);
     explicit KeyProfile(
-        KeyProfileArray customMajor, 
-        KeyProfileArray customMinor);
+        std::string majKeyProfile,
+        std::string minKeyProfile,
+        KeyProfileArray majCustom, 
+        KeyProfileArray minCustom);
     bool isValidMajorKeyProfile(std::string keyProfile);
     bool isValidMinorKeyProfile(std::string keyProfile);
     std::string whichMajorKeyProfile();
@@ -56,8 +58,7 @@ class KeyProfile {
     KeyProfileArray getMinorKeyProfile();
     KeyProfileMap getKeyProfileMap();
 
- private:
-    void Init(std::string majKeyProfile, std::string minKeyProfile);
+ private:    
     std::string m_majorKeyProfile;
     std::string m_minorKeyProfile;
     std::map<std::string, KeyProfileArray> m_majorKeyProfiles;

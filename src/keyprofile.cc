@@ -34,28 +34,32 @@ KeyProfile::KeyProfile() :
 KeyProfile::KeyProfile(std::string keyProfile) :
     KeyProfile(keyProfile, keyProfile) {}
 
-KeyProfile::KeyProfile(std::string majKeyProfile, std::string minKeyProfile) {
-    Init(majKeyProfile, minKeyProfile);
-}
+KeyProfile::KeyProfile(std::string majKeyProfile, std::string minKeyProfile) : 
+    KeyProfile(
+        majKeyProfile, 
+        minKeyProfile, 
+        {0,0,0,0,0,0,0,0,0,0,0,0}, 
+        {0,0,0,0,0,0,0,0,0,0,0,0}) {}
 
-KeyProfile::KeyProfile(KeyProfileArray majCustom, KeyProfileArray minCustom) {
-    // Insert the custom key profiles first
-    m_majorKeyProfiles["custom"] = majCustom;
-    m_minorKeyProfiles["custom"] = minCustom;
-    // Now go through the regular initialization
-    Init("custom", "custom");    
-}
-
-void KeyProfile::Init(std::string majKeyProfile, std::string minKeyProfile) {
+KeyProfile::KeyProfile(
+    std::string majKeyProfile,
+    std::string minKeyProfile,
+    KeyProfileArray majCustom,
+    KeyProfileArray minCustom) {
     // Initializes the stored key profiles
     initKeyProfileArrays();
+    if (majKeyProfile == "custom") {
+        m_majorKeyProfiles[majKeyProfile] = majCustom;
+    }
+    if (minKeyProfile == "custom") {
+        m_minorKeyProfiles[minKeyProfile] = minCustom;
+    }
     // Can we find the ones sent to the constructor?
     if (isValidMajorKeyProfile(majKeyProfile) &&
         isValidMinorKeyProfile(minKeyProfile)) {
         m_majorKeyProfile = majKeyProfile;
         m_minorKeyProfile = minKeyProfile;
-    }
-    return;
+    }    
 }
 
 void KeyProfile::initKeyProfileArrays() {
