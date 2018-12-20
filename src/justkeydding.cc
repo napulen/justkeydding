@@ -217,13 +217,13 @@ int main(int argc, char *argv[]) {
     }
     keySequence = hmm.getKeySequence();
     maximumProbability = hmm.getMaximumProbability();
-    std::cout << "Maximum probability of the sequence: "
-        << maximumProbability << std::endl;
-    for (Key::KeySequence::const_iterator itKey = keySequence.begin();
-        itKey != keySequence.end(); itKey++) {
-        std::cout << itKey->getString() << " ";
-    }
-    std::cout << std::endl;
+    // std::cout << "Maximum probability of the sequence: "
+    //     << maximumProbability << std::endl;
+    // for (Key::KeySequence::const_iterator itKey = keySequence.begin();
+    //     itKey != keySequence.end(); itKey++) {
+    //     std::cout << itKey->getString() << " ";
+    // }
+    // std::cout << std::endl;
     /////////////////////////////
     // Second Hidden Markov Model
     /////////////////////////////
