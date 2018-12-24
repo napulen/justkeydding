@@ -45,6 +45,9 @@ nnls-chroma-1.1/chordextract
 # ignoring temporary csv outputs
 *.csv
 
+# Ignoring compiled python
+*.pyc
+
 # ignoring build and bin folders
 build/
 bin/
