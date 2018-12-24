@@ -22,7 +22,7 @@ logging_dict = {
             'when': 'H',
             'interval': 1,
             'backupCount': 360,
-            'formatter': 'no_date',
+            'formatter': 'date',
             'encoding': 'utf8'
         },
         'console': {
@@ -83,7 +83,7 @@ if __name__ == '__main__':
         os.makedirs('logs')
     logging.config.dictConfig(logging_dict)
     logger = logging.getLogger('ga_runner')
-    population_size = 10
+    population_size = 15
     maximum_range = 100
     dataset = 'midi_dataset.txt'
     initial_population = []
