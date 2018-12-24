@@ -48,3 +48,4 @@ nnls-chroma-1.1/chordextract
 # ignoring build and bin folders
 build/
 bin/
+logs/
