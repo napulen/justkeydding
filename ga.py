@@ -69,8 +69,15 @@ def ga_runner(dataset, maximum_range, population_size, initial_population):
         logger.info('Scores for this generation: {}'.format(new_scores))
         new_lowest_error, new_best_kp = new_grading[0]
         logger.info('Lowest error of {} from {}'.format(new_lowest_error, new_best_kp))
-        if new_lowest_error <= lowest_error:
+        if new_lowest_error < lowest_error:
             lowest_error = new_lowest_error
+            best_kp = new_best_kp
+            scores = new_scores
+            population = [x[1] for x in new_grading]
+        elif new_lowest_error == lowest_error and sum(new_scores) <= sum(scores):
+            lowest_error = new_lowest_error
+            best_kp = new_best_kp
+            scores = new_scores
             population = [x[1] for x in new_grading]
         else:
             logger.warn('Performance was worst in this generation, using the previous one')
@@ -83,8 +90,8 @@ if __name__ == '__main__':
         os.makedirs('logs')
     logging.config.dictConfig(logging_dict)
     logger = logging.getLogger('ga_runner')
-    population_size = 15
-    maximum_range = 100
+    population_size = 5
+    maximum_range = 1000000
     dataset = 'midi_dataset.txt'
     initial_population = []
     ga_runner(dataset, maximum_range, population_size, initial_population)
