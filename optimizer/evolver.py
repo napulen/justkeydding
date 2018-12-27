@@ -1,5 +1,6 @@
 import random
 import logging
+import copy
 logger = logging.getLogger(__name__)
 
 class Evolver:
@@ -9,7 +10,7 @@ class Evolver:
         self.logger.info('Evolver() <- generator={}'.format(generator))
 
     def evolve(self, population, retain=0.2, random_retain=0.2, crossover=0.3,
-            mutation_prob=0.1, mutation_ratio=0.1):
+            mutation_prob=0.2, mutation_ratio=0.2):
         ''' Evolver, assumes a population sorted by best performance first '''
         self.logger.info('Start evolve() <- population={}, retain={}, random_retain={}, crossover={}, mutation_prob={}, mutation_ratio={}'.format(population, retain, random_retain, crossover, mutation_prob, mutation_ratio))
         # Number of key profiles from the old population that we are keeping
@@ -24,15 +25,15 @@ class Evolver:
         self.logger.debug('crossover_length:{}'.format(crossover_length))
 
         # Initialize the parents of the new population
-        new_population = population[:retain_length]
+        new_population = copy.deepcopy(population[:retain_length])
 
         # Select random key profiles from the previous generation
         random_old = []
         while len(random_old) < random_retain_length:
             kp = random.choice(population[retain_length:])
-            if kp not in random_old:
+            if kp not in random_old and kp not in new_population:
                 self.logger.debug('random_kp_retained:{}'.format(kp))
-                random_old.append(kp)
+                random_old.append(copy.deepcopy(kp))
         new_population.extend(random_old)
 
         # Crossover parents to fill some of the population
