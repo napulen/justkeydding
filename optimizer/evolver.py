@@ -1,7 +1,7 @@
 import random
 import logging
 import copy
-logger = logging.getLogger(__name__)
+from . import key_profiles
 
 class Evolver:
     def __init__(self, generator):
@@ -39,41 +39,47 @@ class Evolver:
         # Crossover parents to fill some of the population
         children = []
         while len(children) < crossover_length:
-            male = random.choice(new_population)
-            female = random.choice(new_population)
-            if male != female:
+            male_name = random.choice(new_population)
+            female_name = random.choice(new_population)
+            if male_name != female_name:
                 # Child is made of the major key of
                 # the male and minor key of the female
-                child = male[:12] + female[12:]
-                self.logger.debug('child:{}'.format(child))
-                children.append(child)
+                child_name = '({},{})'.format(male_name, female_name)
+                male_kp = key_profiles.get(male_name)
+                female_kp = key_profiles.get(female_name)
+                child_kp = male_kp[:12] + female_kp[12:]
+                self.logger.debug('child:{}'.format(child_name))
+                key_profiles.insert_new(child_name, child_kp)
+                children.append(child_name)
         new_population.extend(children)
 
         # Do some mutations. Mutations consist in giving a 'fraction'
         # of the magnitude of a pitch class and give it to another pitch class
         # The fraction is defined by 'mutation_ratio', default is 10%
-        for kp in new_population:
+        for idx, key_profile_name in enumerate(new_population):
             if mutation_prob > random.random():
+                mutation_name = '{}*'.format(key_profile_name)
+                self.logger.debug('mutation:{}'.format(mutation_name))
+                kp = copy.deepcopy(key_profiles.get(key_profile_name))
+                index_range = random.choice([(0, 11), (12, 23)])
                 pc1_index = 0
                 pc2_index = 0
-                mode = random.choice(['major', 'minor'])
-                mode_index = 0 if mode == 'major' else 12
                 while pc1_index == pc2_index:
-                    pc1_index = random.randint(0, 11)
-                    pc2_index = random.randint(0, 11)
-                pc1_index += mode_index
-                pc2_index += mode_index
+                    pc1_index = random.randint(index_range[0], index_range[1])
+                    pc2_index = random.randint(index_range[0], index_range[1])
                 delta = kp[pc1_index] * mutation_ratio
                 self.logger.debug('pc1 {} changes by {}, from {} to {}'.format(pc1_index, delta, kp[pc1_index], kp[pc1_index] - delta))
                 self.logger.debug('pc2 {} changes by {}, from {} to {}'.format(pc2_index, delta, kp[pc2_index], kp[pc2_index] + delta))
                 kp[pc1_index] -= delta
                 kp[pc2_index] += delta
+                key_profiles.insert_new(mutation_name, kp)
+                new_population[idx] = mutation_name
 
         # Fill the rest of the population with random key profiles
         while len(population) > len(new_population):
-            kp = self.generator.generate_key_profile()
-            self.logger.debug('Generated key_profile: {}'.format(kp))
-            new_population.append(kp)
+            kp_name = self.generator.generate_key_profile()
+            self.logger.debug('Generated key_profile: {}'.format(kp_name))
+            new_population.append(kp_name)
         self.logger.info('Done evolve() -> new_population={}'.format(new_population))
         return new_population
 

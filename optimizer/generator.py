@@ -1,11 +1,12 @@
 import random
 import logging
-
+from . import key_profiles
 
 class Generator:
     def __init__(self, maximum_range):
         self.logger = logging.getLogger('generator')
         self.maximum_range = maximum_range
+        self.kp_id = 0
         self.logger.info("Generator() <- maximum_range={}".format(self.maximum_range))
 
     def generate_key_profile(self):
@@ -14,8 +15,11 @@ class Generator:
         major = self.generate_major_key_profile()
         minor = self.generate_minor_key_profile()
         key_profile = major + minor
-        self.logger.info('Done generate_key_profile() -> key_profile={}'.format(key_profile))
-        return key_profile
+        key_profile_name = 'kp{}'.format(self.kp_id)
+        self.kp_id += 1
+        key_profiles.insert_new(key_profile_name, key_profile)
+        self.logger.info('Done generate_key_profile() -> key_profile_name={}'.format(key_profile_name))
+        return key_profile_name
 
     def generate_major_key_profile(self):
         self.logger.info('Start generate_major_key_profile()')

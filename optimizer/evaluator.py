@@ -1,5 +1,6 @@
 import subprocess
 import logging
+from . import key_profiles
 from multiprocessing.dummy import Pool as ThreadPool
 
 class Evaluator:
@@ -21,20 +22,19 @@ class Evaluator:
         self.logger.info('Done grade() -> grading={}'.format(grading))
         return grading
 
-    def evaluate(self, key_profile):
+    def evaluate(self, key_profile_name):
         ''' Evaluate a key profile '''
-        self.logger.info('Start evaluate() <- key_profile={}'.format(key_profile))
-        kp_string = ['{:.12f}'.format(p) for p in key_profile]
-        kp_string = ' '.join(kp_string)
+        self.logger.info('Start evaluate() <- key_profile_name={}'.format(key_profile_name))
         # error_list = [self.run_keydetection(filename, kp_string)
         #              for filename in self.files]
         with ThreadPool(max(len(self.files), 8)) as p:
-            error_list = p.map(lambda f: self.run_keydetection(f, kp_string), self.files)
+            error_list = p.map(lambda f: self.run_keydetection(f, key_profile_name), self.files)
         total_error = sum(error_list)
         self.logger.info('Done evaluate() -> total_error={}'.format(total_error))
-        return (total_error, key_profile)
+        return (total_error, key_profile_name)
 
-    def run_keydetection(self, filename, kp_string):
+    def run_keydetection(self, filename, key_profile_name):
+        kp_string = key_profiles.get_as_string(key_profile_name)
         justkeydding = subprocess.Popen(
                 ('bin/justkeydding',
                 '-e',
@@ -48,6 +48,6 @@ class Evaluator:
         except ValueError:
             self.logger.error('Failed while running justkeydding, output: {}'.format(output))
             score = 0.0
-        error = 1 - score
-        self.logger.debug('{}: {}'.format(filename, error))
+        error = 1 - score**2
+        self.logger.debug('{} on {}: {}'.format(key_profile_name, filename, error))
         return error
