@@ -76,7 +76,7 @@ def get(name):
 def get_as_string(name):
     kp = get(name)
     if kp:
-        kp_string = ['{:.12f}'.format(p) for p in kp]
+        kp_string = ['{:.15f}'.format(p) for p in kp]
         kp_string = ' '.join(kp_string)
         return kp_string
     return None

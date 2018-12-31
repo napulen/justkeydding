@@ -40,49 +40,104 @@ logging_dict = {
     }
 }
 
-def ga_runner(dataset, maximum_range, population_size, initial_population):
-    logger.info('ga_runner() <- population_size={}, maximum_range={}, dataset={}'.format(population_size, maximum_range, dataset))
-    gen = generator.Generator(maximum_range)
+def ga_runner(dataset, population_size, initial_key_profiles, initial_key_transitions, kp_max_range, kt_max_range, evolution_swap_threshold):
+    logger.info('ga_runner() <- dataset={}, population_size={}, initial_key_profiles={}, initial_key_transitions={}, kp_max_range={}, kt_max_range={}, evolution_swap_threshold={}'.format(dataset, population_size, initial_key_profiles, initial_key_transitions, kp_max_range, kt_max_range, evolution_swap_threshold))
+    # Invite all the friends to the party
+    gen = generator.Generator(kp_max_range, kt_max_range)
     eva = evaluator.Evaluator(dataset)
     evo = evolver.Evolver(gen)
-    population = initial_population
-    initial_population_length = len(initial_population)
-    if population_size < initial_population_length:
-        logger.warn('Size of initial population greater than population size, extending population size to {}.'.format(initial_population_length))
-        population_size = initial_population_length
-    generated_population_length = population_size - len(initial_population)
-    generated_population = gen.generate_population(generated_population_length)
-    population.extend(generated_population)
-    logger.info('Generation 0 consists of {} user-provided key profiles and {} generated key profiles'.format(initial_population_length, generated_population_length))
-    grading = eva.grade(population)
-    scores = [x[0] for x in grading]
-    logger.debug('Scores for this generation: {}'.format(scores))
-    lowest_error, best_kp = grading[0]
-    logger.info('Lowest error of {} from {}'.format(lowest_error, best_kp))
-    generation = 1
-    population = [x[1] for x in grading]
+    # Set the initial population of key profiles
+    key_profiles = initial_key_profiles
+    key_profiles_length = len(key_profiles)
+    if population_size < key_profiles_length:
+        logger.warn('Size of initial population of key profiles greater than population size, extending population size to {}.'.format(key_profiles_length))
+        population_size = key_profiles_length
+    # Same for the key transitions
+    key_transitions = initial_key_transitions
+    key_transitions_length = len(key_transitions)
+    if population_size < key_transitions_length:
+        logger.warn('Size of initial population of key transitions greater than population size, extending population size to {}.'.format(key_transitions_length))
+        population_size = key_transitions_length
+    # Generate the remaining slots available
+    remaining_key_profiles = population_size - key_profiles_length
+    generated_key_profiles = gen.generate_key_profiles(remaining_key_profiles)
+    key_profiles.extend(generated_key_profiles)
+    remaining_key_transitions = population_size - key_transitions_length
+    generated_key_transitions = gen.generate_key_transitions(remaining_key_transitions)
+    key_transitions.extend(generated_key_transitions)
+    logger.info('Generation 0 consists of {0} ({1} user-provided, {2} generated) key profiles and {0} ({3} user-provided, {4} generated) key transitions'.format(population_size, key_profiles_length, remaining_key_profiles, key_transitions_length, remaining_key_transitions))
+    # Time to find the best kp,kt pair from the initial values
+    best_key_profile = ''
+    best_key_transition = ''
+    lowest_error = float("inf")
+    scores = []
+    for kt in key_transitions:
+        grading = eva.grade_key_profiles(key_profiles, kt)
+        lower_error, kp, _ = grading[0]
+        if lower_error < lowest_error:
+            best_key_profile = kp
+            best_key_transition = kt
+            scores = [x[0] for x in grading]
+    logger.info('From the initial populations, ({},{}) is the best (key_profile, key_transition) pair'.format(best_key_profile, best_key_transition))
+    logger.debug('Scores for this generation of key_profiles: {}'.format(scores))
+    kp_generation = 1
+    kt_generation = 1
+    bad_generation_counter = 0
+    evolution_mode = 'key_profiles'
+    key_profiles = [x[1] for x in grading]
     while lowest_error > 0:
-        logger.info('Generation {}'.format(generation))
-        new_population = evo.evolve(population)
-        new_grading = eva.grade(new_population)
-        new_scores = [x[0] for x in new_grading]
-        logger.info('Scores for this generation: {}'.format(new_scores))
-        new_lowest_error, new_best_kp = new_grading[0]
-        logger.info('Lowest error of {} from {}'.format(new_lowest_error, new_best_kp))
-        if new_lowest_error < lowest_error:
-            lowest_error = new_lowest_error
-            best_kp = new_best_kp
-            scores = new_scores
-            population = [x[1] for x in new_grading]
-        elif new_lowest_error == lowest_error and sum(new_scores) <= sum(scores):
-            lowest_error = new_lowest_error
-            best_kp = new_best_kp
-            scores = new_scores
-            population = [x[1] for x in new_grading]
-        else:
-            logger.warn('Performance was worst in this generation, using the previous one')
-        generation += 1
-    logger.warn('Optimization concluded, best key profile is {}'.format(best_kp))
+        logger.info('Key profile generation {}, Key transition generation {} - Evolving {}'.format(kp_generation, kt_generation, evolution_mode))
+        if evolution_mode == 'key_profiles':
+            new_key_profiles = evo.evolve_key_profiles(key_profiles)
+            new_grading = eva.grade_key_profiles(new_key_profiles, best_key_transition)
+            new_scores = [x[0] for x in new_grading]
+            logger.info('Scores for this generation: {}'.format(new_scores))
+            new_lowest_error, new_best_kp, _ = new_grading[0]
+            logger.info('Lowest error of {} from {}'.format(new_lowest_error, new_best_kp))
+            if new_lowest_error < lowest_error:
+                lowest_error = new_lowest_error
+                best_key_profile = new_best_kp
+                scores = new_scores
+                key_profiles = [x[1] for x in new_grading]
+                bad_generation_counter = 0
+            elif new_lowest_error == lowest_error and sum(new_scores) <= sum(scores):
+                lowest_error = new_lowest_error
+                best_key_profile = new_best_kp
+                scores = new_scores
+                key_profiles = [x[1] for x in new_grading]
+                bad_generation_counter = 0
+            else:
+                logger.warn('Performance was worst in this generation')
+                bad_generation_counter += 1
+                if bad_generation_counter > evolution_swap_threshold:
+                    evolution_mode = 'key_profiles'
+                    bad_generation_counter = 0
+        elif evolution_mode == 'key_transitions':
+            new_key_transitions = evo.evolve_key_transitions(key_transitions)
+            new_grading = eva.grade_key_transitions(best_key_profile, new_key_transitions)
+            new_scores = [x[0] for x in new_grading]
+            logger.info('Scores for this generation: {}'.format(new_scores))
+            new_lowest_error, _, new_best_kt = new_grading[0]
+            logger.info('Lowest error of {} from {}'.format(new_lowest_error, new_best_kt))
+            if new_lowest_error < lowest_error:
+                lowest_error = new_lowest_error
+                best_key_transition = new_best_kt
+                scores = new_scores
+                key_transitions = [x[2] for x in new_grading]
+                bad_generation_counter = 0
+            elif new_lowest_error == lowest_error and sum(new_scores) <= sum(scores):
+                lowest_error = new_lowest_error
+                best_key_transition = new_best_kt
+                scores = new_scores
+                key_transitions = [x[2] for x in new_grading]
+                bad_generation_counter = 0
+            else:
+                logger.warn('Performance was worst in this generation')
+                bad_generation_counter += 1
+                if bad_generation_counter > evolution_swap_threshold:
+                    evolution_mode = 'key_profiles'
+                    bad_generation_counter = 0
+    logger.warn('Optimization concluded, best (key_profile, key_transition) pair is ({},{})'.format(best_key_profile, best_key_transition))
 
 
 if __name__ == '__main__':
@@ -90,8 +145,11 @@ if __name__ == '__main__':
         os.makedirs('logs')
     logging.config.dictConfig(logging_dict)
     logger = logging.getLogger('ga_runner')
-    population_size = 5
-    maximum_range = 1000000
     dataset = 'midi_dataset.txt'
-    initial_population = []
-    ga_runner(dataset, maximum_range, population_size, initial_population)
+    population_size = 10
+    kp_max_range = 100
+    kt_max_range = 256
+    evolutionModeThreshold = 5
+    initial_key_profiles = ['sapp', 'temperley', 'krumhansl_kessler', 'aarden_essen']
+    initial_key_transitions = ['exponential10']
+    ga_runner(dataset, population_size, initial_key_profiles, initial_key_transitions, kp_max_range, kt_max_range)
