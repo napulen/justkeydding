@@ -112,7 +112,7 @@ class Evolver:
                 if mutation_prob > random.random():
                     kt = copy.deepcopy(key_transitions.get(key_transition_name))
                     ratio = kt[13] # Yes, 13 is a magic number, 20 also works
-                    new_ratio = random.randrange(ratio - ratio*mutation_ratio, ratio + ratio*mutation_ratio)
+                    new_ratio = random.uniform(ratio - ratio*mutation_ratio, ratio + ratio*mutation_ratio)
                     kt = self.generator.generate_geometric_key_transition(new_ratio)
                     mutation_name = '{}*'.format(key_transition_name)
                     self.logger.debug('mutation:{}'.format(mutation_name))
