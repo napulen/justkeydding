@@ -108,7 +108,7 @@ class Evolver:
 
         # Do some mutations.
         for idx, key_transition_name in enumerate(new_key_transitions):
-            if key_transition_name.startswith('kpg'):
+            if key_transition_name.startswith('ktg'):
                 if mutation_prob > random.random():
                     kt = copy.deepcopy(key_transitions.get(key_transition_name))
                     ratio = kt[13] # Yes, 13 is a magic number, 20 also works
@@ -118,7 +118,7 @@ class Evolver:
                     self.logger.debug('mutation:{}'.format(mutation_name))
                     key_transitions.insert_new(mutation_name, kt)
                     new_key_transitions[idx] = mutation_name
-            elif key_transition_name.startswith('kps'):
+            elif key_transition_name.startswith('kts'):
                 if mutation_prob > random.random():
                     mutation_name = '{}*'.format(key_transition_name)
                     self.logger.debug('mutation:{}'.format(mutation_name))
