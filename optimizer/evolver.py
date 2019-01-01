@@ -80,10 +80,10 @@ class Evolver:
             kp_name = self.generator.generate_key_profile()
             self.logger.debug('Generated key_profile: {}'.format(kp_name))
             new_key_profiles.append(kp_name)
-        self.logger.info('Done evevolve_key_profilesolve() -> new_key_profiles={}'.format(new_key_profiles))
+        self.logger.info('Done evolve_key_profiles() -> new_key_profiles={}'.format(new_key_profiles))
         return new_key_profiles
 
-    def evolve_key_transitions(self, kts, retain=0.2, random_retain=0.2, mutation_prob=0.2, mutation_ratio=0.1):
+    def evolve_key_transitions(self, kts, retain=0.2, random_retain=0.2, mutation_prob=0.7, mutation_ratio=0.1):
         ''' Evolver, assumes key_transitions sorted by best performance first'''
         self.logger.info('Start evolve_key_transitions() <- kts={}, retain={}, random_retain={}, mutation_prob={}, mutation_ratio={}'.format(kts, retain, random_retain, mutation_prob, mutation_ratio))
 
@@ -114,7 +114,8 @@ class Evolver:
                     new_ratio = random.uniform(ratio - ratio*mutation_ratio, ratio + ratio*mutation_ratio)
                     kt = self.generator.generate_geometric_key_transition(new_ratio)
                     mutation_name = '{}*'.format(key_transition_name)
-                    self.logger.debug('mutation:{}'.format(mutation_name))
+                    self.logger.debug('mutation:{}, original_ratio={}, mutation_ratio={}'.format(mutation_name, ratio, new_ratio))
+                    key_transitions.store_ratio(mutation_name, new_ratio)
                     key_transitions.insert_new(mutation_name, kt)
                     new_key_transitions[idx] = mutation_name
             elif key_transition_name.startswith('kts'):

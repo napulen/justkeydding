@@ -72,9 +72,11 @@ def ga_runner(dataset, population_size, initial_key_profiles, initial_key_transi
     lowest_error = float("inf")
     scores = []
     logger.info("Finding the best (key_profile,key_transition) from the initial populations")
+    kt_grading = []
     for kt in key_transitions:
         grading = eva.grade_key_profiles(key_profiles, kt)
         lower_error, kp, _ = grading[0]
+        kt_grading.append((lower_error, kt))
         if lower_error < lowest_error:
             lowest_error = lower_error
             best_key_profile = kp
@@ -84,6 +86,9 @@ def ga_runner(dataset, population_size, initial_key_profiles, initial_key_transi
             if lowest_error == 0:
                 break
         logger.debug("({},{}) is the best pair so far".format(best_key_profile, best_key_transition))
+    kt_grading = sorted(kt_grading, key=lambda score: score[0])
+    key_transitions = [x[1] for x in kt_grading]
+    logger.debug("sorted_key_transitions:{}".format(key_transitions))
     logger.info('From the initial populations, ({},{}) is the best (key_profile, key_transition) pair'.format(best_key_profile, best_key_transition))
     logger.debug('Scores for the initial generation: {}'.format(scores))
     kp_generation = 1
