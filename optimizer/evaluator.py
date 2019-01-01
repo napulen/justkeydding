@@ -15,7 +15,7 @@ class Evaluator:
 
     def grade_key_profiles(self, key_profiles, key_transition_name):
         ''' Grade a list of key profiles '''
-        self.logger.info('Start grade_key_profiles() <- key_profiles={}, key_transition_name ={}'.format(key_profiles, key_transition_name))
+        self.logger.info('Start grade_key_profiles() <- key_profiles={}, key_transition_name={}'.format(key_profiles, key_transition_name))
         grading = [self.evaluate(x, key_transition_name) for x in key_profiles]
         grading = sorted(grading, key=lambda score: score[0])
         self.logger.info('Done grade_key_profiles() -> grading={}'.format(grading))
@@ -43,6 +43,7 @@ class Evaluator:
     def run_keydetection(self, filename, key_profile_name, key_transition_name):
         kp_string = key_profiles.get_as_string(key_profile_name)
         kt_string = key_transitions.get_as_string(key_transition_name)
+        # self.logger.debug('kp_string:"{}", kt_string:"{}"'.format(kp_string, kt_string))
         justkeydding = subprocess.Popen(
                 ('bin/justkeydding',
                 '-e',

@@ -77,7 +77,7 @@ class Generator:
         self.logger.info("Start generate_key_transition()")
         kt_type = random.choice(['geometric', 'stochastic'])
         if kt_type == 'geometric':
-            ratio = random.random() * 49.0 + 1.0
+            ratio = random.random() * 48.0 + 2.0
             key_transition = self.generate_geometric_key_transition(ratio)
             key_transition_name = 'ktg{}'.format(self.kt_id)
         elif kt_type == 'stochastic':
