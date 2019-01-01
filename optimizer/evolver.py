@@ -110,8 +110,7 @@ class Evolver:
         for idx, key_transition_name in enumerate(new_key_transitions):
             if key_transition_name.startswith('ktg'):
                 if mutation_prob > random.random():
-                    kt = copy.deepcopy(key_transitions.get(key_transition_name))
-                    ratio = kt[13] # Yes, 13 is a magic number, 20 also works
+                    ratio = key_transitions.get_ratio(key_transition_name)
                     new_ratio = random.uniform(ratio - ratio*mutation_ratio, ratio + ratio*mutation_ratio)
                     kt = self.generator.generate_geometric_key_transition(new_ratio)
                     mutation_name = '{}*'.format(key_transition_name)

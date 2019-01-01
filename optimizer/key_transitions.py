@@ -27,6 +27,11 @@ _kt = {
     ]
 }
 
+_ratios = {
+    "exponential2": 2,
+    "exponential10": 10
+}
+
 def insert_new(name, kt):
     kt_sum = sum(kt)
     if 1.0 - abs(kt_sum) > 0.01:
@@ -34,11 +39,22 @@ def insert_new(name, kt):
     _kt[name] = kt
     logger.info('New key transition {}: {}'.format(name, kt))
 
+def store_ratio(name, ratio):
+    _ratios[name] = ratio
+    logger.info('New ratio {}: {}'.format(name, ratio))
+
 def get(name):
     if name in _kt:
         return _kt[name]
     else:
         logger.error('{} key transition not found in the dictionary')
+        return None
+
+def get_ratio(name):
+    if name in _ratios:
+        return _ratios[name]
+    else:
+        logger.error('{} kt ratio not found in the dictionary')
         return None
 
 def get_as_string(name):

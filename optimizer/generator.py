@@ -80,6 +80,7 @@ class Generator:
             ratio = random.random() * 48.0 + 2.0
             key_transition = self.generate_geometric_key_transition(ratio)
             key_transition_name = 'ktg{}'.format(self.kt_id)
+            key_transitions.store_ratio(key_transition_name, ratio)
         elif kt_type == 'stochastic':
             key_transition = self.generate_stochastic_key_transition()
             key_transition_name = 'kts{}'.format(self.kt_id)
