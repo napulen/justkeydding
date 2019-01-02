@@ -1,4 +1,6 @@
 from optimizer import generator, evaluator, evolver
+from optimizer.key_profiles import flush_key_profiles, keep_key_profiles, log_key_profiles_dict
+from optimizer.key_transitions import flush_key_transitions, keep_key_transitions, log_key_transitions_dict
 import os
 import logging
 import logging.handlers
@@ -9,10 +11,10 @@ logging_dict = {
     'disable_existing_loggers': False,
     'formatters': {
         'date': {
-            'format': '%(asctime)s - [%(name)-9s] %(levelname)-5s:  %(message)s',
+            'format': '%(asctime)s [%(name)-15s] %(levelname)-7s: %(message)s',
         },
         'no_date': {
-            'format': '[%(name)-9s] %(levelname)-5s:  %(message)s',
+            'format': '[%(name)-15s] %(levelname)-7s: %(message)s',
         },
     },
     'handlers': {
@@ -110,15 +112,20 @@ def ga_runner(dataset, population_size, initial_key_profiles, initial_key_transi
                 scores = new_scores
                 key_profiles = [x[1] for x in new_grading]
                 bad_generation_counter = 0
+                keep_key_profiles(key_profiles)
+                log_key_profiles_dict()
             elif new_lowest_error == lowest_error and sum(new_scores) <= sum(scores):
                 lowest_error = new_lowest_error
                 best_key_profile = new_best_kp
                 scores = new_scores
                 key_profiles = [x[1] for x in new_grading]
                 bad_generation_counter = 0
+                keep_key_profiles(key_profiles)
+                log_key_profiles_dict()
             else:
                 logger.warn('Performance was worst in this generation')
                 bad_generation_counter += 1
+                flush_key_profiles([k for k in new_key_profiles if k not in key_profiles])
                 if bad_generation_counter > evolution_swap_threshold:
                     evolution_mode = 'key_transitions'
                     bad_generation_counter = 0
@@ -137,15 +144,20 @@ def ga_runner(dataset, population_size, initial_key_profiles, initial_key_transi
                 scores = new_scores
                 key_transitions = [x[2] for x in new_grading]
                 bad_generation_counter = 0
+                keep_key_transitions(key_transitions)
+                log_key_transitions_dict()
             elif new_lowest_error == lowest_error and sum(new_scores) <= sum(scores):
                 lowest_error = new_lowest_error
                 best_key_transition = new_best_kt
                 scores = new_scores
                 key_transitions = [x[2] for x in new_grading]
                 bad_generation_counter = 0
+                keep_key_transitions(key_transitions)
+                log_key_transitions_dict()
             else:
                 logger.warn('Performance was worst in this generation')
                 bad_generation_counter += 1
+                flush_key_transitions([k for k in new_key_transitions if k not in key_transitions])
                 if bad_generation_counter > evolution_swap_threshold:
                     evolution_mode = 'key_profiles'
                     bad_generation_counter = 0
@@ -164,6 +176,6 @@ if __name__ == '__main__':
     kp_max_range = 100
     kt_max_range = 256
     evolution_swap_threshold = 3
-    initial_key_profiles = ['sapp', 'temperley', 'krumhansl_kessler', 'aarden_essen']
-    initial_key_transitions = ['exponential10']
+    initial_key_profiles = ['sapp', 'temperley', 'krumhansl_kessler', 'aarden_essen', 'experiment4', 'experiment6']
+    initial_key_transitions = ['exponential10', 'experiment6']
     ga_runner(dataset, population_size, initial_key_profiles, initial_key_transitions, kp_max_range, kt_max_range, evolution_swap_threshold)

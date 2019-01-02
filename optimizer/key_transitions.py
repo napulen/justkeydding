@@ -24,6 +24,11 @@ _kt = {
         100/144442221, 1000000/144442221, 1000000/144442221,
         100/144442221, 1000000/144442221, 10/144442221,
         10000000/144442221, 10000/144442221, 10000/144442221
+    ],
+    "experiment6": [
+        0.8765246313562368, 3.993824473043542e-08, 3.450952918589394e-05, 3.450952918589394e-05, 1.1739889361311444e-06, 0.02981872670344273, 1.5724030710075827e-12, 0.02981872670344273, 1.1739889361311444e-06, 3.450952918589394e-05, 3.450952918589394e-05, 3.993824473043542e-08,
+
+        0.02981872670344273, 4.622095490077414e-11, 0.0010144112674150716, 1.3586698673708549e-09, 0.0010144112674150716, 0.0010144112674150716, 1.3586698673708549e-09, 0.0010144112674150716, 4.622095490077414e-11, 0.02981872670344273, 1.1739889361311444e-06, 1.1739889361311444e-06
     ]
 }
 
@@ -43,18 +48,35 @@ def store_ratio(name, ratio):
     _ratios[name] = ratio
     logger.info('New ratio {}: {}'.format(name, ratio))
 
+def flush_key_transitions(key_transitions):
+    [_kt.pop(kt) for kt in key_transitions]
+    [_ratios.pop(r) for r in key_transitions if r in _ratios]
+    logger.info('Removed the following key transitions: {}'.format(key_transitions))
+
+def keep_key_transitions(key_transitions):
+    [_kt.pop(kt) for kt in list(_kt.keys()) if kt not in key_transitions]
+    [_ratios.pop(r) for r in list(_ratios.keys()) if r not in key_transitions]
+    logger.info('Removed all but the following key transitions: {}'.format(key_transitions))
+
+def log_key_transitions_dict():
+    logger.info('Current key transitions:')
+    for k in _kt:
+        logger.info('{}: {}'.format(k, get_as_string(k)))
+        if k in _ratios:
+            logger.info('ratio={}'.format(_ratios[k]))
+
 def get(name):
     if name in _kt:
         return _kt[name]
     else:
-        logger.error('{} key transition not found in the dictionary')
+        logger.error('{} key transition not found in the dictionary'.format(name))
         return None
 
 def get_ratio(name):
     if name in _ratios:
         return _ratios[name]
     else:
-        logger.error('{} kt ratio not found in the dictionary')
+        logger.error('{} kt ratio not found in the dictionary'.format(name))
         return None
 
 def get_as_string(name):
