@@ -166,6 +166,7 @@ def ga_runner(dataset, population_size, initial_key_profiles, initial_key_transi
                     bad_generation_counter = 0
                     logger.warn("Changing evolution mode to {}".format(evolution_mode))
             kt_generation += 1
+        logger.info('Best key_profile,key_transition pair ({}, {})'.format(best_key_profile, best_key_transition))
     logger.warn('Optimization concluded, best (key_profile, key_transition) pair is ({},{})'.format(best_key_profile, best_key_transition))
 
 
@@ -181,4 +182,4 @@ if __name__ == '__main__':
     evolution_swap_threshold = 3
     initial_key_profiles = ['sapp', 'temperley', 'krumhansl_kessler', 'aarden_essen', 'experiment4', 'experiment6']
     initial_key_transitions = ['exponential10', 'experiment6']
-    ga_runner(dataset, population_size, initial_key_profiles, initial_key_transitions, kp_max_range, kt_max_range, evolution_swap_threshold)
+    ga_runner(dataset, population_size, initial_key_profiles, initial_key_transitions, kp_max_range, kt_max_range, evolution_swap_threshold, True)
