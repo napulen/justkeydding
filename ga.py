@@ -42,7 +42,7 @@ logging_dict = {
     }
 }
 
-def ga_runner(dataset, population_size, initial_key_profiles, initial_key_transitions, kp_max_range, kt_max_range, evolution_swap_threshold):
+def ga_runner(dataset, population_size, initial_key_profiles, initial_key_transitions, kp_max_range, kt_max_range, evolution_swap_threshold, just_evalute=False):
     logger.info('ga_runner() <- dataset={}, population_size={}, initial_key_profiles={}, initial_key_transitions={}, kp_max_range={}, kt_max_range={}, evolution_swap_threshold={}'.format(dataset, population_size, initial_key_profiles, initial_key_transitions, kp_max_range, kt_max_range, evolution_swap_threshold))
     # Invite all the friends to the party
     gen = generator.Generator(kp_max_range, kt_max_range)
@@ -93,6 +93,9 @@ def ga_runner(dataset, population_size, initial_key_profiles, initial_key_transi
     logger.debug("sorted_key_transitions:{}".format(key_transitions))
     logger.info('From the initial populations, ({},{}) is the best (key_profile, key_transition) pair'.format(best_key_profile, best_key_transition))
     logger.debug('Scores for the initial generation: {}'.format(scores))
+    if just_evalute:
+        logger.info('Evaluation complete!')
+        exit()
     kp_generation = 1
     kt_generation = 1
     bad_generation_counter = 0

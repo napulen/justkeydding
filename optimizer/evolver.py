@@ -12,7 +12,7 @@ class Evolver:
         self.kp_id = 0
         self.kt_id = 0
 
-    def evolve_key_profiles(self, kps, retain=0.2, random_retain=0.2, crossover=0.3, mutation_prob=0.2, mutation_ratio=0.1):
+    def evolve_key_profiles(self, kps, retain=0.2, random_retain=0.2, crossover=0.3, mutation_prob=0.5, mutation_ratio=0.1):
         ''' Evolver, assumes key_profiles sorted by best performance first '''
         self.logger.info('Start evolve_key_profiles() <- kps={}, retain={}, random_retain={}, crossover={}, mutation_prob={}, mutation_ratio={}'.format(kps, retain, random_retain, crossover, mutation_prob, mutation_ratio))
         # Number of key profiles from the old population that we are keeping
@@ -86,7 +86,7 @@ class Evolver:
         self.logger.info('Done evolve_key_profiles() -> new_key_profiles={}'.format(new_key_profiles))
         return new_key_profiles
 
-    def evolve_key_transitions(self, kts, retain=0.2, random_retain=0.2, mutation_prob=0.7, mutation_ratio=0.1):
+    def evolve_key_transitions(self, kts, retain=0.2, random_retain=0.2, mutation_prob=1, mutation_ratio=0.1):
         ''' Evolver, assumes key_transitions sorted by best performance first'''
         self.logger.info('Start evolve_key_transitions() <- kts={}, retain={}, random_retain={}, mutation_prob={}, mutation_ratio={}'.format(kts, retain, random_retain, mutation_prob, mutation_ratio))
 

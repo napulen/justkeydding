@@ -75,7 +75,7 @@ class Generator:
     def generate_key_transition(self):
         ''' Generate a set of random key transitions '''
         self.logger.info("Start generate_key_transition()")
-        kt_type = random.choice(['geometric', 'stochastic'])
+        kt_type = random.choice(['geometric', 'geometric', 'geometric', 'geometric', 'geometric', 'geometric', 'geometric', 'geometric', 'geometric', 'stochastic'])
         if kt_type == 'geometric':
             ratio = random.random() * 48.0 + 2.0
             key_transition = self.generate_geometric_key_transition(ratio)
