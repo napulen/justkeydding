@@ -55,6 +55,7 @@ class HiddenMarkovModel {
  public:
     typedef std::vector<int> Observations;
     typedef std::vector<int> States;
+    typedef std::vector<double> ProbabilityVector;
     typedef std::unordered_map<int, double> InitialProbabilities;
     typedef std::unordered_map<int, double> TransitionProbability;
     typedef std::unordered_map<int, double> EmissionProbability;
@@ -79,6 +80,7 @@ class HiddenMarkovModel {
     void runViterbi();
     Key::KeySequence getKeySequence();
     double getMaximumProbability() const;
+    ProbabilityVector getProbabilityVector() const;
     int getStatus() const;
 
  private:
@@ -89,6 +91,7 @@ class HiddenMarkovModel {
     TransitionProbabilities m_transitionProbabilities;
     EmissionProbabilities m_emissionProbabilities;
     double m_maximumProbability;
+    ProbabilityVector m_probabilityVector;
     Key::KeySequence m_keySequence;
 };
 

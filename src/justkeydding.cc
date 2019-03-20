@@ -47,7 +47,8 @@ int main(int argc, char *argv[]) {
     KeyTransition::KeyTransitionArray customKeyTransition;
     std::string filename;
     int status;
-    bool shouldEvaluate;
+    bool justEvaluation;
+    bool justProbabilities;
     try {
         const optparse::Values &options = parser.parse_args(argc, argv);
         const std::vector<std::string> args = parser.args();
@@ -142,7 +143,8 @@ int main(int argc, char *argv[]) {
             keyTransition = static_cast<std::string>(
                 options.get("keytransition"));
         }
-        shouldEvaluate = options.is_set_by_user("evaluate");
+        justEvaluation = options.is_set_by_user("evaluate");
+        justProbabilities = options.is_set_by_user("probabilities");
     }
     catch (int ret_code) {
         std::cerr << "Error " << ret_code << std::endl;
@@ -216,14 +218,6 @@ int main(int argc, char *argv[]) {
         return status;
     }
     keySequence = hmm.getKeySequence();
-    maximumProbability = hmm.getMaximumProbability();
-    // std::cout << "Maximum probability of the sequence: "
-    //     << maximumProbability << std::endl;
-    // for (Key::KeySequence::const_iterator itKey = keySequence.begin();
-    //     itKey != keySequence.end(); itKey++) {
-    //     std::cout << itKey->getString() << " ";
-    // }
-    // std::cout << std::endl;
     /////////////////////////////
     // Second Hidden Markov Model
     /////////////////////////////
@@ -237,20 +231,17 @@ int main(int argc, char *argv[]) {
         transitionProbabilities);
     hmm2.runViterbi();
     keySequence = hmm2.getKeySequence();
-    maximumProbability = hmm2.getMaximumProbability();
+    HiddenMarkovModel::ProbabilityVector probabilityVector = hmm2.getProbabilityVector();
     Key mainKey = keySequence.front();
-    if (!shouldEvaluate) {
-        std::string mainKeyStr = mainKey.getString();
-        std::transform(
-            mainKeyStr.begin(),
-            std::next(mainKeyStr.begin()),
-            mainKeyStr.begin(),
-            ::toupper);
-        std::cout
-            << mainKeyStr << '\t'
-            << (mainKey.isMajorKey() ? "major" : "minor")
-            << std::endl;
-    } else {
+    if (justProbabilities) {
+        for (HiddenMarkovModel::ProbabilityVector::const_iterator itKeyProb =
+        probabilityVector.begin(); itKeyProb != probabilityVector.end();
+        itKeyProb++) {
+            std::cout << *itKeyProb << " ";
+        }
+        std::cout << std::endl;
+    }
+    else if (justEvaluation) {
         std::size_t underscore = filename.find_last_of("_");
         std::size_t dot = filename.find_last_of(".");
         if (underscore != std::string::npos && dot != std::string::npos) {
@@ -270,6 +261,18 @@ int main(int argc, char *argv[]) {
             }
             std::cout << score << std::endl;
         }
+    }
+    else {
+        std::string mainKeyStr = mainKey.getString();
+        std::transform(
+            mainKeyStr.begin(),
+            std::next(mainKeyStr.begin()),
+            mainKeyStr.begin(),
+            ::toupper);
+        std::cout
+            << mainKeyStr << '\t'
+            << (mainKey.isMajorKey() ? "major" : "minor")
+            << std::endl;
     }
     return 0;
 }
@@ -327,6 +330,9 @@ void initOptionParser(optparse::OptionParserExcept *parser) {
         .metavar("Array[24]");
 
     (*parser).add_option("-e", "--evaluate")
+        .action("store_true");
+
+    (*parser).add_option("-p", "--probabilities")
         .action("store_true");
 }
 

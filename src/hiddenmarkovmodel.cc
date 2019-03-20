@@ -221,12 +221,14 @@ void HiddenMarkovModel::runViterbi() {
   }
   ViterbiLayer lastLayer;
   int lastState = -1;
+  ProbabilityVector probabilities = ProbabilityVector(24, 0);
   while (!m_viterbi.empty()) {
     lastLayer = m_viterbi.back();
     if (lastState == -1) {
       for (ViterbiLayer::const_iterator itLastState = lastLayer.begin();
           itLastState != lastLayer.end(); itLastState++) {
         ViterbiNode lastNode = itLastState->second;
+        probabilities[itLastState->first] = lastNode.probability;
         if (lastNode.probability > maximumProbability) {
           maximumProbability = lastNode.probability;
           lastState = itLastState->first;
@@ -240,12 +242,17 @@ void HiddenMarkovModel::runViterbi() {
   }
   std::reverse(m_keySequence.begin(), m_keySequence.end());
   m_maximumProbability = maximumProbability;
+  m_probabilityVector = probabilities;
   m_status = Status::HIDDENMARKOVMODEL_VITERBI_READY;
   return;
 }
 
 Key::KeySequence HiddenMarkovModel::getKeySequence() {
   return m_keySequence;
+}
+
+HiddenMarkovModel::ProbabilityVector HiddenMarkovModel::getProbabilityVector() const {
+  return m_probabilityVector;
 }
 
 double HiddenMarkovModel::getMaximumProbability() const {
