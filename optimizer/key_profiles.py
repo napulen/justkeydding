@@ -84,6 +84,20 @@ _kp = {
     ]
 }
 
+def mix(major_name, minor_name):
+    if major_name not in _kp:
+        logger.error('Could not find {}'.format(major_name))
+        return
+    if minor_name not in _kp:
+        logger.error('Could not find {}'.format(minor_name))
+        return
+    kp_major = _kp[major_name]
+    kp_minor = _kp[minor_name]
+    kp_mixed = kp_major[:12] + kp_minor[12:]
+    mix_name = '{}_{}'.format(major_name, minor_name)
+    insert_new(mix_name, kp_mixed)
+    return mix_name
+
 def insert_new(name, kp):
     major_sum = sum(kp[:12])
     minor_sum = sum(kp[12:])
@@ -105,7 +119,6 @@ def keep_key_profiles(key_profiles):
 def log_key_profiles_dict():
     for k in _kp:
         logger.info('{}: {}'.format(k, get_as_string(k)))
-
 
 def get(name):
     if name in _kp:

@@ -2,6 +2,7 @@ import subprocess
 import logging
 from . import key_profiles
 from . import key_transitions
+import itertools
 from multiprocessing.dummy import Pool as ThreadPool
 
 class Ensembler:
@@ -27,14 +28,23 @@ class Ensembler:
         self.logger.info('Done grade_key_transitions() -> grading={}'.format(grading))
         return grading
 
-    def evaluate(self, filename):
+    def get_ensemble(self, mixed_profiles=False):
+        ''' Create the ensemble '''
+        self.logger.info('Start get_ensemble() <- mixedProfiles={}'.format(mixed_profiles))
+        if mixed_profiles:
+            profiles = [key_profiles.mix(m[0], m[1]) for m in itertools.product(self.profiles, self.profiles)]
+        else:
+            profiles = self.profiles
+        self.ensemble = [(e[0], e[1]) for e in itertools.product(self.profiles, self.transitions)]
+        return
+
+    def evaluate(self, filename, mixed_profiles=False):
         ''' Evaluate a key profile '''
         self.logger.info('Start evaluate() <- filename={}'.format(filename))
-        # error_list = [self.run_keydetection(filename, kp_string)
-        #              for filename in self.files]
-        with ThreadPool(max(len(self.files), 8)) as p:
-            error_list = p.map(lambda f: self.run_keydetection(f, key_profile_name, key_transition_name), self.files)
-        total_error = sum(error_list)
+        if not self.ensemble:
+            self.get_ensemble(mixed_profiles)
+        with ThreadPool(8) as p:
+            features = p.map(lambda p, t: self.run_keydetection(filename, p, t), self.ensemble)
         self.logger.info('Done evaluate() -> total_error={}'.format(total_error))
         return (total_error, key_profile_name, key_transition_name)
 
@@ -44,7 +54,7 @@ class Ensembler:
         # self.logger.debug('kp_string:"{}", kt_string:"{}"'.format(kp_string, kt_string))
         justkeydding = subprocess.Popen(
                 ('bin/justkeydding',
-                '-e',
+                '-p',
                 '-K',
                 '{}'.format(kp_string),
                 '-T',
@@ -52,11 +62,9 @@ class Ensembler:
                 filename),
                 stdout=subprocess.PIPE)
         output, _ = justkeydding.communicate()
-        try:
-            score = float(output)
-        except ValueError:
+        features = output.split()
+        if len(features) != 24:
             self.logger.error('Failed while running justkeydding, output: {}'.format(output))
-            score = 0.0
-        error = 1 - score**2
-        self.logger.debug('{}: {}'.format(filename, error))
-        return error
+            features = ['-10000'] * 24
+        self.logger.debug('{}: {}'.format(filename, features))
+        return features
