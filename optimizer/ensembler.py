@@ -35,23 +35,25 @@ class Ensembler:
             profiles = [key_profiles.mix(m[0], m[1]) for m in itertools.product(self.profiles, self.profiles)]
         else:
             profiles = self.profiles
-        self.ensemble = [(e[0], e[1]) for e in itertools.product(self.profiles, self.transitions)]
+        self.ensemble = [(e[0], e[1]) for e in itertools.product(profiles, self.transitions)]
         return
 
     def evaluate(self, filename, mixed_profiles=False):
         ''' Evaluate a key profile '''
         self.logger.info('Start evaluate() <- filename={}'.format(filename))
-        if not self.ensemble:
+        if not hasattr(self, 'ensemble'):
             self.get_ensemble(mixed_profiles)
         with ThreadPool(8) as p:
-            features = p.map(lambda p, t: self.run_keydetection(filename, p, t), self.ensemble)
-        self.logger.info('Done evaluate() -> total_error={}'.format(total_error))
-        return (total_error, key_profile_name, key_transition_name)
+            features = p.map(lambda e: self.run_keydetection(filename, e), self.ensemble)
+        self.logger.info('Done evaluate() -> features={}'.format(features))
+        return features
 
-    def run_keydetection(self, filename, key_profile_name, key_transition_name):
+    def run_keydetection(self, filename, ensemble):
+        self.logger.debug('run_keydetection() <- filename={}, ensemble={}'.format(filename, ensemble))
+        key_profile_name = ensemble[0]
+        key_transition_name = ensemble[1]
         kp_string = key_profiles.get_as_string(key_profile_name)
         kt_string = key_transitions.get_as_string(key_transition_name)
-        # self.logger.debug('kp_string:"{}", kt_string:"{}"'.format(kp_string, kt_string))
         justkeydding = subprocess.Popen(
                 ('bin/justkeydding',
                 '-p',
@@ -65,6 +67,7 @@ class Ensembler:
         features = output.split()
         if len(features) != 24:
             self.logger.error('Failed while running justkeydding, output: {}'.format(output))
-            features = ['-10000'] * 24
+            features = ['-100000'] * 24
+        features = [float(x) for x in features]
         self.logger.debug('{}: {}'.format(filename, features))
         return features

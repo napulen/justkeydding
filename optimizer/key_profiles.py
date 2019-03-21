@@ -85,6 +85,7 @@ _kp = {
 }
 
 def mix(major_name, minor_name):
+    logger.info('Mixing {} and {}'.format(major_name, minor_name))
     if major_name not in _kp:
         logger.error('Could not find {}'.format(major_name))
         return
@@ -95,7 +96,7 @@ def mix(major_name, minor_name):
     kp_minor = _kp[minor_name]
     kp_mixed = kp_major[:12] + kp_minor[12:]
     mix_name = '{}_{}'.format(major_name, minor_name)
-    insert_new(mix_name, kp_mixed)
+    insert_new(mix_name, kp_mixed)    
     return mix_name
 
 def insert_new(name, kp):
