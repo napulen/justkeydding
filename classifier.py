@@ -15,7 +15,7 @@ def transpose(Xi, y):
         features = np.roll(Xip, ti, axis=1)
         trans_features.append(features)
         trans_labels.append(label)
-    return trans_features, trans_labels
+    return np.array(trans_features), np.array(trans_labels)
 
 def data_augmentation(X, y):
     original_length = X.shape[1]
