@@ -3,7 +3,8 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.model_selection import cross_val_score
-from sklearn.svm import LinearSVC
+from sklearn.linear_model import LogisticRegression
+from sklearn.utils import shuffle
 
 def transpose(Xi, y):
     is_minor = y // 12
@@ -46,4 +47,6 @@ if __name__ == '__main__':
     Xa, ya = data_augmentation(X, y)
     Xa = Xa.reshape(-1, 27*24)
     ya = ya.reshape(-1)
-    clf = LinearSVC(max_iter=10000)
+    Xa, ya = shuffle(Xa, ya)
+    clf = LogisticRegression(max_iter=10000, solver='lbfgs', multi_class='auto')
+    cross_val_score(clf, Xa, ya, cv=5)
