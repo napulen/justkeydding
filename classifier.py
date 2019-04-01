@@ -4,6 +4,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.model_selection import cross_val_score
 from sklearn.linear_model import LogisticRegression
+from sklearn.svm import LinearSVC
 from sklearn.utils import shuffle
 
 def transpose(Xi, y):
@@ -45,8 +46,6 @@ if __name__ == '__main__':
     y = np.load('dataset_labels.pkl')
     X = feature_scaling(X)
     Xa, ya = data_augmentation(X, y)
-    Xa = Xa.reshape(-1, 27*24)
-    ya = ya.reshape(-1)
     Xa, ya = shuffle(Xa, ya)
-    clf = LogisticRegression(max_iter=10000, solver='lbfgs', multi_class='auto')
-    cross_val_score(clf, Xa, ya, cv=5)
+    clf = LinearSVC(max_iter=10000)
+    cross_val_score(clf, Xa, ya, cv=10)

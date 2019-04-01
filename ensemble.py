@@ -48,9 +48,9 @@ keys ={
     'C': 0, 'C#': 1, 'Db': 1, 'D': 2,
     'D#': 3, 'Eb': 3, 'E': 4, 'F': 5,
     'F#': 6, 'Gb': 6, 'G': 7, 'G#': 8,
-    'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 
+    'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10,
     'B': 11,
-    
+
     'c': 12, 'c#': 13, 'db': 13, 'd': 14,
     'd#': 15, 'eb': 15, 'e': 16, 'f': 17,
     'f#': 18, 'gb': 18, 'g': 19, 'g#': 20,
@@ -87,6 +87,6 @@ if __name__ == '__main__':
     with open('midi_dataset.txt') as f:
         dataset = f.readlines()
         dataset = [x.strip() for x in dataset]
-    initial_key_profiles = ['sapp', 'temperley', 'krumhansl_kessler']
-    initial_key_transitions = ['ktg_exponential10', 'ktg_experiment6', 'ktg_napoles_midi128']
-    ensemble_runner(dataset, initial_key_profiles, initial_key_transitions, mixed_profiles=True)
+    initial_key_profiles = ['krumhansl_kessler', 'aarden_essen', 'sapp', 'bellman_budge', 'temperley', 'albrecht_shanahan']
+    initial_key_transitions = ['ktg_exponential5', 'ktg_exponential10', 'ktg_exponential15']
+    ensemble_runner(dataset, initial_key_profiles, initial_key_transitions, mixed_profiles=False)
