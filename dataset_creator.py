@@ -132,7 +132,7 @@ class DatasetCreator():
                 no_extension = tokens[0]
                 with open(filepath, newline='') as fd:
                     split = fd.readlines()
-                    split = [x.split() for x in split]
+                    split = [x.strip() for x in split]
                     self.splits[no_extension] = split
                 self.logger.info('Found the following splits: {}'.format(self.splits))
         # If we are here, everything should be okay
