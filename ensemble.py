@@ -132,8 +132,8 @@ def ensemble_runner(dataset, initial_key_profiles, initial_key_transitions, mixe
         feature_array = np.array(features)
         dataset_features.append(feature_array)
         logger.info(feature_array)
-    np.array(dataset_features).dump('dataset_features.pkl')
-    np.array(labels).dump('dataset_labels.pkl')
+    np.array(dataset_features).dump('{}_features.pkl'.format(dataset))
+    np.array(labels).dump('{}_labels.pkl'.format(dataset))
 
 if __name__ == '__main__':
     if not os.path.exists('logs'):
