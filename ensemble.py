@@ -89,7 +89,7 @@ def parse_label(annotation_data):
         if key in keys_format0:
             ground_truth = keys_format0[key]
     elif len(annotation_data) == 2:
-        key = tuple(annotation_data)
+        key = (x.lower() for x in annotation_data)
         if key in keys_format1:
             ground_truth = keys_format1[key]
     else:
