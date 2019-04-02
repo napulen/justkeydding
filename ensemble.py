@@ -90,7 +90,7 @@ def parse_label(annotation_data):
             ground_truth = keys_format0[key]
     elif len(annotation_data) == 2:
         key = tuple(annotation_data)
-        if annotation_data in keys_format1:
+        if key in keys_format1:
             ground_truth = keys_format1[key]
     else:
         logger.error('Did not recognize the format of label {}'.format(annotation_data))
