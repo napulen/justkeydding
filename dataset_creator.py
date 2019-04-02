@@ -132,6 +132,7 @@ class DatasetCreator():
                 no_extension = tokens[0]
                 with open(filepath, newline='') as fd:
                     split = fd.readlines()
+                    split = [x.split() for x in split]
                     self.splits[no_extension] = split
                 self.logger.info('Found the following splits: {}'.format(self.splits))
         # If we are here, everything should be okay
@@ -185,17 +186,40 @@ class DatasetCreator():
         features_filename = '{}_features.pkl'.format(dataset_name)
         feature_filepath = os.path.join(output_dir, features_filename)
         feature_array = list(self.features.values())
-        feature_array = np.array(feature_array)
         self.logger.info('writing {}'.format(feature_filepath))
-        feature_array.dump(feature_filepath)
+        np.array(feature_array).dump(feature_filepath)
         if self.annotations:
             annotation_filename = '{}_annotations.pkl'.format(dataset_name)
             annotation_filepath = os.path.join(output_dir, annotation_filename)
             annotation_array = list(self.annotations.values())
-            annotation_array = np.array(annotation_array)
             self.logger.info('writing {}'.format(annotation_filepath))
-            annotation_array.dump(annotation_filepath)
-        return
+            np.array(annotation_array).dump(annotation_filepath)
+        for k,v in self.splits.items():
+            split_features = []
+            split_annotations = []
+            for f in v:
+                if f not in self.features:
+                    self.logger.error('Could not find file {} in {} split. This split will be ignored'.format(f, k))
+                    split_features = []
+                    split_annotations = []
+                    break
+                split_features.append(self.features[f])
+                if self.annotations:
+                    if f not in self.annotations:
+                        self.logger.error('Could not find annotation {} in {} split. This split will be ignored'.format(f, k))
+                        split_features = []
+                        split_annotations = []
+                        break
+                    split_annotations.append(self.annotations[f])
+            if not split_features:
+                continue
+            features_filename = '{}-{}_features.pkl'.format(dataset_name, k)
+            feature_filepath = os.path.join(output_dir, features_filename)
+            np.array(split_features).dump(feature_filepath)
+            if split_annotations:
+                annotation_filename = '{}-{}_annotations.pkl'.format(dataset_name, k)
+                annotation_filepath = os.path.join(output_dir, annotation_filename)
+                np.array(split_annotations).dump(annotation_filepath)
 
 if __name__ == '__main__':
     if not os.path.exists('logs'):
