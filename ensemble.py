@@ -96,7 +96,7 @@ def parse_label(annotation_data):
     return ground_truth
 
 def ensemble_runner(dataset, initial_key_profiles, initial_key_transitions, mixed_profiles=False):
-    logger.info('ensemble_runner() <- dataset={}, initial_key_profiles={}, initial_key_transitions={}, mixed_profiles={}'.format(dataset, initial_key_profiles, initial_key_transitions, mixed_profiles))    
+    logger.info('ensemble_runner() <- dataset={}, initial_key_profiles={}, initial_key_transitions={}, mixed_profiles={}'.format(dataset, initial_key_profiles, initial_key_transitions, mixed_profiles))
     ens = ensembler.Ensembler(initial_key_profiles, initial_key_transitions)
     dataset_features = []
     labels = []
@@ -117,7 +117,7 @@ def ensemble_runner(dataset, initial_key_profiles, initial_key_transitions, mixe
     for filename in features:
         label = -1
         if search_labels:
-            annotation = '{}.csv'.format(filename[:-4])
+            annotation = '{}.key'.format(filename[:-4])
             annotation_file = os.path.join(annotations_dir, annotation)
             if not os.path.exists(annotation_file):
                 logger.warn('Could not find the annotation for {}'.format(filename))
@@ -127,7 +127,7 @@ def ensemble_runner(dataset, initial_key_profiles, initial_key_transitions, mixe
                 label = parse_label(annotation_data)
         logger.info('label: {}'.format(label))
         labels.append(label)
-        features = ens.evaluate(filename, mixed_profiles)
+        features = ens.evaluate(os.path.join(features_dir, filename), mixed_profiles)
         features = [f for l in features for f in l]
         feature_array = np.array(features)
         dataset_features.append(feature_array)
