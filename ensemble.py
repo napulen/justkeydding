@@ -143,6 +143,7 @@ if __name__ == '__main__':
     if len(sys.argv) != 2 or not os.path.isdir(sys.argv[1]):
         logger.error('You need to provide a dataset')
         exit()
+    dataset = sys.argv[1]
     initial_key_profiles = ['krumhansl_kessler', 'aarden_essen', 'sapp', 'bellman_budge', 'temperley', 'albrecht_shanahan2']
     initial_key_transitions = ['ktg_exponential5', 'ktg_exponential10', 'ktg_exponential15']
     ensemble_runner(dataset, initial_key_profiles, initial_key_transitions, mixed_profiles=False)
