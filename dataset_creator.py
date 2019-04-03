@@ -146,6 +146,7 @@ class DatasetCreator():
 
     def parse_label(self, annotation):
         annotation = annotation.strip().split()
+        label = -1
         if len(annotation) == 1:
             key = annotation[0]
             if key in DatasetCreator.keys_single_letter:
@@ -154,9 +155,8 @@ class DatasetCreator():
             key = (annotation[0].lower(), annotation[1].lower())
             if key in DatasetCreator.keys_duple:
                 label = DatasetCreator.keys_duple[key]
-        else:
+        if label == -1:
             self.logger.error('Did not recognize the format of label {}'.format(annotation))
-            label = -1
         return label
 
     def compute_features(self, key_profiles, key_transitions, mixed_profiles=False):
