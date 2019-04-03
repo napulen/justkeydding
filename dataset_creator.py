@@ -79,6 +79,7 @@ class DatasetCreator():
         ('a#', 'minor'): 22, ('bb', 'minor'): 22,
         ('b', 'minor'): 23
     }
+
     def __init__(self, dataset_folder):
         self.logger = logging.getLogger('DatasetCreator')
         self.logger.info('DatasetCreator() <- dataset_folder={}'.format(dataset_folder))
@@ -88,28 +89,33 @@ class DatasetCreator():
         # dataset dir
         if not os.path.isdir(dataset_folder):
             self.logger.error('The dataset provided is not a folder')
-            return dataset_okay
-        self.dataset_folder = dataset_folder
+            exit()
+        self.dataset_folder = dataset_folder[:-1] if dataset_folder.endswith('/') else dataset_folder
+        if not any(c.isalpha() for c in self.dataset_folder):
+            self.logger.warning('The dataset folder, {}, does not contain any parsable name.'.format(self.dataset_folder))
+            self.name = 'unknown_dataset'
+
+        self.name = self.dataset_folder.rsplit('/')[-1]
+        self.logger.info('Dataset name: {}'.format(self.name))
         self.feature_folder = os.path.join(dataset_folder, 'features')
         # features folder
         if not os.path.isdir(self.feature_folder):
             self.logger.error('The dataset folder must contain a "features" folder')
-            return dataset_okay
+            exit()
         self.files = []
         self.files_no_extension = []
         # files there and right formats
         for f in os.listdir(self.feature_folder):
-            self.logger.warning(f)
             tokens = f.rsplit('.', 1)
             if tokens[1] not in ['mid', 'csv', 'wav']:
                 self.logger.error('Unknown file type {}. Expecting .wav, .csv, or .mid'.format(f))
-                return dataset_okay
+                exit()
             no_extension = tokens[0]
             self.files.append(f)
             self.files_no_extension.append(no_extension)
         if not self.files:
             self.logger.error('The features folder seems to be empty.')
-            return dataset_okay
+            exit()
         # Now, not so critical stuff
         self.annotation_folder = os.path.join(dataset_folder, 'annotations')
         if not os.path.isdir(self.annotation_folder):
@@ -137,7 +143,7 @@ class DatasetCreator():
                 self.logger.info('Found the following splits: {}'.format(self.splits))
         # If we are here, everything should be okay
         self.dataset_okay = True
-    
+
     def parse_label(self, annotation):
         annotation = annotation.strip().split()
         if len(annotation) == 1:
@@ -154,6 +160,7 @@ class DatasetCreator():
         return label
 
     def compute_features(self, key_profiles, key_transitions, mixed_profiles=False):
+        self.logger.info('compute_features() <- key_profiles={}, key_transitions={}, mixed_profiles={}'.format(key_profiles, key_transitions, mixed_profiles))
         if not self.dataset_okay:
             return
         ens = ensembler.Ensembler(key_profiles, key_transitions)
@@ -175,21 +182,21 @@ class DatasetCreator():
                 self.annotations[self.files_no_extension[i]] = label
         self.has_features = True
 
-    def write(self, output_dir, dataset_name):
-        self.logger.info('write() <- output_dir={}, dataset_name={}'.format(output_dir, dataset_name))
+    def write(self, output_dir='./datasets'):
+        self.logger.info('write() <- output_dir={}, dataset_name={}'.format(output_dir, self.name))
         if not self.has_features:
             return
         if not os.path.exists(output_dir):
             self.logger.warning('Output folder {} does not exist. Trying to create it'.format(output_dir))
             os.makedirs(output_dir)
             self.logger.warning('Success.')
-        features_filename = '{}_features.pkl'.format(dataset_name)
+        features_filename = '{}_features.pkl'.format(self.name)
         feature_filepath = os.path.join(output_dir, features_filename)
         feature_array = list(self.features.values())
         self.logger.info('writing {}'.format(feature_filepath))
         np.array(feature_array).dump(feature_filepath)
         if self.annotations:
-            annotation_filename = '{}_annotations.pkl'.format(dataset_name)
+            annotation_filename = '{}_annotations.pkl'.format(self.name)
             annotation_filepath = os.path.join(output_dir, annotation_filename)
             annotation_array = list(self.annotations.values())
             self.logger.info('writing {}'.format(annotation_filepath))
@@ -213,12 +220,14 @@ class DatasetCreator():
                     split_annotations.append(self.annotations[f])
             if not split_features:
                 continue
-            features_filename = '{}-{}_features.pkl'.format(dataset_name, k)
+            features_filename = '{}-{}_features.pkl'.format(self.name, k)
             feature_filepath = os.path.join(output_dir, features_filename)
+            self.logger.info('writing {}'.format(feature_filepath))
             np.array(split_features).dump(feature_filepath)
             if split_annotations:
-                annotation_filename = '{}-{}_annotations.pkl'.format(dataset_name, k)
+                annotation_filename = '{}-{}_annotations.pkl'.format(self.name, k)
                 annotation_filepath = os.path.join(output_dir, annotation_filename)
+                self.logger.info('writing {}'.format(annotation_filepath))
                 np.array(split_annotations).dump(annotation_filepath)
 
 if __name__ == '__main__':
@@ -234,4 +243,4 @@ if __name__ == '__main__':
     key_transitions = ['ktg_exponential5', 'ktg_exponential10', 'ktg_exponential15']
     dc = DatasetCreator(dataset)
     dc.compute_features(key_profiles, key_transitions)
-    dc.write('datasets', 'test_dataset')
+    dc.write()
