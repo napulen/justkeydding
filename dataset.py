@@ -108,8 +108,8 @@ def data_augmentation(X, y):
     trans_labels = np.array(trans_labels).reshape(-1)
     return trans_features, trans_labels
 
-def feature_scaling(X):
-    scaler = MinMaxScaler()
+def feature_scaling(X, minmax=(-1, 1)):
+    scaler = MinMaxScaler(feature_range=minmax)
     original_length = X.shape[1]
     Xp = X.reshape(-1, 24)
     Xp = np.apply_along_axis(lambda x: scaler.fit_transform(x.reshape(-1, 1)), 1, Xp)
