@@ -19,7 +19,7 @@ if __name__ == '__main__':
     experiment1_symbolic.X = dataset.feature_scaling(experiment1_symbolic.X)
 
     random_seed = 1
-    splits = 10
+    splits = 20
 
     clf_symbolic = LogisticRegression(penalty='l2', solver='lbfgs', multi_class='auto', max_iter=100000)
 
@@ -45,8 +45,8 @@ if __name__ == '__main__':
         print(score)
         scores.append(score)
 
-    print('\nAverage: {}'.format(sum(scores)/splits))
+    scores = np.array(scores)
+    print('\nAverage: {} (std={})'.format(scores.mean(), scores.std()))
 
 
     # scores = cross_val_score(clf_symbolic, experiment1_symbolic.X, experiment1_symbolic.y, cv=2)
-
