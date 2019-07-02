@@ -23,32 +23,68 @@ names = {
 }
 
 albrecht = dataset.Dataset('albrecht_symbolic')
-albrecht.X = albrecht.X.reshape(981, -1, 24)
+
+# Removing problematic datapoints (see corrections to experiment 1)
+bad_indexes = np.where(albrecht.y == -1)
+albrecht.y = np.delete(albrecht.y, bad_indexes)
+albrecht.X = np.delete(albrecht.X, bad_indexes, axis=0)
+
+albrecht.X = albrecht.X.reshape(albrecht.X.shape[0], -1, 24)
 
 predictions = np.argmax(albrecht.X, axis=2)
 
-for idx in range(len(predictions)):
+for idx in range(predictions.shape[0]):
     predictions[idx] = np.array([xi==albrecht.y[idx] for xi in predictions[idx]])
-
 
 iterations = 10
 
+major_scores = []
+minor_scores = []
 all_scores = []
 
 for i in range(iterations):
+    # sample = predictions[np.random.choice(predictions.shape[0], 492, replace=False)]
+    test_indices = np.random.permutation(albrecht.y.shape[0])[:492]
 
-    sample = predictions[np.random.choice(predictions.shape[0], 492, replace=False)]
+    testing_X = np.take(predictions, test_indices, axis=0)
+    testing_y = np.take(albrecht.y, test_indices)
 
-    corrects = np.sum(sample, axis=0)
+    # Separating testing into major and minor keys
+    testing_major_indices = np.where(testing_y < 12)[0]
+    testing_minor_indices = np.where(testing_y >= 12)[0]
 
-    scores = corrects / sample.shape[0]
+    testing_major_X = np.take(testing_X, testing_major_indices, axis=0)
+    testing_major_y = np.take(testing_y, testing_major_indices)
 
-    all_scores.append(scores)
+    testing_minor_X = np.take(testing_X, testing_minor_indices, axis=0)
+    testing_minor_y = np.take(testing_y, testing_minor_indices)
 
+    # Evaluating
+    major_correct = np.sum(testing_major_X, axis=0)
+    major_score = major_correct / testing_major_X.shape[0]
+
+    minor_correct = np.sum(testing_minor_X, axis=0)
+    minor_score = minor_correct / testing_minor_X.shape[0]
+
+    correct = np.sum(testing_X, axis=0)
+    score = correct / testing_X.shape[0]
+
+    major_scores.append(major_score)
+    minor_scores.append(minor_score)
+    all_scores.append(score)
+
+major_scores = np.array(major_scores)
+minor_scores = np.array(minor_scores)
 all_scores = np.array(all_scores)
+
+major_cv_mean = major_scores.mean(axis=0)
+major_cv_std = major_scores.std(axis=0)
+
+minor_cv_mean = minor_scores.mean(axis=0)
+minor_cv_std = minor_scores.std(axis=0)
 
 cv_mean = all_scores.mean(axis=0)
 cv_std = all_scores.std(axis=0)
 
 for idx in range(2, cv_mean.shape[0], 3):
-    print('{}: {} (std={})'.format(names[idx], cv_mean[idx], cv_std[idx]))
+    print('{:<40}: {:.1%} (std={:.1%})\t{:.1%} (std={:.1%})\t{:.1%} (std={:.1%})'.format(names[idx], major_cv_mean[idx], major_cv_std[idx], minor_cv_mean[idx], minor_cv_std[idx], cv_mean[idx], cv_std[idx]))
