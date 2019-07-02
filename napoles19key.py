@@ -25,6 +25,8 @@ if __name__ == '__main__':
 
     rs = ShuffleSplit(n_splits=splits, random_state=random_seed, test_size=492, train_size=None)
 
+    major_scores = []
+    minor_scores = []
     scores = []
 
     for training_indices, testing_indices in rs.split(experiment1_symbolic.X, experiment1_symbolic.y):
@@ -40,13 +42,33 @@ if __name__ == '__main__':
             training_X,
             training_y)
 
+        # Separating testing into major and minor keys
+        testing_major_indices = np.where(testing_y < 12)[0]
+        testing_minor_indices = np.where(testing_y >= 12)[0]
+
+        testing_major_X = np.take(testing_X, testing_major_indices, axis=0)
+        testing_major_y = np.take(testing_y, testing_major_indices)
+
+        testing_minor_X = np.take(testing_X, testing_minor_indices, axis=0)
+        testing_minor_y = np.take(testing_y, testing_minor_indices)
+
+        # Training
         clf_symbolic.fit(training_X, training_y)
+        
+        # Testing
+        major_score = clf_symbolic.score(testing_major_X, testing_major_y)
+        minor_score = clf_symbolic.score(testing_minor_X, testing_minor_y)
         score = clf_symbolic.score(testing_X, testing_y)
-        print(score)
+
+        print('{:.1%}\t{:.1%}\t{:.1%}'.format(major_score, minor_score, score))
+        major_scores.append(major_score)
+        minor_scores.append(minor_score)
         scores.append(score)
 
     scores = np.array(scores)
-    print('\nAverage: {} (std={})'.format(scores.mean(), scores.std()))
+    major_scores = np.array(major_scores)
+    minor_scores = np.array(minor_scores)
+    print('\nAverages: {:.1%} (std={:.1%})\t{:.1%} (std={:.1%})\t{:.1%} (std={:.1%})'.format(major_scores.mean(), major_scores.std(), minor_scores.mean(), minor_scores.std(), scores.mean(), scores.std()))
 
 
     # scores = cross_val_score(clf_symbolic, experiment1_symbolic.X, experiment1_symbolic.y, cv=2)
