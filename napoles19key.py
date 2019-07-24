@@ -18,10 +18,18 @@ if __name__ == '__main__':
     # Feature scaling in all the feature vectors
     experiment1_symbolic.X = dataset.feature_scaling(experiment1_symbolic.X)
 
-    random_seed = 1
+    random_seed = 42
     splits = 20
 
-    clf_symbolic = LogisticRegression(penalty='l2', solver='lbfgs', multi_class='auto', max_iter=100000)
+    clf_symbolic = LogisticRegression(
+        penalty='l2',
+        fit_intercept=False,
+        dual=False,
+        C=0.7,
+        solver='lbfgs',
+        multi_class='auto',
+        max_iter=100000
+    )
 
     rs = ShuffleSplit(n_splits=splits, random_state=random_seed, test_size=492, train_size=None)
 
@@ -54,7 +62,7 @@ if __name__ == '__main__':
 
         # Training
         clf_symbolic.fit(training_X, training_y)
-        
+
         # Testing
         major_score = clf_symbolic.score(testing_major_X, testing_major_y)
         minor_score = clf_symbolic.score(testing_minor_X, testing_minor_y)
