@@ -239,8 +239,8 @@ if __name__ == '__main__':
         logger.error('You need to provide a dataset')
         exit()
     dataset = sys.argv[1]
-    key_profiles = ['krumhansl_kessler', 'aarden_essen', 'sapp', 'bellman_budge', 'temperley', 'albrecht_shanahan2']
-    key_transitions = ['ktg_exponential5', 'ktg_exponential10', 'ktg_exponential15']
+    key_profiles = ['simple_natural_minor', 'simple_harmonic_minor', 'simple_melodic_minor']
+    key_transitions = ['ktg_exponential15']
     dc = DatasetCreator(dataset)
     dc.compute_features(key_profiles, key_transitions)
     dc.write()
