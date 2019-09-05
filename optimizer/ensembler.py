@@ -67,7 +67,7 @@ class Ensembler:
         features = output.split()
         if len(features) != 24:
             self.logger.error('Failed while running justkeydding, output: {}'.format(output))
-            features = ['-100000'] * 24
+            features = ['-1000000'] * 24
         features = [float(x) for x in features]
-        self.logger.debug('{}: {}'.format(filename, features))
+        self.logger.debug('{} {}: {}'.format(filename, ensemble, features))
         return features
