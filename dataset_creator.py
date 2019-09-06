@@ -85,6 +85,7 @@ class DatasetCreator():
         self.logger.info('DatasetCreator() <- dataset_folder={}'.format(dataset_folder))
         self.dataset_okay = False
         self.has_features = False
+        self.ensemble = None
         # Check critical stuff:
         # dataset dir
         if not os.path.isdir(dataset_folder):
@@ -166,7 +167,8 @@ class DatasetCreator():
         ens = ensembler.Ensembler(key_profiles, key_transitions)
         for i in range(len(self.files)):
             feature_filepath = os.path.join(self.feature_folder, self.files[i])
-            features = ens.evaluate(feature_filepath, mixed_profiles)
+            self.ensemble = ens.get_ensemble(mixed_profiles=mixed_profiles)
+            features = ens.evaluate(feature_filepath)
             features = [f for l in features for f in l]
             feature_array = np.array(features)
             self.features[self.files_no_extension[i]] = feature_array
@@ -190,6 +192,12 @@ class DatasetCreator():
             self.logger.warning('Output folder {} does not exist. Trying to create it'.format(output_dir))
             os.makedirs(output_dir)
             self.logger.warning('Success.')
+        ensemble_filename = '{}_ensemble.txt'.format(self.name)
+        ensemble_filepath = os.path.join(output_dir, ensemble_filename)
+        self.logger.info('writing {}'.format(ensemble_filepath))
+        with open(ensemble_filepath, 'w') as fd:
+            for major, minor in self.ensemble:
+                fd.write('{}, {}\n'.format(major, minor))
         features_filename = '{}_features.pkl'.format(self.name)
         feature_filepath = os.path.join(output_dir, features_filename)
         feature_array = list(self.features.values())
@@ -239,8 +247,11 @@ if __name__ == '__main__':
         logger.error('You need to provide a dataset')
         exit()
     dataset = sys.argv[1]
-    key_profiles = ['simple_natural_minor', 'simple_harmonic_minor', 'simple_melodic_minor']
-    key_transitions = ['ktg_exponential15']
+    key_profiles = [
+        'simple_natural_minor',
+        'simple_harmonic_minor',
+        'simple_melodic_minor']
+    key_transitions = ['ktg_exponential10']
     dc = DatasetCreator(dataset)
     dc.compute_features(key_profiles, key_transitions)
     dc.write()

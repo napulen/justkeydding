@@ -36,7 +36,7 @@ class Ensembler:
         else:
             profiles = self.profiles
         self.ensemble = [(e[0], e[1]) for e in itertools.product(profiles, self.transitions)]
-        return
+        return self.ensemble
 
     def evaluate(self, filename, mixed_profiles=False):
         ''' Evaluate a key profile '''
