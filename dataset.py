@@ -18,8 +18,25 @@ class Dataset():
                 files.append(f)
         annotations_re = re.escape(self.dataset_name) + '-?(.*)_annotations.pkl'
         features_re = re.escape(self.dataset_name) + '-?(.*)_features.pkl'
+        ensemble_file = '{}_ensemble.txt'.format(self.dataset_name)
         for f in files:
             print('Loading {}...'.format(f))
+            if f == ensemble_file:
+                with open(f) as fd:
+                    lines = fd.readlines()
+                if len(lines) != 3:
+                    print('The format of the ensemble metadata is incorrect.')
+                    exit()
+                kps, kts, mixed_profiles = lines
+                kps = kps.split(',')
+                kts = kts.split(',')
+                mixed_profiles = bool(mixed_profiles.split('=')[1])
+                ensemble = {
+                    'key_profiles': kps,
+                    'key_transitions': kts,
+                    'mixed_profiles': mixed_profiles
+                }
+                setattr(self, 'ensemble', ensemble)
             match = re.search(features_re, f, re.IGNORECASE)
             if match:
                 split_name = match.group(1)
