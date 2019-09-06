@@ -164,11 +164,13 @@ class DatasetCreator():
         self.logger.info('compute_features() <- key_profiles={}, key_transitions={}, mixed_profiles={}'.format(key_profiles, key_transitions, mixed_profiles))
         if not self.dataset_okay:
             return
+        self.key_profiles = key_profiles
+        self.key_transitions = key_transitions
+        self.mixed_profiles = mixed_profiles
         ens = ensembler.Ensembler(key_profiles, key_transitions)
         for i in range(len(self.files)):
             feature_filepath = os.path.join(self.feature_folder, self.files[i])
-            self.ensemble = ens.get_ensemble(mixed_profiles=mixed_profiles)
-            features = ens.evaluate(feature_filepath)
+            features = ens.evaluate(feature_filepath, mixed_profiles)
             features = [f for l in features for f in l]
             feature_array = np.array(features)
             self.features[self.files_no_extension[i]] = feature_array
@@ -196,8 +198,10 @@ class DatasetCreator():
         ensemble_filepath = os.path.join(output_dir, ensemble_filename)
         self.logger.info('writing {}'.format(ensemble_filepath))
         with open(ensemble_filepath, 'w') as fd:
-            for major, minor in self.ensemble:
-                fd.write('{}, {}\n'.format(major, minor))
+            fd.write('{}\n'.format(', '.join(self.key_profiles)))
+            fd.write('{}\n'.format(', '.join(self.key_transitions)))
+            fd.write('mixed_profiles={}\n'.format(self.mixed_profiles))
+
         features_filename = '{}_features.pkl'.format(self.name)
         feature_filepath = os.path.join(output_dir, features_filename)
         feature_array = list(self.features.values())
