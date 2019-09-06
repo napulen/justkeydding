@@ -201,7 +201,6 @@ class DatasetCreator():
             fd.write('{}\n'.format(', '.join(self.key_profiles)))
             fd.write('{}\n'.format(', '.join(self.key_transitions)))
             fd.write('mixed_profiles={}\n'.format(self.mixed_profiles))
-
         features_filename = '{}_features.pkl'.format(self.name)
         feature_filepath = os.path.join(output_dir, features_filename)
         feature_array = list(self.features.values())
