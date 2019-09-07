@@ -22,14 +22,16 @@ class Dataset():
         for f in files:
             print('Loading {}...'.format(f))
             if f == ensemble_file:
-                with open(f) as fd:
+                with open(os.path.join(self.dataset_dir, f)) as fd:
                     lines = fd.readlines()
                 if len(lines) != 3:
                     print('The format of the ensemble metadata is incorrect.')
                     exit()
                 kps, kts, mixed_profiles = lines
                 kps = kps.split(',')
+                kps = [s.strip() for s in kps]
                 kts = kts.split(',')
+                kts = [s.strip() for s in kts]
                 mixed_profiles = bool(mixed_profiles.split('=')[1])
                 ensemble = {
                     'key_profiles': kps,
