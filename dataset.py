@@ -32,7 +32,7 @@ class Dataset():
                 kps = [s.strip() for s in kps]
                 kts = kts.split(',')
                 kts = [s.strip() for s in kts]
-                mixed_profiles = bool(mixed_profiles.split('=')[1])
+                mixed_profiles = mixed_profiles.split('=')[1] == "True"
                 ensemble = {
                     'key_profiles': kps,
                     'key_transitions': kts,
@@ -42,7 +42,7 @@ class Dataset():
             match = re.search(features_re, f, re.IGNORECASE)
             if match:
                 split_name = match.group(1)
-                array = np.load(os.path.join(self.dataset_dir, f))
+                array = np.load(os.path.join(self.dataset_dir, f), allow_pickle=True)
                 if split_name:
                     attr_name = '{}_X'.format(split_name)
                     setattr(self, attr_name, array)
@@ -52,7 +52,7 @@ class Dataset():
                 match = re.search(annotations_re, f, re.IGNORECASE)
                 if match:
                     split_name = match.group(1)
-                    array = np.load(os.path.join(self.dataset_dir, f))
+                    array = np.load(os.path.join(self.dataset_dir, f), allow_pickle=True)
                     if split_name:
                         attr_name = '{}_y'.format(split_name)
                         setattr(self, attr_name, array)
