@@ -57,7 +57,7 @@ class Evaluator:
         try:
             score = float(output)
         except ValueError:
-            self.logger.error('Failed while running justkeydding, output: {}'.format(output))
+            self.logger.error('Failed while running justkeydding on file {}, output: {}'.format(filename, output))
             score = 0.0
         error = 1 - score**2
         self.logger.debug('{}: {}'.format(filename, error))
