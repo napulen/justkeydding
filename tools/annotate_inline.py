@@ -1,18 +1,19 @@
 import os
 import sys
+from shutil import copyfile
 
 keys_single_letter = {
     'C': 0, 'C#': 1, 'Db': 1, 'D': 2,
     'D#': 3, 'Eb': 3, 'E': 4, 'F': 5,
     'F#': 6, 'Gb': 6, 'G': 7, 'G#': 8,
     'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10,
-    'B': 11,
+    'B': 11, 'H': 11,
 
     'c': 12, 'c#': 13, 'db': 13, 'd': 14,
     'd#': 15, 'eb': 15, 'e': 16, 'f': 17,
     'f#': 18, 'gb': 18, 'g': 19, 'g#': 20,
     'ab': 20, 'a': 21, 'a#': 22, 'bb': 22,
-    'b': 23
+    'b': 23, 'h': 23
 }
 
 keys_single_reverse = {
@@ -35,7 +36,7 @@ keys_duple = {
     ('g', 'major'): 7, ('g#', 'major'): 8,
     ('ab', 'major'): 8, ('a', 'major'): 9,
     ('a#', 'major'): 10, ('bb', 'major'): 10,
-    ('b', 'major'): 11,
+    ('b', 'major'): 11, ('h', 'major'): 11,
 
     ('c', 'minor'): 12, ('c#', 'minor'): 13,
     ('db', 'minor'): 13, ('d', 'minor'): 14,
@@ -45,7 +46,7 @@ keys_duple = {
     ('g', 'minor'): 19, ('g#', 'minor'): 20,
     ('ab', 'minor'): 20, ('a', 'minor'): 21,
     ('a#', 'minor'): 22, ('bb', 'minor'): 22,
-    ('b', 'minor'): 23
+    ('b', 'minor'): 23, ('h', 'minor'): 23
 }
 
 
@@ -69,7 +70,7 @@ def normalize_key_label(key_label):
 
 if __name__ == '__main__':
     dataset_folder = sys.argv[1]
-    new_folder = sys.argv[1] + '_inline'
+    new_folder = sys.argv[1] + '_inplace'
     annotations = os.path.join(dataset_folder, 'annotations')
     features =os.path.join(dataset_folder, 'features')
     for f in os.listdir(features):
@@ -79,6 +80,11 @@ if __name__ == '__main__':
         with open(keyfile) as k:
             original_key = k.read().strip()
             key = normalize_key_label(original_key)
-
-        print(noext, original_key, key)
+        new_filename = '{}_{}{}'.format(noext, key, dotext)
+        if not os.path.exists(new_folder):
+            os.makedirs(new_folder)
+        copyfile(
+            os.path.join(features, f), 
+            os.path.join(new_folder, new_filename)
+        )
         
