@@ -2,7 +2,8 @@ import subprocess
 import logging
 from . import key_profiles
 from . import key_transitions
-from multiprocessing.dummy import Pool as ThreadPool
+from multiprocessing.dummy import Pool
+import threading
 
 class Evaluator:
     def __init__(self, dataset):
@@ -32,9 +33,9 @@ class Evaluator:
     def evaluate(self, key_profile_name, key_transition_name):
         ''' Evaluate a key profile '''
         self.logger.info('Start evaluate() <- key_profile_name={}, key_transition_name={}'.format(key_profile_name, key_transition_name))
-        # error_list = [self.run_keydetection(filename, kp_string)
+        # error_list = [self.run_keydetection(filename, key_profile_name, key_transition_name)
         #              for filename in self.files]
-        with ThreadPool(max(len(self.files), 8)) as p:
+        with Pool(4) as p:
             error_list = p.map(lambda f: self.run_keydetection(f, key_profile_name, key_transition_name), self.files)
         total_error = sum(error_list)
         self.logger.info('Done evaluate() -> total_error={}'.format(total_error))
@@ -62,3 +63,4 @@ class Evaluator:
         error = 1 - score**2
         self.logger.debug('{}: {}'.format(filename, error))
         return error
+
