@@ -20,7 +20,7 @@ class Dataset():
         features_re = re.escape(self.dataset_name) + '-?(.*)_features.pkl'
         ensemble_file = '{}_ensemble.txt'.format(self.dataset_name)
         for f in files:
-            print('Loading {}...'.format(f))
+            # print('Loading {}...'.format(f))
             if f == ensemble_file:
                 with open(os.path.join(self.dataset_dir, f)) as fd:
                     lines = fd.readlines()

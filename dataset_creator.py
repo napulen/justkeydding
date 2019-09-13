@@ -251,6 +251,13 @@ if __name__ == '__main__':
         exit()
     dataset = sys.argv[1]
     key_profiles = [
+        'aarden_essen',
+        'temperley',
+        'krumhansl_kessler',
+        'bellman_budge',
+        'albrecht_shanahan1',
+        'albrecht_shanahan2',
+        'sapp',
         'simple_natural_minor',
         'simple_harmonic_minor',
         'simple_melodic_minor']

@@ -7,12 +7,11 @@ import joblib
 
 if __name__ == '__main__':
 
-    clf_name = 'testmodel'
+    clf_name = 'pre-trained'
 
     dataset_filenames = [
         'napoles2018_symbolic',
         'arthur2018-synth_symbolic',
-        'albrecht_chroma',
     ]
 
     for idx, d in enumerate(dataset_filenames):

@@ -61,13 +61,13 @@ def ga_runner(dataset, population_size, initial_key_profiles, initial_key_transi
         logger.warn('Size of initial population of key transitions greater than population size, extending population size to {}.'.format(key_transitions_length))
         population_size = key_transitions_length
     # Generate the remaining slots available
-    remaining_key_profiles = population_size - key_profiles_length
-    generated_key_profiles = gen.generate_key_profiles(remaining_key_profiles)
-    key_profiles.extend(generated_key_profiles)
-    remaining_key_transitions = population_size - key_transitions_length
-    generated_key_transitions = gen.generate_key_transitions(remaining_key_transitions)
-    key_transitions.extend(generated_key_transitions)
-    logger.info('Generation 0 consists of {0} ({1} user-provided, {2} generated) key profiles and {0} ({3} user-provided, {4} generated) key transitions'.format(population_size, key_profiles_length, remaining_key_profiles, key_transitions_length, remaining_key_transitions))
+    # remaining_key_profiles = population_size - key_profiles_length
+    # generated_key_profiles = gen.generate_key_profiles(remaining_key_profiles)
+    # key_profiles.extend(generated_key_profiles)
+    # remaining_key_transitions = population_size - key_transitions_length
+    # generated_key_transitions = gen.generate_key_transitions(remaining_key_transitions)
+    # key_transitions.extend(generated_key_transitions)
+    # logger.info('Generation 0 consists of {0} ({1} user-provided, {2} generated) key profiles and {0} ({3} user-provided, {4} generated) key transitions'.format(population_size, key_profiles_length, remaining_key_profiles, key_transitions_length, remaining_key_transitions))
     # Time to find the best kp,kt pair from the initial values
     best_key_profile = ''
     best_key_transition = ''
@@ -75,8 +75,10 @@ def ga_runner(dataset, population_size, initial_key_profiles, initial_key_transi
     scores = []
     logger.info("Finding the best (key_profile,key_transition) from the initial populations")
     kt_grading = []
+    full_grading = []
     for kt in key_transitions:
         grading = eva.grade_key_profiles(key_profiles, kt)
+        full_grading.extend(grading)
         lower_error, kp, _ = grading[0]
         kt_grading.append((lower_error, kt))
         if lower_error < lowest_error:
@@ -88,6 +90,8 @@ def ga_runner(dataset, population_size, initial_key_profiles, initial_key_transi
             if lowest_error == 0:
                 break
         logger.debug("({},{}) is the best pair so far".format(best_key_profile, best_key_transition))
+    full_grading = sorted(full_grading, key=lambda score: score[0])
+    logger.debug('full_grading:{}'.format(full_grading))
     kt_grading = sorted(kt_grading, key=lambda score: score[0])
     key_transitions = [x[1] for x in kt_grading]
     logger.debug("sorted_key_transitions:{}".format(key_transitions))
@@ -176,10 +180,23 @@ if __name__ == '__main__':
     logging.config.dictConfig(logging_dict)
     logger = logging.getLogger('ga_runner')
     dataset = 'midi_dataset.txt'
-    population_size = 5
+    population_size = 3
     kp_max_range = 100
     kt_max_range = 256
     evolution_swap_threshold = 3
-    initial_key_profiles = ['sapp', 'temperley', 'krumhansl_kessler', 'aarden_essen', 'experiment4', 'experiment6']
-    initial_key_transitions = ['exponential10', 'experiment6']
+    initial_key_profiles = [
+        'sapp', 
+        'temperley', 
+        'krumhansl_kessler', 
+        'aarden_essen', 
+        'albrecht_shanahan1', 
+        'albrecht_shanahan2', 
+        'bellman_budge', 
+        'simple_natural_minor', 
+        'simple_harmonic_minor', 
+        'simple_melodic_minor']
+    initial_key_transitions = [
+        'ktg_exponential5', 
+        'ktg_exponential10',
+        'ktg_exponential15']
     ga_runner(dataset, population_size, initial_key_profiles, initial_key_transitions, kp_max_range, kt_max_range, evolution_swap_threshold, True)
