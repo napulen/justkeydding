@@ -51,3 +51,7 @@ mv logs logs_12-napoles2018_chroma
 find . | grep "13-napoles2018_symbolic.*\.mid" > midi_dataset.txt
 python3 ga.py
 mv logs logs_13-napoles2018_symbolic
+
+find . | grep "^\.\/[0-9][0-9]-.*[\.mid|\.csv]$" > midi_dataset.txt
+python3 ga.py
+mv logs logs-14-alldatasets
