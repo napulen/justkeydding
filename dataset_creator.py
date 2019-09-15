@@ -260,8 +260,11 @@ if __name__ == '__main__':
         'sapp',
         'simple_natural_minor',
         'simple_harmonic_minor',
-        'simple_melodic_minor']
-    key_transitions = ['ktg_exponential10']
+        'simple_melodic_minor',]
+    key_transitions = [
+        'ktg_exponential5',
+        'ktg_exponential10',
+        'ktg_exponential15',]
     dc = DatasetCreator(dataset)
     dc.compute_features(key_profiles, key_transitions)
     dc.write()
