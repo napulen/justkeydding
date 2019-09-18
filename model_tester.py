@@ -12,9 +12,12 @@ if __name__ == '__main__':
         print('You need to train a model first')
         exit()
 
-    dataset = dataset.Dataset('albrecht_chroma')
+    data = dataset.Dataset('albrecht_chroma')
+
+    X = dataset.feature_scaling(data.X)
+    y = data.y
 
     clf = joblib.load(model)
 
-    score = clf.score(dataset.X, dataset.y)
+    score = clf.score(X, y)
     print(score)
