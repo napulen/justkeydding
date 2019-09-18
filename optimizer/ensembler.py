@@ -43,7 +43,7 @@ class Ensembler:
         self.logger.info('Start evaluate() <- filename={}'.format(filename))
         if not hasattr(self, 'ensemble'):
             self.get_ensemble(mixed_profiles)
-        with ThreadPool(8) as p:
+        with ThreadPool(4) as p:
             features = p.map(lambda e: self.run_keydetection(filename, e), self.ensemble)
         self.logger.info('Done evaluate() -> features={}'.format(features))
         return features
