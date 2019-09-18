@@ -72,4 +72,11 @@ Vagrant.configure("2") do |config|
     apt-get install -y libsndfile1-dev
     apt-get install -y python3-pip
   SHELL
+
+  config.vm.provision "shell", privileged: false, inline: <<-SHELL
+    python3 -m pip install sklearn
+    cd /vagrant
+    make clean
+    make
+  SHELL
 end
