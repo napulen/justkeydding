@@ -1,3 +1,0 @@
-aarden_essen, temperley, krumhansl_kessler, bellman_budge, albrecht_shanahan1, albrecht_shanahan2, sapp, simple_natural_minor, simple_harmonic_minor, simple_melodic_minor
-ktg_exponential5, ktg_exponential10, ktg_exponential15
-mixed_profiles=False
