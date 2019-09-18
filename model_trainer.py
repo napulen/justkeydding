@@ -10,8 +10,19 @@ if __name__ == '__main__':
     clf_name = 'pre-trained'
 
     dataset_filenames = [
-        'napoles2018_symbolic',
-        'arthur2018-synth_symbolic',
+        'a-maps_chroma',
+        # 'a-maps_symbolic',
+        'albrecht_chroma',
+        # 'albrecht_symbolic',
+        'arthur2018-recordings_chroma',
+        'arthur2018-synth-shortname_chroma',
+        # 'arthur2018-synth-shortname_symbolic',
+        'billboard_chroma',
+        'cross-era-shortname_chroma',
+        'giantsteps-key_chroma',
+        'giantsteps-mtg-key_chroma',
+        'napoles2018_chroma',
+        # 'napoles2018_symbolic',
     ]
 
     for idx, d in enumerate(dataset_filenames):
