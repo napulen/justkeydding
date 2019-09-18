@@ -64,14 +64,39 @@ PitchClass::PitchClassSequence Chromagram::getPitchClassSequence() {
 }
 
 void Chromagram::printChromagram() {
+    if (m_status != Status::CHROMAGRAM_ORIGINAL_READY &&
+        m_status != Status::CHROMAGRAM_DISCRETE_READY) {
+        return;
+    }
     for (ChromagramMap::const_iterator itChr = m_discreteChromagramMap.begin();
          itChr != m_discreteChromagramMap.end(); itChr++) {
         double timestamp = itChr->first;
         ChromagramVector chrVector = itChr->second;
-        std::cout << timestamp << ": ";
+        std::cout << timestamp;
         for (ChromagramVector::const_iterator itChrVector = chrVector.begin();
             itChrVector != chrVector.end(); itChrVector++) {
-            std::cout << (*itChrVector) << " ";
+            std::cout << "," << (*itChrVector);
+        }
+        std::cout << std::endl;
+    }
+}
+
+void Chromagram::printOriginalChromagram(bool startOnANatural=true) {
+    if (m_status != Status::CHROMAGRAM_ORIGINAL_READY &&
+        m_status != Status::CHROMAGRAM_DISCRETE_READY) {
+        return;
+    }
+    for (ChromagramMap::const_iterator itChr = m_originalChromagramMap.begin();
+            itChr != m_originalChromagramMap.end(); itChr++) {
+        double timestamp = itChr->first;
+        ChromagramVector chrVector = itChr->second;
+        std::cout << timestamp;
+        for (int i = 0; i < chrVector.size(); i++) {
+            int index = i;
+            if (startOnANatural) {
+                index = (PitchClass::PITCHCLASS_A_NATURAL + i) % PitchClass::NUMBER_OF_PITCHCLASSES;
+            }
+            std::cout << "," << chrVector[index];
         }
         std::cout << std::endl;
     }

@@ -49,6 +49,7 @@ int main(int argc, char *argv[]) {
     int status;
     bool justEvaluation;
     bool justProbabilities;
+    bool chromaOnly;
     try {
         const optparse::Values &options = parser.parse_args(argc, argv);
         const std::vector<std::string> args = parser.args();
@@ -145,6 +146,7 @@ int main(int argc, char *argv[]) {
         }
         justEvaluation = options.is_set_by_user("evaluate");
         justProbabilities = options.is_set_by_user("probabilities");
+        chromaOnly = options.is_set_by_user("chromaonly");
     }
     catch (int ret_code) {
         std::cerr << "Error " << ret_code << std::endl;
@@ -175,6 +177,11 @@ int main(int argc, char *argv[]) {
             std::cerr << "There was an error while"
                         " reading the input file." << std::endl;
             return status;
+        }
+        if (chromaOnly) {
+            bool startOnANatural = true;
+            chr.printOriginalChromagram(startOnANatural);
+            return 0;
         }
         // Turn into a PitchcClassSequence
         pitchClassSequence = chr.getPitchClassSequence();
@@ -333,6 +340,9 @@ void initOptionParser(optparse::OptionParserExcept *parser) {
         .action("store_true");
 
     (*parser).add_option("-p", "--probabilities")
+        .action("store_true");
+    
+    (*parser).add_option("-c", "--chromaonly")
         .action("store_true");
 }
 

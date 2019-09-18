@@ -65,6 +65,7 @@ class Chromagram {
   PitchClass::PitchClassSequence getPitchClassSequence();
   void printChromagram();
   int getStatus() const;
+  void printOriginalChromagram(bool);
  private:
   int m_status;
   ChromagramMap m_originalChromagramMap;
