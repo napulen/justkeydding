@@ -25,20 +25,19 @@ This takes a while, it will download the Ubuntu image (if you don't have it), sp
 ```
 vagrant ssh
 ```
-### Compiling
+### Running full algorithm
 Inside the virtual machine, the repository's folder has been mounted as a shared folder in `/vagrant`. Go there.
 ```
 cd /vagrant
 ```
-### Running full algorithm
 Run the full algorithm (including the meta-classifier) with
 ```
 ./justkeydding <input_file> <output_file>
 ```
 The `output_file` is where the key is going to be stored.
 
-### Running individual HMM
-If you are interested in running the individual HMM, that is the binary located at `bin/justkeydding`. This program supports a few optional arguments, but in its most basic usage, it only requires an input midi|audio|chromagram_csv file as a command line argument.
+#### Running individual HMM
+If you are interested in running the individual HMM, that is the binary located at `bin/justkeydding`. This program supports a few  optional arguments, but in its most basic usage, it only requires an input midi|audio|chromagram_csv file as a command line argument.
 ```
 bin/justkeydding <audio_filename>.wav
 ```
