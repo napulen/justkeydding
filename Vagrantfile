@@ -54,8 +54,8 @@ Vagrant.configure("2") do |config|
     # vb.gui = true
 
     # Customize the amount of memory on the VM:
-    vb.memory = "2048"
-    vb.cpus = 3
+    vb.memory = "4096"
+    vb.cpus = 4
   end
 
   # View the documentation for the provider you are using for more
@@ -70,5 +70,6 @@ Vagrant.configure("2") do |config|
     apt-get install -y libboost-all-dev
     apt-get install -y vamp-plugin-sdk
     apt-get install -y libsndfile1-dev
+    apt-get install -y python3-pip
   SHELL
 end
