@@ -6,8 +6,8 @@ that finds the key of a sequence of notes
 Nestor Napoles (napulen@gmail.com)
 """
 
-import justkeydding.optimizer.key_transitions as kt
-import ustkeydding.optimizer.key_profiles as kp
+import optimizer.key_transitions as kt
+import optimizer.key_profiles as kp
 import mido
 import music21
 import pprint as pp
@@ -180,8 +180,8 @@ def analyze(input_sequence, kp_major_name, kp_minor_name, kt_name):
     # Preparing the args for the first HMM
     key_transition = kt._kt[kt_name]
     trans_p = create_transition_probabilities(key_transition)
-    major = kp._kp[kp_major_name]
-    minor = kp._kp[kp_minor_name]
+    major = kp._kp[kp_major_name][:12]
+    minor = kp._kp[kp_minor_name][12:]
     emit_p = create_emission_probabilities(major, minor)
     obs = input_sequence
     local_keys, max_p = viterbi(obs, states, start_p, trans_p, emit_p)
@@ -191,7 +191,7 @@ def analyze(input_sequence, kp_major_name, kp_minor_name, kt_name):
     # Preparing the args for the second HMM
     obs = local_keys  # the keys become the observations
     emit_p = trans_p  # the transitions become emission
-    key_transitions = kt._kt["key_transitions_null"]
+    key_transitions = kt._kt["null"]
     trans_p = create_transition_probabilities(key_transitions)
     key, max_prob = viterbi(obs, states, start_p, trans_p, emit_p)
     global_key = key[0]
@@ -199,22 +199,22 @@ def analyze(input_sequence, kp_major_name, kp_minor_name, kt_name):
 
 def batch(args):
     transitions = [
-        'key_transitions_exponential_10',
-        'key_transitions_exponential',
+        'ktg_exponential10',
+        'ktg_exponential2',
     ]
     profiles_major = [
-        'krumhansl_kessler_major',
-        'aarden_essen_major',
-        'sapp_major',
-        'bellman_budge_major',
-        'temperley_major'
+        'krumhansl_kessler',
+        'aarden_essen',
+        'sapp',
+        'bellman_budge',
+        'temperley'
     ]
     profiles_minor = [
-        'krumhansl_kessler_minor',
-        'aarden_essen_minor',
-        'sapp_minor',
-        'bellman_budge_minor',
-        'temperley_minor'
+        'krumhansl_kessler',
+        'aarden_essen',
+        'sapp',
+        'bellman_budge',
+        'temperley'
     ]
     scores = {}
     for transition in transitions:
@@ -244,7 +244,7 @@ def batch(args):
                         # Preparing the args for the second HMM
                         obs = state_list  # the keys become the observations
                         emit_p = trans_p  # the transitions become emission
-                        key_transitions = kt._kt["key_transitions_null"]
+                        key_transitions = kt._kt["null"]
                         trans_p = create_transition_probabilities(key_transitions)
                         key, max_prob = viterbi(obs, states, start_p, trans_p, emit_p)
                         guess_key = key[0]
@@ -291,36 +291,36 @@ if __name__ == '__main__':
         '--transition',
         dest='key_transition',
         choices=[
-            'key_transitions_exponential_10',
-            'key_transitions_exponential'
+            'ktg_exponential10',
+            'ktg_exponential2'
         ],
-        default='key_transitions_exponential_10',
+        default='ktg_exponential10',
         help='Key transition to use'
     )
     parser.add_argument(
         '--majorEmission',
         dest='key_profile_major',
         choices=[
-            'krumhansl_kessler_major',
-            'aarden_essen_major',
-            'sapp_major',
-            'bellman_budge_major',
-            'temperley_major',
+            'krumhansl_kessler',
+            'aarden_essen',
+            'sapp',
+            'bellman_budge',
+            'temperley',
         ],
-        default='sapp_major',
+        default='sapp',
         help='Major key profile to use as emission probability distribution'
     )
     parser.add_argument(
         '--minorEmission',
         dest='key_profile_minor',
         choices=[
-            'krumhansl_kessler_minor',
-            'aarden_essen_minor',
-            'sapp_minor',
-            'bellman_budge_minor',
-            'temperley_minor',
+            'krumhansl_kessler',
+            'aarden_essen',
+            'sapp',
+            'bellman_budge',
+            'temperley',
         ],
-        default='sapp_minor',
+        default='sapp',
         help='Minor key profile to use as emission probability distribution'
     )
 
