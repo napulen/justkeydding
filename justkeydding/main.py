@@ -6,8 +6,8 @@ that finds the key of a sequence of notes
 Nestor Napoles (napulen@gmail.com)
 """
 
-import key_transitions as kt
-import key_profiles as kp
+import justkeydding.optimizer.key_transitions as kt
+import ustkeydding.optimizer.key_profiles as kp
 import mido
 import music21
 import pprint as pp
@@ -178,10 +178,10 @@ def viterbi(obs, states, start_p, trans_p, emit_p):
 
 def analyze(input_sequence, kp_major_name, kp_minor_name, kt_name):
     # Preparing the args for the first HMM
-    key_transition = kt.key_transitions[kt_name]
+    key_transition = kt._kt[kt_name]
     trans_p = create_transition_probabilities(key_transition)
-    major = kp.normalized[kp_major_name]
-    minor = kp.normalized[kp_minor_name]
+    major = kp._kp[kp_major_name]
+    minor = kp._kp[kp_minor_name]
     emit_p = create_emission_probabilities(major, minor)
     obs = input_sequence
     local_keys, max_p = viterbi(obs, states, start_p, trans_p, emit_p)
@@ -191,7 +191,7 @@ def analyze(input_sequence, kp_major_name, kp_minor_name, kt_name):
     # Preparing the args for the second HMM
     obs = local_keys  # the keys become the observations
     emit_p = trans_p  # the transitions become emission
-    key_transitions = kt.key_transitions["key_transitions_null"]
+    key_transitions = kt._kt["key_transitions_null"]
     trans_p = create_transition_probabilities(key_transitions)
     key, max_prob = viterbi(obs, states, start_p, trans_p, emit_p)
     global_key = key[0]
@@ -233,10 +233,10 @@ def batch(args):
                         filepath = os.path.join(root, filename)
                         ground_truth_key = get_key_from_filename(filename)
                         # Preparing the args for the first HMM
-                        key_transitions = kt.key_transitions[transition]
+                        key_transitions = kt._kt[transition]
                         trans_p = create_transition_probabilities(key_transitions)
-                        major = kp.normalized[profile_major]
-                        minor = kp.normalized[profile_minor]
+                        major = kp._kp[profile_major]
+                        minor = kp._kp[profile_minor]
                         emit_p = create_emission_probabilities(major, minor)
                         # obs = create_observation_list(filepath)
                         state_list, max_p = viterbi(obs, states, start_p, trans_p, emit_p)
@@ -244,7 +244,7 @@ def batch(args):
                         # Preparing the args for the second HMM
                         obs = state_list  # the keys become the observations
                         emit_p = trans_p  # the transitions become emission
-                        key_transitions = kt.key_transitions["key_transitions_null"]
+                        key_transitions = kt._kt["key_transitions_null"]
                         trans_p = create_transition_probabilities(key_transitions)
                         key, max_prob = viterbi(obs, states, start_p, trans_p, emit_p)
                         guess_key = key[0]
