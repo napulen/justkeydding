@@ -1,9 +1,0 @@
-#!/bin/bash
-
-# arg1 input file
-# arg2 output file
-
-chromafile=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1).csv
-/vagrant/bin/justkeydding --chromaonly /vagrant/$1 > $chromafile
-python3 /vagrant/justkeydding_ensemble.py $chromafile > /vagrant/$2
-rm $chromafile

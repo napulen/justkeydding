@@ -1,6 +1,3 @@
 [submodule "include/optparse"]
 	path = include/optparse
 	url = https://github.com/myint/optparse.git
-[submodule "midifile"]
-	path = midifile
-	url = https://github.com/craigsapp/midifile.git
