@@ -259,7 +259,7 @@ def batch(args):
     pp.pprint(scores)
 
 
-if __name__ == '__main__':
+def parse_args():
     parser = argparse.ArgumentParser(description='justkeydding for symbolic music files, python version')
     parser.add_argument(
         'input',
@@ -323,8 +323,12 @@ if __name__ == '__main__':
         default='sapp',
         help='Minor key profile to use as emission probability distribution'
     )
-
     args = parser.parse_args()
+    return args
+
+
+if __name__ == '__main__':
+    args = parse_args()
     # print(args)
     if args.is_batch:
         batch(args)
