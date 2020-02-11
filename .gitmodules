@@ -1,3 +1,0 @@
-[submodule "include/optparse"]
-	path = include/optparse
-	url = https://github.com/myint/optparse.git
