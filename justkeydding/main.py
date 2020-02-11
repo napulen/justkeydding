@@ -6,8 +6,8 @@ that finds the key of a sequence of notes
 Nestor Napoles (napulen@gmail.com)
 """
 
-import optimizer.key_transitions as kt
-import optimizer.key_profiles as kp
+import parameters.key_transitions as kt
+import parameters.key_profiles as kp
 import mido
 import music21
 import pprint as pp
