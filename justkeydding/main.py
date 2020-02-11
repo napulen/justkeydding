@@ -8,6 +8,10 @@ Nestor Napoles (napulen@gmail.com)
 
 import parameters.key_transitions as kt
 import parameters.key_profiles as kp
+from parameters.observations import Observations
+import parsers.midi
+import parsers.symbolic
+import parsers.audio
 import mido
 import music21
 import pprint as pp
@@ -63,58 +67,20 @@ def create_emission_probabilities(major, minor):
         d[key] = {pc: profile[pc] for pc in range(12)}
     return d
 
-
-def get_notes_from_midi(midi_file):
-    """Returns a list of notes from the note_on events of a MIDI file"""
-    mid = mido.MidiFile(midi_file)
-    notes = [msg.note for msg in mid
-             if msg.type == 'note_on'
-             and msg.velocity > 0]
-    return notes
-
-
-def get_notes_chords_and_rests_from_music21(m21_input_file):
-    s = music21.converter.parse(m21_input_file)
-    notes_and_rests = s.parts.flat.notesAndRests
-    return notes_and_rests
-
-
-def get_notes_from_music21(notes_chords_and_rests):
-    notes = []
-    for c in notes_chords_and_rests:
-        if isinstance(c, music21.chord.Chord):
-            for n in c:
-                notes.append(n)
-        elif isinstance(c, music21.note.Note):
-            notes.append(c)
-    return notes
-
-
-def get_note_names_from_music21(notes):
-    return [n.name for n in notes]
-
-
-def get_pc_from_music21(notes):
-    return [n.pitch.pitchClass for n in notes]
-
-
-def get_pc_from_midi_notes(notes):
-    """Returns the list of pitch-classes from a list of midi notes"""
-    return [note % 12 for note in notes]
-
-
 def extract_input_sequence(input_file, is_sequence=False):
+    extension = input_file.rsplit('.')[-1]
     if is_sequence == True:
+        # TODO: Implement this for new format of input sequences
         input_sequence = [int(s) for s in input_file.split(',')]
-    elif input_file.endswith('.mid') or input_file.endswith('.midi'):
-        notes = get_notes_from_midi(input_file)
-        input_sequence = get_pc_from_midi_notes(notes)
-    elif input_file.endswith('.musicxml') or input_file.endswith('.xml') or input_file.endswith('.mei') or input_file.endswith('.krn'):
-        notes_chords_and_rests = get_notes_chords_and_rests_from_music21(input_file)
-        notes = get_notes_from_music21(notes_chords_and_rests)
-        input_sequence = get_pc_from_music21(notes)
-    return input_sequence
-
+    elif extension in parsers.midi.supported_extensions:
+        input_sequence = parsers.midi.parse_file(input_file)
+    elif extension in parsers.symbolic.supported_extensions:
+        input_sequence = parsers.symbolic.parse_file(input_file)
+    elif extension in parsers.audio.supported_extensions:
+        input_sequence = parsers.audio.parse_file(input_file)
+    else:
+        raise ValueError("unsuported file type")
+    return Observations(input_sequence)
 
 def mylog(x):
     """Returns the logarithm of x (without the annoying warnings of np.log)"""
