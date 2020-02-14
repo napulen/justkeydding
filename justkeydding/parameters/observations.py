@@ -20,20 +20,20 @@ class Observations(object):
         for _, slic in enumerate(self.slices):
             for elem in slic:
                 yield elem
-    
+
     def __getitem__(self, key):
         l = [elem for slic in self.slices for elem in slic]
         return l[key]
-    
+
     def __len__(self):
         l = [elem for slic in self.slices for elem in slic]
         return len(l)
-    
+
     def slice_indexes(self):
         for idx, slic in enumerate(self.slices):
             for _ in slic:
                 yield idx
-    
+
     def tuples(self):
         for idx, slic in enumerate(self.slices):
             for elem in slic:
@@ -42,7 +42,7 @@ class Observations(object):
     @staticmethod
     def from_tuples(l):
         slices = Observations()
-        max_index = max(l)[1]
+        max_index = max(l, key=lambda x: x[1])[1]
         [slices.append([]) for _ in range(max_index + 1)]
         for elem, idx in l:
             slices.slices[idx].append(elem)

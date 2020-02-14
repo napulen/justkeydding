@@ -56,7 +56,6 @@ def create_transition_probabilities(key_transitions):
         d[key] = {key: kt_[idx] for idx, key in enumerate(states)}
     return d
 
-
 def create_emission_probabilities(major, minor):
     """Returns the emission probabilities"""
     d = dict()
@@ -86,23 +85,6 @@ def mylog(x):
     """Returns the logarithm of x (without the annoying warnings of np.log)"""
     return np.log(x) if x > 8.7565e-27 else -np.inf
 
-
-def get_key_from_filename(filename):
-    """Returns the key of a midi file if it is a postfix of the filename"""
-    key = filename[:-4].split('_')[-1]
-    keys_plus_enharmonics = list(states) + list(enharmonics.values())
-    return key if key in keys_plus_enharmonics else 'x'
-
-
-def is_key_guess_correct(ground_truth, guess):
-    """Returns whether a key guess is correct or not"""
-    if ground_truth in states:
-        iscorrect = True if ground_truth == guess else False
-    elif ground_truth in list(enharmonics.values()):
-        iscorrect = True if guess in enharmonics and ground_truth == enharmonics[guess] else False
-    return iscorrect
-
-
 def viterbi(obs, states, start_p, trans_p, emit_p):
     V = [{}]
     for st in states:
@@ -120,8 +102,6 @@ def viterbi(obs, states, start_p, trans_p, emit_p):
                     max_prob = max_tr_prob + mylog(emit_p[st][obs[t]])
                     V[t][st] = {"prob": max_prob, "prev": prev_st}
                     break
-    # for line in dptable(V):
-    #    print(line)
     opt = []
     # The highest probability
     max_prob = max(value["prob"] for value in V[-1].values())
@@ -136,10 +116,6 @@ def viterbi(obs, states, start_p, trans_p, emit_p):
     for t in range(len(V) - 2, -1, -1):
         opt.insert(0, V[t + 1][previous]["prev"])
         previous = V[t + 1][previous]["prev"]
-
-    # print('The steps of states are '
-    #     + ' '.join(opt)
-    #      + ' with highest probability of %s' % max_prob)
     return opt, max_prob
 
 def analyze(input_sequence, kp_major_name, kp_minor_name, kt_name):
@@ -151,9 +127,8 @@ def analyze(input_sequence, kp_major_name, kp_minor_name, kt_name):
     emit_p = create_emission_probabilities(major, minor)
     obs = input_sequence
     local_keys, max_p = viterbi(obs, states, start_p, trans_p, emit_p)
-    # if args.output_local:
-    #     print(local_keys)
-    #     return
+    sliced_local_keys = list(zip(local_keys, obs.slice_indexes()))
+    sliced_local_keys = Observations.from_tuples(sliced_local_keys)
     # Preparing the args for the second HMM
     obs = local_keys  # the keys become the observations
     emit_p = trans_p  # the transitions become emission
@@ -161,7 +136,21 @@ def analyze(input_sequence, kp_major_name, kp_minor_name, kt_name):
     trans_p = create_transition_probabilities(key_transitions)
     key, max_prob = viterbi(obs, states, start_p, trans_p, emit_p)
     global_key = key[0]
-    return [global_key, local_keys]
+    return [global_key, sliced_local_keys.slices]
+
+def get_key_from_filename(filename):
+    """Returns the key of a midi file if it is a postfix of the filename"""
+    key = filename[:-4].split('_')[-1]
+    keys_plus_enharmonics = list(states) + list(enharmonics.values())
+    return key if key in keys_plus_enharmonics else 'x'
+
+def is_key_guess_correct(ground_truth, guess):
+    """Returns whether a key guess is correct or not"""
+    if ground_truth in states:
+        iscorrect = True if ground_truth == guess else False
+    elif ground_truth in list(enharmonics.values()):
+        iscorrect = True if guess in enharmonics and ground_truth == enharmonics[guess] else False
+    return iscorrect
 
 def batch(args):
     transitions = [
@@ -216,14 +205,12 @@ def batch(args):
                         guess_key = key[0]
                         iscorrect = is_key_guess_correct(ground_truth_key, guess_key)
                         score += 0 if iscorrect else 1
-
                         print('{}:\t{}\t{}\t{}'.format(filepath,
                                                        ground_truth_key,
                                                        guess_key,
                                                        "Good" if iscorrect else "Wrong"))
                 scores[(transition, profile_major, profile_minor)] = score
     pp.pprint(scores)
-
 
 def parse_args():
     parser = argparse.ArgumentParser(description='justkeydding for symbolic music files, python version')
@@ -292,10 +279,8 @@ def parse_args():
     args = parser.parse_args()
     return args
 
-
 if __name__ == '__main__':
     args = parse_args()
-    # print(args)
     if args.is_batch:
         batch(args)
     else:
