@@ -18,6 +18,7 @@ import pprint as pp
 import numpy as np
 import os
 import argparse
+from collections import Counter
 
 states = (
     'C', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B',
@@ -136,7 +137,7 @@ def analyze(input_sequence, kp_major_name, kp_minor_name, kt_name):
     trans_p = create_transition_probabilities(key_transitions)
     key, max_prob = viterbi(obs, states, start_p, trans_p, emit_p)
     global_key = key[0]
-    return [global_key, sliced_local_keys.slices]
+    return [global_key, sliced_local_keys]
 
 def get_key_from_filename(filename):
     """Returns the key of a midi file if it is a postfix of the filename"""
@@ -279,6 +280,13 @@ def parse_args():
     args = parser.parse_args()
     return args
 
+def postprocess_local_keys(local_keys):
+    slices = []
+    for slic in local_keys.slices:
+        c = Counter(slic)
+        slices.append(max(slic, key=c.get))
+    return slices
+
 if __name__ == '__main__':
     args = parse_args()
     if args.is_batch:
@@ -287,7 +295,8 @@ if __name__ == '__main__':
         input_sequence = extract_input_sequence(args.input, args.is_sequence)
         outputs = analyze(input_sequence, args.key_profile_major, args.key_profile_minor, args.key_transition)
         if args.output_local:
-            print(outputs)
+            keys_by_onset = postprocess_local_keys(outputs[1])
+            print('{}\n{}'.format(outputs[0], keys_by_onset))
         else:
             print(outputs[0])
 
