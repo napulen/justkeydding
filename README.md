@@ -1,3 +1,5 @@
+> For v2.0.0 of `justkeydding`, I am planning to move entirely to Python. The main advantage is that I will be able to use the deepchroma features from `madmom`, which seem to deliver better results than NNLS-Chroma. Another feature in mind (WIP) is the annotation of a `MusicXML`|`krn`|`MIDI` file in symbolic. The code should be able to deliver an aligned-and-annotated file back (local keys as lyrics, global key annotated somewhere in the metadata) as well as the individual features. This will be released as a python package in PyPI (pip). Expected release is May 2020. Development of that new direction is happening in the `pythononly` branch, if you are interested in checking that code.
+
 # justkeydding
 Audio and Symbolic Key Detection algorithm based on [nnls-chroma](http://www.isophonics.net/nnls-chroma) and a Hidden Markov Model.
 
