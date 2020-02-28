@@ -1,7 +1,7 @@
+from justkeydding.parameters import key_profiles, key_transitions
 import random
 import logging
-from . import key_profiles
-from . import key_transitions
+
 
 class Generator:
     def __init__(self, kp_max_range, kt_max_range):
@@ -89,7 +89,6 @@ class Generator:
         self.logger.info('Done generate_key_transition() -> key_transition_name={}'.format(key_transition_name))
         return key_transition_name
 
-
     def generate_geometric_key_transition(self, ratio):
         self.logger.info('Start generate_geometric_key_transition() <- ratio={}'.format(ratio))
         key_transition = [
@@ -117,7 +116,6 @@ class Generator:
         key_transition = [x/s for x in key_transition]
         self.logger.info('Done generate_geometric_key_transition() -> key_transition={}'.format(key_transition))
         return key_transition
-
 
     def generate_stochastic_key_transition(self):
         self.logger.info('Start generate_stochastic_key_transition()')

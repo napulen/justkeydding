@@ -1,9 +1,9 @@
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.utils import shuffle
 import collections
 import re
 import os
+
 
 class Dataset():
     def __init__(self, dataset_name):
@@ -42,7 +42,10 @@ class Dataset():
             match = re.search(features_re, f, re.IGNORECASE)
             if match:
                 split_name = match.group(1)
-                array = np.load(os.path.join(self.dataset_dir, f), allow_pickle=True)
+                array = np.load(
+                    os.path.join(self.dataset_dir, f),
+                    allow_pickle=True
+                )
                 if split_name:
                     attr_name = '{}_X'.format(split_name)
                     setattr(self, attr_name, array)
@@ -52,12 +55,16 @@ class Dataset():
                 match = re.search(annotations_re, f, re.IGNORECASE)
                 if match:
                     split_name = match.group(1)
-                    array = np.load(os.path.join(self.dataset_dir, f), allow_pickle=True)
+                    array = np.load(
+                        os.path.join(self.dataset_dir, f),
+                        allow_pickle=True
+                    )
                     if split_name:
                         attr_name = '{}_y'.format(split_name)
                         setattr(self, attr_name, array)
                     else:
                         self.y = array
+
 
 def transpose(Xi, y):
     is_minor = y // 12
@@ -98,6 +105,7 @@ def compare_keys(k1, k2):
     else:
         return 'other'
 
+
 def weighted_score(pred, y):
     length = len(pred)
     if length != len(y):
@@ -115,6 +123,7 @@ def weighted_score(pred, y):
     all_scores = [x / length for x in all_scores]
     return all_scores
 
+
 def data_augmentation(X, y):
     original_length = X.shape[1]
     trans_features = []
@@ -127,10 +136,13 @@ def data_augmentation(X, y):
     trans_labels = np.array(trans_labels).reshape(-1)
     return trans_features, trans_labels
 
+
 def feature_scaling(X, minmax=(-1, 1)):
     scaler = MinMaxScaler(feature_range=minmax)
     original_length = X.shape[1]
     Xp = X.reshape(-1, 24)
-    Xp = np.apply_along_axis(lambda x: scaler.fit_transform(x.reshape(-1, 1)), 1, Xp)
+    Xp = np.apply_along_axis(
+        lambda x: scaler.fit_transform(x.reshape(-1, 1)), 1, Xp
+    )
     Xp = Xp.reshape(-1, original_length)
     return Xp

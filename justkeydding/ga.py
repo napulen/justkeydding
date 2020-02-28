@@ -1,6 +1,14 @@
-from optimizer import generator, evaluator, evolver
-from optimizer.key_profiles import flush_key_profiles, keep_key_profiles, log_key_profiles_dict
-from optimizer.key_transitions import flush_key_transitions, keep_key_transitions, log_key_transitions_dict
+from justkeydding.parameters.key_profiles import (
+    flush_key_profiles,
+    keep_key_profiles,
+    log_key_profiles_dict
+)
+from justkeydding.parameters.key_transitions import (
+    flush_key_transitions,
+    keep_key_transitions,
+    log_key_transitions_dict
+)
+from justkeydding.optimizer import generator, evaluator, evolver
 import os
 import logging
 import logging.handlers
@@ -41,6 +49,7 @@ logging_dict = {
         }
     }
 }
+
 
 def ga_runner(dataset, population_size, initial_key_profiles, initial_key_transitions, kp_max_range, kt_max_range, evolution_swap_threshold, just_evalute=False):
     logger.info('ga_runner() <- dataset={}, population_size={}, initial_key_profiles={}, initial_key_transitions={}, kp_max_range={}, kt_max_range={}, evolution_swap_threshold={}'.format(dataset, population_size, initial_key_profiles, initial_key_transitions, kp_max_range, kt_max_range, evolution_swap_threshold))

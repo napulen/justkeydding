@@ -1,8 +1,8 @@
+from justkeydding.parameters import key_profiles, key_transitions
 import random
 import logging
 import copy
-from . import key_profiles
-from . import key_transitions
+
 
 class Evolver:
     def __init__(self, generator):

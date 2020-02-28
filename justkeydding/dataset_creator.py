@@ -1,11 +1,10 @@
-from optimizer import ensembler
+from justkeydding.optimizer import ensembler
 import collections
 import os
 import logging
 import logging.handlers
 import logging.config
 import numpy as np
-import re
 import sys
 
 logging_dict = {
@@ -43,6 +42,7 @@ logging_dict = {
         }
     }
 }
+
 
 class DatasetCreator():
     keys_single_letter = {
@@ -82,7 +82,8 @@ class DatasetCreator():
 
     def __init__(self, dataset_folder):
         self.logger = logging.getLogger('DatasetCreator')
-        self.logger.info('DatasetCreator() <- dataset_folder={}'.format(dataset_folder))
+        self.logger.info(
+            'DatasetCreator() <- dataset_folder={}'.format(dataset_folder))
         self.dataset_okay = False
         self.has_features = False
         self.ensemble = None
@@ -91,7 +92,10 @@ class DatasetCreator():
         if not os.path.isdir(dataset_folder):
             self.logger.error('The dataset provided is not a folder')
             exit()
-        self.dataset_folder = dataset_folder[:-1] if dataset_folder.endswith('/') else dataset_folder
+        if dataset_folder.endswith('/'):
+            self.dataset_folder = dataset_folder[:-1]
+        else:
+            self.dataset_folder = dataset_folder
         if not any(c.isalpha() for c in self.dataset_folder):
             self.logger.warning('The dataset folder, {}, does not contain any parsable name.'.format(self.dataset_folder))
             self.name = 'unknown_dataset'
@@ -101,7 +105,8 @@ class DatasetCreator():
         self.feature_folder = os.path.join(dataset_folder, 'features')
         # features folder
         if not os.path.isdir(self.feature_folder):
-            self.logger.error('The dataset folder must contain a "features" folder')
+            self.logger.error(('The dataset folder must '
+                               'contain a "features" folder'))
             exit()
         self.files = []
         self.files_no_extension = []
@@ -241,6 +246,7 @@ class DatasetCreator():
                 self.logger.info('writing {}'.format(annotation_filepath))
                 np.array(split_annotations).dump(annotation_filepath)
 
+
 if __name__ == '__main__':
     if not os.path.exists('logs'):
         os.makedirs('logs')
@@ -260,11 +266,11 @@ if __name__ == '__main__':
         'sapp',
         'simple_natural_minor',
         'simple_harmonic_minor',
-        'simple_melodic_minor',]
+        'simple_melodic_minor', ]
     key_transitions = [
         'ktg_exponential5',
         'ktg_exponential10',
-        'ktg_exponential15',]
+        'ktg_exponential15', ]
     dc = DatasetCreator(dataset)
     dc.compute_features(key_profiles, key_transitions)
     dc.write()

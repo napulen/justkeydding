@@ -1,8 +1,6 @@
-from sklearn.model_selection import cross_val_score
+import justkeydding.dataset
 from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
 import numpy as np
-import dataset
 import joblib
 
 if __name__ == '__main__':
@@ -26,7 +24,7 @@ if __name__ == '__main__':
     ]
 
     for idx, d in enumerate(dataset_filenames):
-        data = dataset.Dataset(d)
+        data = justkeydding.dataset.Dataset(d)
         if idx == 0:
             ensemble = data.ensemble
             fulldataset_X = data.X
@@ -49,10 +47,10 @@ if __name__ == '__main__':
     )
 
     # Feature scaling in all the feature vectors
-    fulldataset_X = dataset.feature_scaling(fulldataset_X)
+    fulldataset_X = justkeydding.dataset.feature_scaling(fulldataset_X)
 
     # Data augmentation on the training sets
-    fulldataset_X, fulldataset_y = dataset.data_augmentation(
+    fulldataset_X, fulldataset_y = justkeydding.dataset.data_augmentation(
         fulldataset_X,
         fulldataset_y)
 

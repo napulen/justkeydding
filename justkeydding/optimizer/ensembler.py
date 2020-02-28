@@ -1,7 +1,6 @@
+from justkeydding.parameters import key_profiles, key_transitions
 import subprocess
 import logging
-from . import key_profiles
-from . import key_transitions
 import itertools
 from multiprocessing.dummy import Pool as ThreadPool
 
