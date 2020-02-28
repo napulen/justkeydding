@@ -11,11 +11,7 @@ from justkeydding.parameters.observations import Observations
 import justkeydding.parsers.midi
 import justkeydding.parsers.symbolic
 import justkeydding.parsers.audio
-import mido
-import music21
-import pprint as pp
 import numpy as np
-import os
 import argparse
 from collections import Counter
 
@@ -56,6 +52,7 @@ def create_transition_probabilities(key_transitions):
         d[key] = {key: kt_[idx] for idx, key in enumerate(states)}
     return d
 
+
 def create_emission_probabilities(major, minor):
     """Returns the emission probabilities"""
     d = dict()
@@ -66,9 +63,10 @@ def create_emission_probabilities(major, minor):
         d[key] = {pc: profile[pc] for pc in range(12)}
     return d
 
+
 def extract_input_sequence(input_file, is_sequence=False):
     extension = input_file.rsplit('.')[-1]
-    if is_sequence == True:
+    if is_sequence:
         # TODO: Implement this for new format of input sequences
         input_sequence = [int(s) for s in input_file.split(',')]
     elif extension in justkeydding.parsers.midi.supported_extensions:
@@ -81,9 +79,11 @@ def extract_input_sequence(input_file, is_sequence=False):
         raise ValueError("unsuported file type")
     return Observations(input_sequence)
 
+
 def mylog(x):
     """Returns the logarithm of x (without the annoying warnings of np.log)"""
     return np.log(x) if x > 8.7565e-27 else -np.inf
+
 
 def viterbi(obs, states, start_p, trans_p, emit_p):
     V = [{}]
@@ -118,6 +118,7 @@ def viterbi(obs, states, start_p, trans_p, emit_p):
         previous = V[t + 1][previous]["prev"]
     return opt, max_prob
 
+
 def analyze(input_sequence, kp_major_name, kp_minor_name, kt_name):
     # Preparing the args for the first HMM
     key_transition = kt._kt[kt_name]
@@ -138,19 +139,25 @@ def analyze(input_sequence, kp_major_name, kp_minor_name, kt_name):
     global_key = key[0]
     return [global_key, sliced_local_keys]
 
+
 def get_key_from_filename(filename):
     """Returns the key of a midi file if it is a postfix of the filename"""
     key = filename[:-4].split('_')[-1]
     keys_plus_enharmonics = list(states) + list(enharmonics.values())
     return key if key in keys_plus_enharmonics else 'x'
 
+
 def is_key_guess_correct(ground_truth, guess):
     """Returns whether a key guess is correct or not"""
     if ground_truth in states:
         iscorrect = True if ground_truth == guess else False
     elif ground_truth in list(enharmonics.values()):
-        iscorrect = True if guess in enharmonics and ground_truth == enharmonics[guess] else False
+        if guess in enharmonics and ground_truth == enharmonics[guess]:
+            iscorrect = True
+        else:
+            iscorrect = False
     return iscorrect
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -213,6 +220,7 @@ def parse_args():
     args = parser.parse_args()
     return args
 
+
 def postprocess_local_keys(local_keys):
     slices = []
     for slic in local_keys.slices:
@@ -220,13 +228,17 @@ def postprocess_local_keys(local_keys):
         slices.append(max(slic, key=c.get))
     return slices
 
+
 if __name__ == '__main__':
     args = parse_args()
-    input_sequence = extract_input_sequence(args.input, args.is_sequence)
+    input_sequence = extract_input_sequence(
+        args.input,
+        args.is_sequence
+    )
     outputs = analyze(
-        input_sequence, 
-        args.key_profile_major, 
-        args.key_profile_minor, 
+        input_sequence,
+        args.key_profile_major,
+        args.key_profile_minor,
         args.key_transition
     )
     if args.output_local:
@@ -234,4 +246,3 @@ if __name__ == '__main__':
         print('{}\n{}'.format(outputs[0], keys_by_onset))
     else:
         print(outputs[0])
-
