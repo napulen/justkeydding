@@ -1,17 +1,16 @@
 """justkeydding
 
-Creates the parameters for a Hidden Markov Model
-that finds the key of a sequence of notes
+Key-finding algorithm for Symbolic and Audio files.
 
 Nestor Napoles (napulen@gmail.com)
 """
 
-import parameters.key_transitions as kt
-import parameters.key_profiles as kp
-from parameters.observations import Observations
-import parsers.midi
-import parsers.symbolic
-import parsers.audio
+import justkeydding.parameters.key_transitions as kt
+import justkeydding.parameters.key_profiles as kp
+from justkeydding.parameters.observations import Observations
+import justkeydding.parsers.midi
+import justkeydding.parsers.symbolic
+import justkeydding.parsers.audio
 import mido
 import music21
 import pprint as pp
@@ -72,12 +71,12 @@ def extract_input_sequence(input_file, is_sequence=False):
     if is_sequence == True:
         # TODO: Implement this for new format of input sequences
         input_sequence = [int(s) for s in input_file.split(',')]
-    elif extension in parsers.midi.supported_extensions:
-        input_sequence = parsers.midi.parse_file(input_file)
-    elif extension in parsers.symbolic.supported_extensions:
-        input_sequence = parsers.symbolic.parse_file(input_file)
-    elif extension in parsers.audio.supported_extensions:
-        input_sequence = parsers.audio.parse_file(input_file)
+    elif extension in justkeydding.parsers.midi.supported_extensions:
+        input_sequence = justkeydding.parsers.midi.parse_file(input_file)
+    elif extension in justkeydding.parsers.symbolic.supported_extensions:
+        input_sequence = justkeydding.parsers.symbolic.parse_file(input_file)
+    elif extension in justkeydding.parsers.audio.supported_extensions:
+        input_sequence = justkeydding.parsers.audio.parse_file(input_file)
     else:
         raise ValueError("unsuported file type")
     return Observations(input_sequence)
@@ -153,78 +152,12 @@ def is_key_guess_correct(ground_truth, guess):
         iscorrect = True if guess in enharmonics and ground_truth == enharmonics[guess] else False
     return iscorrect
 
-def batch(args):
-    transitions = [
-        'ktg_exponential10',
-        'ktg_exponential2',
-    ]
-    profiles_major = [
-        'krumhansl_kessler',
-        'aarden_essen',
-        'sapp',
-        'bellman_budge',
-        'temperley'
-    ]
-    profiles_minor = [
-        'krumhansl_kessler',
-        'aarden_essen',
-        'sapp',
-        'bellman_budge',
-        'temperley'
-    ]
-    scores = {}
-    for transition in transitions:
-        for profile_major in profiles_major:
-            for profile_minor in profiles_minor:
-                print("Hidden Markov Model parameters:\n"
-                      "key_transitions: {}\n"
-                      "key_profile (major): {}\n"
-                      "key_profile (minor): {}\n"
-                      "Filename\tOriginal\tGuess\t"
-                      "Correct?".format(transition, profile_major, profile_minor)
-                      )
-                score = 0
-                for root, dirs, files in os.walk(args.input):
-                    for filename in files:
-                        filepath = os.path.join(root, filename)
-                        ground_truth_key = get_key_from_filename(filename)
-                        # Preparing the args for the first HMM
-                        key_transitions = kt._kt[transition]
-                        trans_p = create_transition_probabilities(key_transitions)
-                        major = kp._kp[profile_major]
-                        minor = kp._kp[profile_minor]
-                        emit_p = create_emission_probabilities(major, minor)
-                        # obs = create_observation_list(filepath)
-                        state_list, max_p = viterbi(obs, states, start_p, trans_p, emit_p)
-
-                        # Preparing the args for the second HMM
-                        obs = state_list  # the keys become the observations
-                        emit_p = trans_p  # the transitions become emission
-                        key_transitions = kt._kt["null"]
-                        trans_p = create_transition_probabilities(key_transitions)
-                        key, max_prob = viterbi(obs, states, start_p, trans_p, emit_p)
-                        guess_key = key[0]
-                        iscorrect = is_key_guess_correct(ground_truth_key, guess_key)
-                        score += 0 if iscorrect else 1
-                        print('{}:\t{}\t{}\t{}'.format(filepath,
-                                                       ground_truth_key,
-                                                       guess_key,
-                                                       "Good" if iscorrect else "Wrong"))
-                scores[(transition, profile_major, profile_minor)] = score
-    pp.pprint(scores)
-
 def parse_args():
-    parser = argparse.ArgumentParser(description='justkeydding for symbolic music files, python version')
+    parser = argparse.ArgumentParser(
+        description='justkeydding for symbolic music files, python version')
     parser.add_argument(
         'input',
         help='Input symbolic music file (or folder if --batch)'
-    )
-    parser.add_argument(
-        '--batch',
-        dest='is_batch',
-        const=True,
-        action='store_const',
-        help='Process several files within a folder'
     )
     parser.add_argument(
         '--sequence',
@@ -289,14 +222,16 @@ def postprocess_local_keys(local_keys):
 
 if __name__ == '__main__':
     args = parse_args()
-    if args.is_batch:
-        batch(args)
+    input_sequence = extract_input_sequence(args.input, args.is_sequence)
+    outputs = analyze(
+        input_sequence, 
+        args.key_profile_major, 
+        args.key_profile_minor, 
+        args.key_transition
+    )
+    if args.output_local:
+        keys_by_onset = postprocess_local_keys(outputs[1])
+        print('{}\n{}'.format(outputs[0], keys_by_onset))
     else:
-        input_sequence = extract_input_sequence(args.input, args.is_sequence)
-        outputs = analyze(input_sequence, args.key_profile_major, args.key_profile_minor, args.key_transition)
-        if args.output_local:
-            keys_by_onset = postprocess_local_keys(outputs[1])
-            print('{}\n{}'.format(outputs[0], keys_by_onset))
-        else:
-            print(outputs[0])
+        print(outputs[0])
 
