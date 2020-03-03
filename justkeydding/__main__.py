@@ -5,17 +5,16 @@ Key-finding algorithm for Symbolic and Audio files.
 Nestor Napoles (napulen@gmail.com)
 """
 
+import justkeydding.inputs
 import justkeydding.parameters
 import justkeydding.parameters.key_transitions as kt
 import justkeydding.parameters.key_profiles as kp
 from justkeydding.parameters.observations import Observations
-import justkeydding.parsers.midi
-import justkeydding.parsers.symbolic
-import justkeydding.parsers.audio
 import justkeydding.cli
 
 import numpy as np
 from collections import Counter
+
 
 def create_transition_probabilities(key_transitions):
     """Returns the transition probabilities"""
@@ -46,19 +45,24 @@ def create_emission_probabilities(major, minor):
     return d
 
 
-def extract_input_sequence(input_file, is_sequence=False):
+def resolve_input_type(input_file):
     extension = input_file.rsplit('.')[-1]
+    input_type = ''
+    if extension in justkeydding.inputs.midi.supported_extensions:
+        input_type = 'midi'
+    elif extension in justkeydding.inputs.symbolic.supported_extensions:
+        input_type = 'symbolic'
+    elif extension in justkeydding.inputs.audio.supported_extensions:
+        input_type = 'audio'
+    return input_type
+
+
+def extract_input_sequence(input_file, is_sequence=False):
     if is_sequence:
         # TODO: Implement this for new format of input sequences
         input_sequence = [int(s) for s in input_file.split(',')]
-    elif extension in justkeydding.parsers.midi.supported_extensions:
-        input_sequence = justkeydding.parsers.midi.parse_file(input_file)
-    elif extension in justkeydding.parsers.symbolic.supported_extensions:
-        input_sequence = justkeydding.parsers.symbolic.parse_file(input_file)
-    elif extension in justkeydding.parsers.audio.supported_extensions:
-        input_sequence = justkeydding.parsers.audio.parse_file(input_file)
     else:
-        raise ValueError("unsuported file type")
+        input_sequence = input_format.parse_file(input_file)
     return Observations(input_sequence)
 
 
@@ -109,7 +113,12 @@ def analyze(input_sequence, kp_major_name, kp_minor_name, kt_name):
     minor = kp._kp[kp_minor_name][12:]
     emit_p = create_emission_probabilities(major, minor)
     obs = input_sequence
-    local_keys, max_p = viterbi(obs, justkeydding.parameters.states, justkeydding.parameters.start_p, trans_p, emit_p)
+    local_keys, max_p = viterbi(
+        obs,
+        justkeydding.parameters.states,
+        justkeydding.parameters.start_p,
+        trans_p,
+        emit_p)
     sliced_local_keys = list(zip(local_keys, obs.slice_indexes()))
     sliced_local_keys = Observations.from_tuples(sliced_local_keys)
     # Preparing the args for the second HMM
@@ -117,7 +126,13 @@ def analyze(input_sequence, kp_major_name, kp_minor_name, kt_name):
     emit_p = trans_p  # the transitions become emission
     key_transitions = kt._kt["null"]
     trans_p = create_transition_probabilities(key_transitions)
-    key, max_prob = viterbi(obs, justkeydding.parameters.states, justkeydding.parameters.start_p, trans_p, emit_p)
+    key, max_prob = viterbi(
+        obs,
+        justkeydding.parameters.states,
+        justkeydding.parameters.start_p,
+        trans_p,
+        emit_p
+    )
     global_key = key[0]
     return [global_key, sliced_local_keys]
 
@@ -132,6 +147,15 @@ def postprocess_local_keys(local_keys):
 
 if __name__ == '__main__':
     args = justkeydding.cli.parse_args()
+    input_type = resolve_input_type(args.input)
+    if input_type == 'midi':
+        import justkeydding.inputs.midi as input_format
+    elif input_type == 'symbolic':
+        import justkeydding.inputs.symbolic as input_format
+    elif input_type == 'audio':
+        import justkeydding.inputs.audio as input_format
+    elif not args.is_sequence:
+        raise ValueError("unsuported file type")
     input_sequence = extract_input_sequence(
         args.input,
         args.is_sequence
@@ -145,5 +169,6 @@ if __name__ == '__main__':
     if args.output_local:
         keys_by_onset = postprocess_local_keys(outputs[1])
         print('{}\n{}'.format(outputs[0], keys_by_onset))
+        # if args.annotate_file:
     else:
         print(outputs[0])
