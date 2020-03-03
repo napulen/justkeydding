@@ -5,40 +5,22 @@ Key-finding algorithm for Symbolic and Audio files.
 Nestor Napoles (napulen@gmail.com)
 """
 
+import justkeydding.parameters
 import justkeydding.parameters.key_transitions as kt
 import justkeydding.parameters.key_profiles as kp
 from justkeydding.parameters.observations import Observations
 import justkeydding.parsers.midi
 import justkeydding.parsers.symbolic
 import justkeydding.parsers.audio
+import justkeydding.cli
+
 import numpy as np
-import argparse
 from collections import Counter
-
-states = (
-    'C', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B',
-    'c', 'c#', 'd', 'eb', 'e', 'f', 'f#', 'g', 'ab', 'a', 'bb', 'b',
-)
-
-enharmonics = {
-    'Db': 'C#', 'Eb': 'D#', 'F#': 'Gb', 'Ab': 'G#', 'Bb': 'A#',
-    'c#': 'db', 'eb': 'd#', 'f#': 'gb', 'ab': 'g#', 'bb': 'a#',
-}
-
-start_p = {
-    'C': 1.0/24.0, 'Db': 1.0/24.0, 'D': 1.0/24.0, 'Eb': 1.0/24.0,
-    'E': 1.0/24.0, 'F': 1.0/24.0, 'F#': 1.0/24.0, 'G': 1.0/24.0,
-    'Ab': 1.0/24.0, 'A': 1.0/24.0, 'Bb': 1.0/24.0, 'B': 1.0/24.0,
-    'c': 1.0/24.0, 'c#': 1.0/24.0, 'd': 1.0/24.0, 'eb': 1.0/24.0,
-    'e': 1.0/24.0, 'f': 1.0/24.0, 'f#': 1.0/24.0, 'g': 1.0/24.0,
-    'ab': 1.0/24.0, 'a': 1.0/24.0, 'bb': 1.0/24.0, 'b': 1.0/24.0,
-}
-
 
 def create_transition_probabilities(key_transitions):
     """Returns the transition probabilities"""
     d = dict()
-    for idx, key in enumerate(states):
+    for idx, key in enumerate(justkeydding.parameters.states):
         tonic = key_transitions[:12]
         relative = key_transitions[12:]
         tonic_rotation = -(idx % 12)
@@ -49,14 +31,14 @@ def create_transition_probabilities(key_transitions):
         probs1 = tonic[tonic_rotation:] + tonic[:tonic_rotation]
         probs2 = relative[relative_rotation:] + relative[:relative_rotation]
         kt_ = probs1 + probs2
-        d[key] = {key: kt_[idx] for idx, key in enumerate(states)}
+        d[key] = {key: kt_[idx] for idx, key in enumerate(justkeydding.parameters.states)}
     return d
 
 
 def create_emission_probabilities(major, minor):
     """Returns the emission probabilities"""
     d = dict()
-    for idx, key in enumerate(states):
+    for idx, key in enumerate(justkeydding.parameters.states):
         rotation = -(idx % 12)
         profile = major if idx < 12 else minor
         profile = profile[rotation:] + profile[:rotation]
@@ -127,7 +109,7 @@ def analyze(input_sequence, kp_major_name, kp_minor_name, kt_name):
     minor = kp._kp[kp_minor_name][12:]
     emit_p = create_emission_probabilities(major, minor)
     obs = input_sequence
-    local_keys, max_p = viterbi(obs, states, start_p, trans_p, emit_p)
+    local_keys, max_p = viterbi(obs, justkeydding.parameters.states, justkeydding.parameters.start_p, trans_p, emit_p)
     sliced_local_keys = list(zip(local_keys, obs.slice_indexes()))
     sliced_local_keys = Observations.from_tuples(sliced_local_keys)
     # Preparing the args for the second HMM
@@ -135,90 +117,9 @@ def analyze(input_sequence, kp_major_name, kp_minor_name, kt_name):
     emit_p = trans_p  # the transitions become emission
     key_transitions = kt._kt["null"]
     trans_p = create_transition_probabilities(key_transitions)
-    key, max_prob = viterbi(obs, states, start_p, trans_p, emit_p)
+    key, max_prob = viterbi(obs, justkeydding.parameters.states, justkeydding.parameters.start_p, trans_p, emit_p)
     global_key = key[0]
     return [global_key, sliced_local_keys]
-
-
-def get_key_from_filename(filename):
-    """Returns the key of a midi file if it is a postfix of the filename"""
-    key = filename[:-4].split('_')[-1]
-    keys_plus_enharmonics = list(states) + list(enharmonics.values())
-    return key if key in keys_plus_enharmonics else 'x'
-
-
-def is_key_guess_correct(ground_truth, guess):
-    """Returns whether a key guess is correct or not"""
-    if ground_truth in states:
-        iscorrect = True if ground_truth == guess else False
-    elif ground_truth in list(enharmonics.values()):
-        if guess in enharmonics and ground_truth == enharmonics[guess]:
-            iscorrect = True
-        else:
-            iscorrect = False
-    return iscorrect
-
-
-def parse_args():
-    parser = argparse.ArgumentParser(
-        description='justkeydding for symbolic music files, python version')
-    parser.add_argument(
-        'input',
-        help='Input symbolic music file (or folder if --batch)'
-    )
-    parser.add_argument(
-        '--sequence',
-        dest='is_sequence',
-        const=True,
-        action='store_const',
-        default=False,
-        help='Provide the input as a string of comma-separated pitch-classes'
-    )
-    parser.add_argument(
-        '--local',
-        dest='output_local',
-        const=True,
-        action='store_const',
-        help='Output local keys'
-    )
-    parser.add_argument(
-        '--transition',
-        dest='key_transition',
-        choices=[
-            'ktg_exponential10',
-            'ktg_exponential2'
-        ],
-        default='ktg_exponential10',
-        help='Key transition to use'
-    )
-    parser.add_argument(
-        '--majorEmission',
-        dest='key_profile_major',
-        choices=[
-            'krumhansl_kessler',
-            'aarden_essen',
-            'sapp',
-            'bellman_budge',
-            'temperley',
-        ],
-        default='sapp',
-        help='Major key profile to use as emission probability distribution'
-    )
-    parser.add_argument(
-        '--minorEmission',
-        dest='key_profile_minor',
-        choices=[
-            'krumhansl_kessler',
-            'aarden_essen',
-            'sapp',
-            'bellman_budge',
-            'temperley',
-        ],
-        default='sapp',
-        help='Minor key profile to use as emission probability distribution'
-    )
-    args = parser.parse_args()
-    return args
 
 
 def postprocess_local_keys(local_keys):
@@ -230,7 +131,7 @@ def postprocess_local_keys(local_keys):
 
 
 if __name__ == '__main__':
-    args = parse_args()
+    args = justkeydding.cli.parse_args()
     input_sequence = extract_input_sequence(
         args.input,
         args.is_sequence
