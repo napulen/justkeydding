@@ -52,3 +52,5 @@ nnls-chroma-1.1/chordextract
 build/
 bin/
 logs/
+
+.vscode/
