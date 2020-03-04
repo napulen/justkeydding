@@ -22,6 +22,12 @@ PACKAGE_DATA = {
 
 # What packages are required for this module to be executed?
 REQUIRED = [
+    'music21>=5.7.2',
+    'numpy>=1.18.1',
+    'madmom>=0.16.1',
+    'mido>=1.2.9',
+    'joblib>=0.14.1'
+    'scikit_learn>=0.22.2.post1'
 ]
 
 # What packages are optional?
