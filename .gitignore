@@ -54,3 +54,6 @@ bin/
 logs/
 
 .vscode/
+
+dist/
+*egg-info/
