@@ -26,7 +26,7 @@ REQUIRED = [
     'numpy>=1.18.1',
     'madmom>=0.16.1',
     'mido>=1.2.9',
-    'joblib>=0.14.1'
+    'joblib>=0.14.1',
     'scikit_learn>=0.22.2.post1'
 ]
 
