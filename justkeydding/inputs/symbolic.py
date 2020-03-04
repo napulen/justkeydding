@@ -35,4 +35,6 @@ def annotate_local_keys(filename, local_keys):
             ev.addLyric(key)
         else:
             ev.addLyric('')
-    s.show()
+    path, extension = tuple(filename.rsplit('.', 1))
+    new_filename = path + '_justkeydding.' + extension
+    s.write(fp=new_filename, fmt='musicxml')
