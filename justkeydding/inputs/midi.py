@@ -2,6 +2,7 @@ import mido
 
 supported_extensions = ['mid', 'midi']
 
+
 def parse_file(filename):
     """ Returns a list of notes from the note_on events of a MIDI file. """
     mid = mido.MidiFile(filename)

@@ -140,8 +140,11 @@ def analyze(input_sequence, kp_major_name, kp_minor_name, kt_name):
 def postprocess_local_keys(local_keys):
     slices = []
     for slic in local_keys.slices:
-        c = Counter(slic)
-        slices.append(max(slic, key=c.get))
+        if slic:
+            c = Counter(slic)
+            slices.append(max(slic, key=c.get))
+        else:
+            slices.append('')
     return slices
 
 
@@ -169,6 +172,7 @@ if __name__ == '__main__':
     if args.output_local:
         keys_by_onset = postprocess_local_keys(outputs[1])
         print('{}\n{}'.format(outputs[0], keys_by_onset))
-        # if args.annotate_file:
+        if args.annotate_file:
+            input_format.annotate_local_keys(args.input, keys_by_onset)
     else:
         print(outputs[0])
