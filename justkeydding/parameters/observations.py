@@ -2,9 +2,12 @@
 class Observations(object):
     def __init__(self, slices=None):
         self.slices = []
+        self._sequence = []
         if slices:
-            for l in slices:
-                self.append(l)
+            for slic in slices:
+                self.append(slic)
+                for elem in slic:
+                    self._sequence.append(elem)
 
     def append(self, l):
         try:
@@ -17,17 +20,14 @@ class Observations(object):
         self.slices.append(l)
 
     def __iter__(self):
-        for _, slic in enumerate(self.slices):
-            for elem in slic:
-                yield elem
+        for elem in self._sequence:
+            yield elem
 
     def __getitem__(self, key):
-        l = [elem for slic in self.slices for elem in slic]
-        return l[key]
+        return self._sequence[key]
 
     def __len__(self):
-        l = [elem for slic in self.slices for elem in slic]
-        return len(l)
+        return len(self._sequence)
 
     def slice_indexes(self):
         for idx, slic in enumerate(self.slices):

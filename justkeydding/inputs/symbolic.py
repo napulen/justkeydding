@@ -7,7 +7,7 @@ def parse_file(filename):
     s = music21.converter.parse(filename)
     c = s.chordify()
     slices = []
-    for ev in c.flat.notesAndRests:
+    for ev in c.flat.notes:
         if type(ev) == music21.chord.Chord:
             slic = [n.pitch.pitchClass for n in ev]
         elif type(ev) == music21.note.Note:
@@ -24,11 +24,11 @@ def annotate_local_keys(filename, local_keys):
     c.partName = 'Local keys'
     c.partAbbreviation = 'Local keys'
     s.append(c)
-    events = c.flat.notesAndRests
+    events = c.flat.notes
     if len(events) != len(local_keys):
         print(len(events), len(local_keys))
         raise ValueError('Expected same slice/local keys length.')
-    for idx, ev in enumerate(c.flat.notesAndRests):
+    for idx, ev in enumerate(events):
         if type(ev) == music21.chord.Chord:
             key = local_keys[idx]
             ev._notes = [music21.note.Note(key)]
