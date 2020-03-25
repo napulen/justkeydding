@@ -16,7 +16,7 @@ def parse_file(filename):
         else:
             slic = []
         slices.append(slic)
-        times.append(ev.offset)
+        times.append(eval(str(ev.offset)))
     return slices, times
 
 

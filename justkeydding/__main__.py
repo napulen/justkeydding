@@ -170,13 +170,16 @@ if __name__ == '__main__':
         args.key_profile_minor,
         args.key_transition
     )
-    if args.output_local:
+    if args.json_output:
         keys_by_onset = postprocess_local_keys(outputs[1])
-        print(outputs[0])
         keys_by_onset_index = {input_sequence.times[i]: keys_by_onset[i] for i in range(len(keys_by_onset))}
         output = {'global_key': outputs[0], 'local_keys': keys_by_onset_index}
         print(json.dumps(output))
         if args.annotate_file:
             input_format.annotate_local_keys(args.input, keys_by_onset)
+    elif args.output_local:
+        keys_by_onset = postprocess_local_keys(outputs[1])
+        print(outputs[0])
+        print('{}'.format(keys_by_onset))
     else:
         print(outputs[0])

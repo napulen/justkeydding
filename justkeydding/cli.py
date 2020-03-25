@@ -66,5 +66,12 @@ def parse_args():
         action='store_const',
         help='Annotate the input file'
     )
+    parser.add_argument(
+        '--json',
+        dest='json_output',
+        const=True,
+        action='store_const',
+        help='Output the local/global features in json format'
+    )
     args = parser.parse_args()
     return args
