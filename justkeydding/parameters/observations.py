@@ -1,7 +1,8 @@
 
 class Observations(object):
-    def __init__(self, slices=None):
+    def __init__(self, slices=None, times=None):
         self.slices = []
+        self.times = times
         self._sequence = []
         if slices:
             for slic in slices:

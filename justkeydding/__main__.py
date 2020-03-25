@@ -11,6 +11,7 @@ import justkeydding.parameters.key_transitions as kt
 import justkeydding.parameters.key_profiles as kp
 from justkeydding.parameters.observations import Observations
 import justkeydding.cli
+import json
 
 import numpy as np
 from collections import Counter
@@ -62,8 +63,8 @@ def extract_input_sequence(input_file, is_sequence=False):
         # TODO: Implement this for new format of input sequences
         input_sequence = [int(s) for s in input_file.split(',')]
     else:
-        input_sequence = input_format.parse_file(input_file)
-    return Observations(input_sequence)
+        input_sequence, times = input_format.parse_file(input_file)
+    return Observations(input_sequence, times)
 
 
 def mylog(x):
@@ -171,7 +172,10 @@ if __name__ == '__main__':
     )
     if args.output_local:
         keys_by_onset = postprocess_local_keys(outputs[1])
-        print('{}\n{}'.format(outputs[0], keys_by_onset))
+        print(outputs[0])
+        keys_by_onset_index = {input_sequence.times[i]: keys_by_onset[i] for i in range(len(keys_by_onset))}
+        output = {'global_key': outputs[0], 'local_keys': keys_by_onset_index}
+        print(json.dumps(output))
         if args.annotate_file:
             input_format.annotate_local_keys(args.input, keys_by_onset)
     else:

@@ -7,6 +7,7 @@ def parse_file(filename):
     s = music21.converter.parse(filename)
     c = s.chordify()
     slices = []
+    times = []
     for ev in c.flat.notes:
         if type(ev) == music21.chord.Chord:
             slic = [n.pitch.pitchClass for n in ev]
@@ -15,7 +16,8 @@ def parse_file(filename):
         else:
             slic = []
         slices.append(slic)
-    return slices
+        times.append(ev.offset)
+    return slices, times
 
 
 def annotate_local_keys(filename, local_keys):
