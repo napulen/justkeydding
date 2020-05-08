@@ -28,6 +28,7 @@ def parse_args():
         dest='key_transition',
         choices=[
             'ktg_exponential10',
+            'ktg_exponential15',
             'ktg_exponential2'
         ],
         default='ktg_exponential10',
@@ -42,6 +43,8 @@ def parse_args():
             'sapp',
             'bellman_budge',
             'temperley',
+            'albrecht_shanahan1',
+            'albrecht_shanahan2',
         ],
         default='sapp',
         help='Major key profile to use as emission probability distribution'
@@ -55,6 +58,8 @@ def parse_args():
             'sapp',
             'bellman_budge',
             'temperley',
+            'albrecht_shanahan1',
+            'albrecht_shanahan2',
         ],
         default='sapp',
         help='Minor key profile to use as emission probability distribution'
