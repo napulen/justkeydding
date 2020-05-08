@@ -45,6 +45,7 @@ def parse_args():
             'temperley',
             'albrecht_shanahan1',
             'albrecht_shanahan2',
+            'simple_harmonic_minor'
         ],
         default='sapp',
         help='Major key profile to use as emission probability distribution'
@@ -60,6 +61,7 @@ def parse_args():
             'temperley',
             'albrecht_shanahan1',
             'albrecht_shanahan2',
+            'simple_harmonic_minor',
         ],
         default='sapp',
         help='Minor key profile to use as emission probability distribution'
