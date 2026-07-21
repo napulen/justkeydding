@@ -52,13 +52,13 @@ def ga_runner(dataset, population_size, initial_key_profiles, initial_key_transi
     key_profiles = initial_key_profiles
     key_profiles_length = len(key_profiles)
     if population_size < key_profiles_length:
-        logger.warn('Size of initial population of key profiles greater than population size, extending population size to {}.'.format(key_profiles_length))
+        logger.warning('Size of initial population of key profiles greater than population size, extending population size to {}.'.format(key_profiles_length))
         population_size = key_profiles_length
     # Same for the key transitions
     key_transitions = initial_key_transitions
     key_transitions_length = len(key_transitions)
     if population_size < key_transitions_length:
-        logger.warn('Size of initial population of key transitions greater than population size, extending population size to {}.'.format(key_transitions_length))
+        logger.warning('Size of initial population of key transitions greater than population size, extending population size to {}.'.format(key_transitions_length))
         population_size = key_transitions_length
     # Generate the remaining slots available
     # remaining_key_profiles = population_size - key_profiles_length
@@ -130,13 +130,13 @@ def ga_runner(dataset, population_size, initial_key_profiles, initial_key_transi
                 keep_key_profiles(key_profiles)
                 log_key_profiles_dict()
             else:
-                logger.warn('Performance was worst in this generation')
+                logger.warning('Performance was worst in this generation')
                 bad_generation_counter += 1
                 flush_key_profiles([k for k in new_key_profiles if k not in key_profiles])
                 if bad_generation_counter > evolution_swap_threshold:
                     evolution_mode = 'key_transitions'
                     bad_generation_counter = 0
-                    logger.warn("Changing evolution mode to {}".format(evolution_mode))
+                    logger.warning("Changing evolution mode to {}".format(evolution_mode))
             kp_generation += 1
         elif evolution_mode == 'key_transitions':
             new_key_transitions = evo.evolve_key_transitions(key_transitions)
@@ -162,16 +162,16 @@ def ga_runner(dataset, population_size, initial_key_profiles, initial_key_transi
                 keep_key_transitions(key_transitions)
                 log_key_transitions_dict()
             else:
-                logger.warn('Performance was worst in this generation')
+                logger.warning('Performance was worst in this generation')
                 bad_generation_counter += 1
                 flush_key_transitions([k for k in new_key_transitions if k not in key_transitions])
                 if bad_generation_counter > evolution_swap_threshold:
                     evolution_mode = 'key_profiles'
                     bad_generation_counter = 0
-                    logger.warn("Changing evolution mode to {}".format(evolution_mode))
+                    logger.warning("Changing evolution mode to {}".format(evolution_mode))
             kt_generation += 1
         logger.info('Best key_profile,key_transition pair ({}, {})'.format(best_key_profile, best_key_transition))
-    logger.warn('Optimization concluded, best (key_profile, key_transition) pair is ({},{})'.format(best_key_profile, best_key_transition))
+    logger.warning('Optimization concluded, best (key_profile, key_transition) pair is ({},{})'.format(best_key_profile, best_key_transition))
 
 
 if __name__ == '__main__':
